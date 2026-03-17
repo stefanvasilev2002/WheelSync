@@ -1,0 +1,61 @@
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  color: #1a1a2e;
+
+  mat-icon {
+    color: #3f51b5;
+  }
+}
+
+.vehicle-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5f7ff;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 500;
+  color: #3f51b5;
+  margin-bottom: 16px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0;
+  color: #666;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+mat-dialog-content {
+  min-width: 380px;
+  padding-top: 8px !important;
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  gap: 8px;
+
+  button {
+    border-radius: 8px;
+    padding: 0 20px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}

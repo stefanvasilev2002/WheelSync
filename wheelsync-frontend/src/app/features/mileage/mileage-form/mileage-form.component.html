@@ -1,0 +1,110 @@
+<div class="page-container">
+  <div class="page-header">
+    <button mat-icon-button routerLink="/mileage" class="back-btn">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h1 class="page-title">Внеси километри</h1>
+      <p class="page-subtitle">Евидентирање на изминато патување</p>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>speed</mat-icon>
+        <mat-card-title>Детали за патувањето</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-grid">
+          <!-- Vehicle select -->
+          <mat-form-field appearance="outline" class="span-2">
+            <mat-label>Возило *</mat-label>
+            <mat-icon matPrefix>directions_car</mat-icon>
+            <mat-select formControlName="vehicleId">
+              @if (loadingVehicles()) {
+                <mat-option disabled>Се вчитуваат возилата...</mat-option>
+              }
+              @for (v of vehicles(); track v.id) {
+                <mat-option [value]="v.id">
+                  {{ v.make }} {{ v.model }} — {{ v.licensePlate }}
+                </mat-option>
+              }
+            </mat-select>
+            @if (getFieldError('vehicleId')) {
+              <mat-error>{{ getFieldError('vehicleId') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Date -->
+          <mat-form-field appearance="outline">
+            <mat-label>Датум *</mat-label>
+            <mat-icon matPrefix>calendar_today</mat-icon>
+            <input matInput [matDatepicker]="picker" formControlName="date">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            @if (getFieldError('date')) {
+              <mat-error>{{ getFieldError('date') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Distance preview -->
+          @if (calculatedDistance() > 0) {
+            <div class="distance-preview">
+              <mat-icon>straighten</mat-icon>
+              <div>
+                <span class="distance-label">Пресметано растојание</span>
+                <span class="distance-value">{{ calculatedDistance() | number }} km</span>
+              </div>
+            </div>
+          }
+
+          <!-- Start mileage -->
+          <mat-form-field appearance="outline">
+            <mat-label>Почетна километража *</mat-label>
+            <mat-icon matPrefix>trip_origin</mat-icon>
+            <input matInput type="number" formControlName="startMileage" placeholder="0">
+            <span matSuffix>km</span>
+            @if (getFieldError('startMileage')) {
+              <mat-error>{{ getFieldError('startMileage') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- End mileage -->
+          <mat-form-field appearance="outline">
+            <mat-label>Крајна километража *</mat-label>
+            <mat-icon matPrefix>place</mat-icon>
+            <input matInput type="number" formControlName="endMileage" placeholder="0">
+            <span matSuffix>km</span>
+            @if (getFieldError('endMileage')) {
+              <mat-error>{{ getFieldError('endMileage') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Note -->
+          <mat-form-field appearance="outline" class="span-2">
+            <mat-label>Белешка</mat-label>
+            <mat-icon matPrefix>notes</mat-icon>
+            <textarea matInput formControlName="note" rows="3"
+                      placeholder="Опис на патувањето..."></textarea>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="form-actions">
+      <button mat-stroked-button type="button" routerLink="/mileage">
+        <mat-icon>close</mat-icon>
+        Откажи
+      </button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+        @if (saving()) {
+          <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
+        } @else {
+          <mat-icon>save</mat-icon>
+        }
+        Зачувај запис
+      </button>
+    </div>
+  </form>
+</div>

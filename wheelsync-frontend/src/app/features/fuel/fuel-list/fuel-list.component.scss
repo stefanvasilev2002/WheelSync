@@ -1,0 +1,240 @@
+.page-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .header-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: #f57c00;
+  }
+
+  .page-title {
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a2e;
+  }
+
+  .page-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 4px 0 0;
+  }
+
+  .add-btn {
+    border-radius: 8px;
+    height: 42px;
+    padding: 0 20px;
+    font-weight: 500;
+  }
+}
+
+.stats-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+
+  .stat-card {
+    flex: 0 0 220px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+    mat-card-content {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px !important;
+    }
+  }
+
+  .stat-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    mat-icon {
+      color: white;
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+
+    &.orange { background: linear-gradient(135deg, #f57c00, #ffb74d); }
+    &.blue { background: linear-gradient(135deg, #1565c0, #42a5f5); }
+    &.green { background: linear-gradient(135deg, #2e7d32, #66bb6a); }
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: #888;
+    margin: 0 0 2px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 0;
+  color: #666;
+  gap: 16px;
+}
+
+.table-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.fuel-table {
+  width: 100%;
+
+  th.mat-header-cell {
+    font-weight: 600;
+    color: #555;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #fafafa;
+    border-bottom: 2px solid #e0e0e0;
+    padding: 12px 14px;
+    white-space: nowrap;
+  }
+
+  td.mat-cell {
+    padding: 11px 14px;
+  }
+}
+
+.table-row:hover {
+  background: #fff8f0;
+}
+
+.vehicle-cell,
+.person-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #f57c00;
+  }
+}
+
+.date-badge {
+  background: #f5f5f5;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #555;
+}
+
+.fuel-chip {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+
+  &.fuel-petrol { background: #fff3e0; color: #e65100; }
+  &.fuel-diesel { background: #e8f5e9; color: #2e7d32; }
+  &.fuel-lpg { background: #e3f2fd; color: #1565c0; }
+  &.fuel-electric { background: #f3e5f5; color: #6a1b9a; }
+  &.fuel-hybrid { background: #e0f2f1; color: #00695c; }
+}
+
+.quantity-cell {
+  font-weight: 600;
+  color: #f57c00;
+}
+
+.total-price {
+  font-weight: 700;
+  color: #1565c0;
+}
+
+.consumption-badge {
+  background: #e3f2fd;
+  color: #1565c0;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.no-data {
+  color: #ccc;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 0;
+  gap: 12px;
+  color: #aaa;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    opacity: 0.4;
+  }
+
+  h3 {
+    font-size: 20px;
+    margin: 0;
+    color: #666;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: #999;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-container { padding: 16px; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .stats-row { flex-wrap: wrap; }
+  .stat-card { flex: 1 1 140px; }
+}

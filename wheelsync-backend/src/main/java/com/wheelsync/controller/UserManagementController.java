@@ -1,0 +1,57 @@
+package com.wheelsync.controller;
+
+import com.wheelsync.dto.common.ApiResponse;
+import com.wheelsync.dto.user.UserResponse;
+import com.wheelsync.dto.user.UserUpdateRequest;
+import com.wheelsync.security.UserPrincipal;
+import com.wheelsync.service.UserManagementService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
+public class UserManagementController {
+
+    private final UserManagementService userManagementService;
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'FLEET_MANAGER')")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAll(
+            @AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(ApiResponse.ok(userManagementService.getAll(principal)));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FLEET_MANAGER')")
+    public ResponseEntity<ApiResponse<UserResponse>> getById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(ApiResponse.ok(userManagementService.getById(id, principal)));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<UserResponse>> update(
+            @PathVariable Long id,
+            @Valid @RequestBody UserUpdateRequest request,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        UserResponse response = userManagementService.update(id, request, principal);
+        return ResponseEntity.ok(ApiResponse.ok("Корисникот е успешно ажуриран", response));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deactivate(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        userManagementService.deactivate(id, principal);
+        return ResponseEntity.ok(ApiResponse.ok("Корисникот е успешно деактивиран"));
+    }
+}

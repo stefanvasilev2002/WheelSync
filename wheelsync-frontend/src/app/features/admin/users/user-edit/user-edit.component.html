@@ -1,0 +1,107 @@
+<div class="page-container">
+  <div class="page-header">
+    <button mat-icon-button routerLink="/admin/users" class="back-btn">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h1 class="page-title">Уреди корисник</h1>
+      <p class="page-subtitle">Ажурирање на податоците за корисникот</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-wrapper">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>manage_accounts</mat-icon>
+          <mat-card-title>Лични податоци</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-grid">
+
+            <!-- First name -->
+            <mat-form-field appearance="outline">
+              <mat-label>Ime *</mat-label>
+              <mat-icon matPrefix>person</mat-icon>
+              <input matInput formControlName="firstName" placeholder="Внеси ime...">
+              @if (getFieldError('firstName')) {
+                <mat-error>{{ getFieldError('firstName') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Last name -->
+            <mat-form-field appearance="outline">
+              <mat-label>Презиме *</mat-label>
+              <mat-icon matPrefix>person</mat-icon>
+              <input matInput formControlName="lastName" placeholder="Внеси презиме...">
+              @if (getFieldError('lastName')) {
+                <mat-error>{{ getFieldError('lastName') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Phone -->
+            <mat-form-field appearance="outline">
+              <mat-label>Телефон</mat-label>
+              <mat-icon matPrefix>phone</mat-icon>
+              <input matInput formControlName="phone" placeholder="+389 ...">
+            </mat-form-field>
+
+            <!-- Role -->
+            <mat-form-field appearance="outline">
+              <mat-label>Улога *</mat-label>
+              <mat-icon matPrefix>badge</mat-icon>
+              <mat-select formControlName="role">
+                @for (r of roles; track r.value) {
+                  <mat-option [value]="r.value">{{ r.label }}</mat-option>
+                }
+              </mat-select>
+              @if (getFieldError('role')) {
+                <mat-error>{{ getFieldError('role') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Company -->
+            <mat-form-field appearance="outline">
+              <mat-label>Компанија</mat-label>
+              <mat-icon matPrefix>business</mat-icon>
+              <mat-select formControlName="companyId">
+                <mat-option [value]="null">— Без компанија —</mat-option>
+                @for (c of companies(); track c.id) {
+                  <mat-option [value]="c.id">{{ c.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <!-- Active toggle -->
+            <div class="toggle-field">
+              <label class="toggle-label">Статус на корисникот</label>
+              <mat-slide-toggle formControlName="isActive" color="primary">
+                {{ form.get('isActive')?.value ? 'Активен' : 'Неактивен' }}
+              </mat-slide-toggle>
+            </div>
+
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="form-actions">
+        <button mat-stroked-button type="button" routerLink="/admin/users">
+          <mat-icon>close</mat-icon>
+          Откажи
+        </button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+          @if (saving()) {
+            <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
+          } @else {
+            <mat-icon>save</mat-icon>
+          }
+          Зачувај промени
+        </button>
+      </div>
+    </form>
+  }
+</div>

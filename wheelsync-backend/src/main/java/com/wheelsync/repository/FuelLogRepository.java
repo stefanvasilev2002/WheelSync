@@ -18,4 +18,6 @@ public interface FuelLogRepository extends JpaRepository<FuelLog, Long> {
     Optional<FuelLog> findLastRefuelByVehicleId(@Param("vehicleId") Long vehicleId);
 
     long countByVehicleId(Long vehicleId);
+
+    List<FuelLog> findByVehicleCompanyIdOrderByDateDesc(Long companyId);
 }

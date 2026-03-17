@@ -1,0 +1,135 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="header-icon">speed</mat-icon>
+      <div>
+        <h1 class="page-title">Евиденција на километри</h1>
+        <p class="page-subtitle">Преглед на патувања и поминати километри</p>
+      </div>
+    </div>
+    <a mat-raised-button color="primary" routerLink="/mileage/new" class="add-btn">
+      <mat-icon>add</mat-icon>
+      Внеси км
+    </a>
+  </div>
+
+  <!-- Stats Row -->
+  @if (!loading() && logs().length > 0) {
+    <div class="stats-row">
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon-wrap blue">
+            <mat-icon>route</mat-icon>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Вкупно km</p>
+            <p class="stat-value">{{ totalDistance() | number }} km</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-icon-wrap green">
+            <mat-icon>list</mat-icon>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Записи</p>
+            <p class="stat-value">{{ logs().length }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Се вчитуваат записите...</p>
+    </div>
+  }
+
+  @if (!loading()) {
+    <mat-card class="table-card">
+      <mat-card-content>
+        @if (logs().length === 0) {
+          <div class="empty-state">
+            <mat-icon>speed</mat-icon>
+            <h3>Нема евидентирани километри</h3>
+            <p>Кликнете "Внеси км" за да додадете прв запис</p>
+            <a mat-raised-button color="primary" routerLink="/mileage/new">
+              <mat-icon>add</mat-icon>
+              Внеси км
+            </a>
+          </div>
+        } @else {
+          <div class="table-wrapper">
+            <table mat-table [dataSource]="logs()" class="mileage-table">
+
+              @if (isManager()) {
+                <ng-container matColumnDef="driver">
+                  <th mat-header-cell *matHeaderCellDef>Возач</th>
+                  <td mat-cell *matCellDef="let row">
+                    <div class="driver-cell">
+                      <mat-icon>person</mat-icon>
+                      {{ row.driverName }}
+                    </div>
+                  </td>
+                </ng-container>
+              }
+
+              <ng-container matColumnDef="vehicle">
+                <th mat-header-cell *matHeaderCellDef>Возило</th>
+                <td mat-cell *matCellDef="let row">
+                  <div class="vehicle-cell">
+                    <mat-icon>directions_car</mat-icon>
+                    {{ row.vehicleDisplayName }}
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef>Датум</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="date-badge">{{ row.date }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="startMileage">
+                <th mat-header-cell *matHeaderCellDef>Почеток km</th>
+                <td mat-cell *matCellDef="let row">{{ row.startMileage | number }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="endMileage">
+                <th mat-header-cell *matHeaderCellDef>Крај km</th>
+                <td mat-cell *matCellDef="let row">{{ row.endMileage | number }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="distance">
+                <th mat-header-cell *matHeaderCellDef>Растојание</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="distance-chip">
+                    <mat-icon>straighten</mat-icon>
+                    {{ row.distance | number }} km
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="note">
+                <th mat-header-cell *matHeaderCellDef>Белешка</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="note-text" [matTooltip]="row.note">
+                    {{ row.note || '—' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns();" class="table-row"></tr>
+            </table>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

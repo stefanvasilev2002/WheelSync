@@ -1,0 +1,149 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <button mat-icon-button routerLink="/vehicles" class="back-btn">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h1 class="page-title">{{ isEditMode() ? 'Уреди возило' : 'Додај возило' }}</h1>
+      <p class="page-subtitle">{{ isEditMode() ? 'Ажурирање на податоците за возилото' : 'Внесување на ново возило во флотата' }}</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <!-- Basic Info Card -->
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>info</mat-icon>
+          <mat-card-title>Основни информации</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Марка *</mat-label>
+              <input matInput formControlName="make" placeholder="пр. Toyota, BMW...">
+              @if (getFieldError('make')) {
+                <mat-error>{{ getFieldError('make') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Модел *</mat-label>
+              <input matInput formControlName="model" placeholder="пр. Corolla, X5...">
+              @if (getFieldError('model')) {
+                <mat-error>{{ getFieldError('model') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Година *</mat-label>
+              <input matInput type="number" formControlName="year" placeholder="пр. 2020">
+              @if (getFieldError('year')) {
+                <mat-error>{{ getFieldError('year') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Боја</mat-label>
+              <input matInput formControlName="color" placeholder="пр. Бела, Сребрена...">
+              @if (getFieldError('color')) {
+                <mat-error>{{ getFieldError('color') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Registration Card -->
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>article</mat-icon>
+          <mat-card-title>Регистрација и идентификација</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>VIN број *</mat-label>
+              <input matInput formControlName="vin" placeholder="17 карактери" maxlength="17">
+              <mat-hint>Точно 17 карактери</mat-hint>
+              @if (getFieldError('vin')) {
+                <mat-error>{{ getFieldError('vin') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Регистарски број *</mat-label>
+              <input matInput formControlName="licensePlate" placeholder="пр. SK-1234-AB">
+              @if (getFieldError('licensePlate')) {
+                <mat-error>{{ getFieldError('licensePlate') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Technical Card -->
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>build</mat-icon>
+          <mat-card-title>Технички податоци</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Вид гориво *</mat-label>
+              <mat-select formControlName="fuelType">
+                @for (ft of fuelTypes; track ft.value) {
+                  <mat-option [value]="ft.value">{{ ft.label }}</mat-option>
+                }
+              </mat-select>
+              @if (getFieldError('fuelType')) {
+                <mat-error>{{ getFieldError('fuelType') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Тип на мотор</mat-label>
+              <input matInput formControlName="engineType" placeholder="пр. 2.0 TDI, 1.6 бензин...">
+              @if (getFieldError('engineType')) {
+                <mat-error>{{ getFieldError('engineType') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Тековна километража *</mat-label>
+              <input matInput type="number" formControlName="currentMileage" placeholder="0">
+              <mat-hint>Внесете тековната километража на возилото</mat-hint>
+              @if (getFieldError('currentMileage')) {
+                <mat-error>{{ getFieldError('currentMileage') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button mat-stroked-button type="button" routerLink="/vehicles">
+          <mat-icon>close</mat-icon>
+          Откажи
+        </button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+          @if (saving()) {
+            <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
+          } @else {
+            <mat-icon>save</mat-icon>
+          }
+          {{ isEditMode() ? 'Зачувај промени' : 'Додај возило' }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

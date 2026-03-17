@@ -1,0 +1,319 @@
+<div class="page-container">
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading() && vehicle()) {
+    <!-- Header -->
+    <div class="page-header">
+      <button mat-icon-button routerLink="/vehicles" class="back-btn">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="vehicle-icon-wrapper">
+        <mat-icon>directions_car</mat-icon>
+      </div>
+      <div class="header-info">
+        <h1 class="page-title">{{ vehicle()!.make }} {{ vehicle()!.model }}</h1>
+        <p class="page-subtitle">
+          <span class="license-plate">{{ vehicle()!.licensePlate }}</span>
+          <span class="year-badge">{{ vehicle()!.year }}</span>
+          <span class="status-chip" [class.active]="vehicle()!.isActive" [class.inactive]="!vehicle()!.isActive">
+            {{ vehicle()!.isActive ? 'Активно' : 'Неактивно' }}
+          </span>
+        </p>
+      </div>
+      @if (isAdminOrManager()) {
+        <div class="header-actions">
+          <a mat-stroked-button [routerLink]="['/vehicles', vehicle()!.id, 'edit']">
+            <mat-icon>edit</mat-icon>
+            Уреди
+          </a>
+        </div>
+      }
+    </div>
+
+    <!-- Tabs -->
+    <mat-tab-group animationDuration="200ms" class="detail-tabs">
+
+      <!-- Info Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">info</mat-icon>
+          Информации
+        </ng-template>
+
+        <div class="tab-content">
+          <div class="info-grid">
+            <!-- Basic Info Card -->
+            <mat-card class="info-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>directions_car</mat-icon>
+                  Основни податоци
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="info-row">
+                  <span class="info-label">Марка</span>
+                  <span class="info-value">{{ vehicle()!.make }}</span>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="info-row">
+                  <span class="info-label">Модел</span>
+                  <span class="info-value">{{ vehicle()!.model }}</span>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="info-row">
+                  <span class="info-label">Година</span>
+                  <span class="info-value">{{ vehicle()!.year }}</span>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="info-row">
+                  <span class="info-label">Боја</span>
+                  <span class="info-value">{{ vehicle()!.color || '—' }}</span>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="info-row">
+                  <span class="info-label">Тип мотор</span>
+                  <span class="info-value">{{ vehicle()!.engineType || '—' }}</span>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Tech Info Card -->
+            <mat-card class="info-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>build</mat-icon>
+                  Технички податоци
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="info-row">
+                  <span class="info-label">VIN број</span>
+                  <span class="info-value vin">{{ vehicle()!.vin }}</span>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="info-row">
+                  <span class="info-label">Рег. таблица</span>
+                  <span class="info-value">
+                    <span class="license-plate-display">{{ vehicle()!.licensePlate }}</span>
+                  </span>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="info-row">
+                  <span class="info-label">Гориво</span>
+                  <span class="info-value">{{ fuelTypeLabels[vehicle()!.fuelType] }}</span>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="info-row">
+                  <span class="info-label">Тековни km</span>
+                  <span class="info-value mileage">
+                    <mat-icon>speed</mat-icon>
+                    {{ vehicle()!.currentMileage | number }} km
+                  </span>
+                </div>
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Assignment Card -->
+            <mat-card class="info-card assignment-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>person</mat-icon>
+                  Тековен возач
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                @if (vehicle()!.assignedDriverName) {
+                  <div class="driver-info">
+                    <div class="driver-avatar">
+                      <mat-icon>person</mat-icon>
+                    </div>
+                    <div>
+                      <p class="driver-name">{{ vehicle()!.assignedDriverName }}</p>
+                      <p class="driver-label">Активен возач</p>
+                    </div>
+                  </div>
+                  @if (isAdminOrManager()) {
+                    <button mat-stroked-button color="warn" class="unassign-btn" (click)="unassignDriver()">
+                      <mat-icon>person_remove</mat-icon>
+                      Отдодели возач
+                    </button>
+                  }
+                } @else {
+                  <div class="no-driver">
+                    <mat-icon>person_off</mat-icon>
+                    <p>Нема доделен возач</p>
+                  </div>
+                  @if (isAdminOrManager()) {
+                    <button mat-raised-button color="primary" (click)="openAssignDialog()">
+                      <mat-icon>person_add</mat-icon>
+                      Додели возач
+                    </button>
+                  }
+                }
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Assignment History Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">history</mat-icon>
+          Историја на доделување
+        </ng-template>
+        <div class="tab-content">
+          @if (assignments().length === 0) {
+            <div class="empty-tab">
+              <mat-icon>history</mat-icon>
+              <p>Нема историја на доделување</p>
+            </div>
+          } @else {
+            <mat-card class="table-card">
+              <mat-card-content>
+                <table mat-table [dataSource]="assignments()" class="detail-table">
+                  <ng-container matColumnDef="driverName">
+                    <th mat-header-cell *matHeaderCellDef>Возач</th>
+                    <td mat-cell *matCellDef="let row">
+                      <div class="driver-cell">
+                        <mat-icon>person</mat-icon>
+                        <div>
+                          <span class="driver-name-cell">{{ row.driverName }}</span>
+                          <span class="driver-email-cell">{{ row.driverEmail }}</span>
+                        </div>
+                      </div>
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="assignedDate">
+                    <th mat-header-cell *matHeaderCellDef>Доделен на</th>
+                    <td mat-cell *matCellDef="let row">{{ row.assignedDate }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="unassignedDate">
+                    <th mat-header-cell *matHeaderCellDef>Отдоделен на</th>
+                    <td mat-cell *matCellDef="let row">{{ row.unassignedDate || '—' }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef>Статус</th>
+                    <td mat-cell *matCellDef="let row">
+                      <span class="status-chip" [class.active]="row.isActive" [class.inactive]="!row.isActive">
+                        {{ row.isActive ? 'Активен' : 'Завршен' }}
+                      </span>
+                    </td>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="assignmentColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: assignmentColumns;"></tr>
+                </table>
+              </mat-card-content>
+            </mat-card>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- Mileage Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">speed</mat-icon>
+          Километри
+        </ng-template>
+        <div class="tab-content">
+          @if (mileageLogs().length === 0) {
+            <div class="empty-tab">
+              <mat-icon>speed</mat-icon>
+              <p>Нема евидентирани километри</p>
+            </div>
+          } @else {
+            <mat-card class="table-card">
+              <mat-card-content>
+                <table mat-table [dataSource]="mileageLogs()" class="detail-table">
+                  <ng-container matColumnDef="date">
+                    <th mat-header-cell *matHeaderCellDef>Датум</th>
+                    <td mat-cell *matCellDef="let row">{{ row.date }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="startMileage">
+                    <th mat-header-cell *matHeaderCellDef>Почеток km</th>
+                    <td mat-cell *matCellDef="let row">{{ row.startMileage | number }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="endMileage">
+                    <th mat-header-cell *matHeaderCellDef>Крај km</th>
+                    <td mat-cell *matCellDef="let row">{{ row.endMileage | number }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="distance">
+                    <th mat-header-cell *matHeaderCellDef>Растојание</th>
+                    <td mat-cell *matCellDef="let row">
+                      <span class="distance-badge">{{ row.distance | number }} km</span>
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="note">
+                    <th mat-header-cell *matHeaderCellDef>Белешка</th>
+                    <td mat-cell *matCellDef="let row">{{ row.note || '—' }}</td>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="mileageColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: mileageColumns;"></tr>
+                </table>
+              </mat-card-content>
+            </mat-card>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- Fuel Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">local_gas_station</mat-icon>
+          Танкирања
+        </ng-template>
+        <div class="tab-content">
+          @if (fuelLogs().length === 0) {
+            <div class="empty-tab">
+              <mat-icon>local_gas_station</mat-icon>
+              <p>Нема евидентирани танкирања</p>
+            </div>
+          } @else {
+            <mat-card class="table-card">
+              <mat-card-content>
+                <div class="table-wrapper">
+                  <table mat-table [dataSource]="fuelLogs()" class="detail-table">
+                    <ng-container matColumnDef="date">
+                      <th mat-header-cell *matHeaderCellDef>Датум</th>
+                      <td mat-cell *matCellDef="let row">{{ row.date }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="fuelType">
+                      <th mat-header-cell *matHeaderCellDef>Гориво</th>
+                      <td mat-cell *matCellDef="let row">{{ fuelTypeLabels[row.fuelType] }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="quantityLiters">
+                      <th mat-header-cell *matHeaderCellDef>Количина (L)</th>
+                      <td mat-cell *matCellDef="let row">{{ row.quantityLiters | number:'1.2-2' }} L</td>
+                    </ng-container>
+                    <ng-container matColumnDef="pricePerLiter">
+                      <th mat-header-cell *matHeaderCellDef>Цена/л</th>
+                      <td mat-cell *matCellDef="let row">{{ row.pricePerLiter | number:'1.2-2' }} МКД</td>
+                    </ng-container>
+                    <ng-container matColumnDef="totalPrice">
+                      <th mat-header-cell *matHeaderCellDef>Вкупно</th>
+                      <td mat-cell *matCellDef="let row">
+                        <span class="total-price">{{ row.totalPrice | number:'1.0-0' }} МКД</span>
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="mileageAtRefuel">
+                      <th mat-header-cell *matHeaderCellDef>км при полнење</th>
+                      <td mat-cell *matCellDef="let row">{{ row.mileageAtRefuel | number }}</td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="fuelColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: fuelColumns;"></tr>
+                  </table>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          }
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  }
+</div>

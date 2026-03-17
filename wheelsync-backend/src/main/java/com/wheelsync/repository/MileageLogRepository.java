@@ -19,4 +19,6 @@ public interface MileageLogRepository extends JpaRepository<MileageLog, Long> {
 
     @Query("SELECT MAX(m.endMileage) FROM MileageLog m WHERE m.vehicle.id = :vehicleId")
     Optional<Integer> findMaxEndMileageByVehicleId(@Param("vehicleId") Long vehicleId);
+
+    List<MileageLog> findByVehicleCompanyIdOrderByDateDesc(Long companyId);
 }

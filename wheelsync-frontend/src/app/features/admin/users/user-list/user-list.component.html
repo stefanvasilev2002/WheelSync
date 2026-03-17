@@ -1,0 +1,107 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Корисници</h1>
+      <p class="page-subtitle">Управување со корисници на системот</p>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="toolbar">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Пребарај корисници</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput
+             [ngModel]="searchQuery()"
+             (ngModelChange)="onSearchChange($event)"
+             placeholder="Ime, e-mail, компанија...">
+    </mat-form-field>
+    <div class="toolbar-info">
+      <span class="user-count">{{ filteredUsers().length }} корисници</span>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-wrapper">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  } @else {
+    <mat-card class="table-card">
+      <mat-card-content>
+        @if (filteredUsers().length === 0) {
+          <div class="empty-state">
+            <mat-icon>people</mat-icon>
+            <p>{{ searchQuery() ? 'Нема резултати за пребарувањето' : 'Нема регистрирани корисници' }}</p>
+          </div>
+        } @else {
+          <table mat-table [dataSource]="filteredUsers()" class="users-table">
+
+            <!-- Name column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Корисник</th>
+              <td mat-cell *matCellDef="let u">
+                <div class="user-name">{{ u.firstName }} {{ u.lastName }}</div>
+              </td>
+            </ng-container>
+
+            <!-- Email column -->
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef>E-mail</th>
+              <td mat-cell *matCellDef="let u">{{ u.email }}</td>
+            </ng-container>
+
+            <!-- Role column -->
+            <ng-container matColumnDef="role">
+              <th mat-header-cell *matHeaderCellDef>Улога</th>
+              <td mat-cell *matCellDef="let u">
+                <mat-chip class="role-chip" [class]="'role-' + u.role.toLowerCase()">
+                  {{ getRoleLabel(u.role) }}
+                </mat-chip>
+              </td>
+            </ng-container>
+
+            <!-- Company column -->
+            <ng-container matColumnDef="company">
+              <th mat-header-cell *matHeaderCellDef>Компанија</th>
+              <td mat-cell *matCellDef="let u">{{ u.companyName || '—' }}</td>
+            </ng-container>
+
+            <!-- Status column -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Статус</th>
+              <td mat-cell *matCellDef="let u">
+                @if (u.isActive) {
+                  <mat-chip class="status-chip active-chip">Активен</mat-chip>
+                } @else {
+                  <mat-chip class="status-chip inactive-chip">Неактивен</mat-chip>
+                }
+              </td>
+            </ng-container>
+
+            <!-- Actions column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let u">
+                <div class="action-buttons">
+                  <button mat-icon-button color="primary"
+                          (click)="editUser(u.id)"
+                          matTooltip="Уреди">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button [color]="u.isActive ? 'warn' : 'primary'"
+                          (click)="deactivateUser(u)"
+                          [matTooltip]="u.isActive ? 'Деактивирај' : 'Активирај'">
+                    <mat-icon>{{ u.isActive ? 'person_off' : 'person' }}</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

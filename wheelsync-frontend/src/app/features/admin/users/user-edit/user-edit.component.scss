@@ -1,0 +1,123 @@
+.page-container {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+
+  .back-btn {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+  }
+
+  .page-title {
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a2e;
+  }
+
+  .page-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 4px 0 0;
+  }
+}
+
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 64px 0;
+}
+
+.form-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+
+  mat-card-header {
+    padding: 20px 20px 0;
+
+    mat-icon[mat-card-avatar] {
+      background: linear-gradient(135deg, #4a148c, #9c27b0);
+      color: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    mat-card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  mat-card-content {
+    padding: 20px;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .span-2 {
+    grid-column: 1 / -1;
+  }
+}
+
+.toggle-field {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 0;
+
+  .toggle-label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  button {
+    border-radius: 8px;
+    padding: 0 24px;
+    height: 44px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.btn-spinner {
+  margin-right: 4px;
+}
+
+@media (max-width: 600px) {
+  .page-container { padding: 16px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .span-2 { grid-column: 1; }
+}

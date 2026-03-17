@@ -1,0 +1,77 @@
+<div class="page-container">
+  <div class="page-header">
+    <button mat-icon-button routerLink="/admin/companies" class="back-btn">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h1 class="page-title">{{ isEditMode ? 'Уреди компанија' : 'Нова компанија' }}</h1>
+      <p class="page-subtitle">{{ isEditMode ? 'Ажурирање на податоците за компанијата' : 'Регистрирање на нова компанија' }}</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-wrapper">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>business</mat-icon>
+          <mat-card-title>Податоци за компанијата</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-grid">
+
+            <!-- Name -->
+            <mat-form-field appearance="outline" class="span-2">
+              <mat-label>Naziv на компанијата *</mat-label>
+              <mat-icon matPrefix>business</mat-icon>
+              <input matInput formControlName="name" placeholder="Внеси назив...">
+              @if (getFieldError('name')) {
+                <mat-error>{{ getFieldError('name') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Address -->
+            <mat-form-field appearance="outline" class="span-2">
+              <mat-label>Адреса</mat-label>
+              <mat-icon matPrefix>location_on</mat-icon>
+              <input matInput formControlName="address" placeholder="Улица, број, град...">
+            </mat-form-field>
+
+            <!-- Phone -->
+            <mat-form-field appearance="outline">
+              <mat-label>Телефон</mat-label>
+              <mat-icon matPrefix>phone</mat-icon>
+              <input matInput formControlName="phone" placeholder="+389 ...">
+            </mat-form-field>
+
+            <!-- Contact person -->
+            <mat-form-field appearance="outline">
+              <mat-label>Контакт лице</mat-label>
+              <mat-icon matPrefix>person</mat-icon>
+              <input matInput formControlName="contactPerson" placeholder="Ime и презиме...">
+            </mat-form-field>
+
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="form-actions">
+        <button mat-stroked-button type="button" routerLink="/admin/companies">
+          <mat-icon>close</mat-icon>
+          Откажи
+        </button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+          @if (saving()) {
+            <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
+          } @else {
+            <mat-icon>save</mat-icon>
+          }
+          {{ isEditMode ? 'Зачувај промени' : 'Креирај компанија' }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

@@ -1,0 +1,102 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Компании</h1>
+      <p class="page-subtitle">Управување со регистрирани компании</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="addCompany()">
+      <mat-icon>add</mat-icon>
+      Додај компанија
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-wrapper">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  } @else {
+    <mat-card class="table-card">
+      <mat-card-content>
+        @if (companies().length === 0) {
+          <div class="empty-state">
+            <mat-icon>business</mat-icon>
+            <p>Нема регистрирани компании</p>
+            <button mat-raised-button color="primary" (click)="addCompany()">
+              Додај прва компанија
+            </button>
+          </div>
+        } @else {
+          <table mat-table [dataSource]="companies()" class="companies-table">
+
+            <!-- Name column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Компанија</th>
+              <td mat-cell *matCellDef="let c">
+                <div class="company-name">{{ c.name }}</div>
+                @if (c.address) {
+                  <div class="company-address">{{ c.address }}</div>
+                }
+              </td>
+            </ng-container>
+
+            <!-- Contact person column -->
+            <ng-container matColumnDef="contactPerson">
+              <th mat-header-cell *matHeaderCellDef>Контакт лице</th>
+              <td mat-cell *matCellDef="let c">{{ c.contactPerson || '—' }}</td>
+            </ng-container>
+
+            <!-- Phone column -->
+            <ng-container matColumnDef="phone">
+              <th mat-header-cell *matHeaderCellDef>Телефон</th>
+              <td mat-cell *matCellDef="let c">{{ c.phone || '—' }}</td>
+            </ng-container>
+
+            <!-- User count column -->
+            <ng-container matColumnDef="userCount">
+              <th mat-header-cell *matHeaderCellDef>Корисници</th>
+              <td mat-cell *matCellDef="let c">
+                <mat-chip class="count-chip user-chip">
+                  <mat-icon>people</mat-icon>
+                  {{ c.userCount }}
+                </mat-chip>
+              </td>
+            </ng-container>
+
+            <!-- Vehicle count column -->
+            <ng-container matColumnDef="vehicleCount">
+              <th mat-header-cell *matHeaderCellDef>Возила</th>
+              <td mat-cell *matCellDef="let c">
+                <mat-chip class="count-chip vehicle-chip">
+                  <mat-icon>directions_car</mat-icon>
+                  {{ c.vehicleCount }}
+                </mat-chip>
+              </td>
+            </ng-container>
+
+            <!-- Actions column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let c">
+                <div class="action-buttons">
+                  <button mat-icon-button color="primary"
+                          (click)="editCompany(c.id)"
+                          matTooltip="Уреди">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn"
+                          (click)="deleteCompany(c)"
+                          matTooltip="Избриши">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

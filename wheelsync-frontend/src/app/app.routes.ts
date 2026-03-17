@@ -37,7 +37,82 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
-      // Phase 2+ routes will be added here
+
+      // Vehicles
+      {
+        path: 'vehicles',
+        loadComponent: () =>
+          import('./features/vehicles/vehicle-list/vehicle-list.component').then(m => m.VehicleListComponent)
+      },
+      {
+        path: 'vehicles/new',
+        loadComponent: () =>
+          import('./features/vehicles/vehicle-form/vehicle-form.component').then(m => m.VehicleFormComponent)
+      },
+      {
+        path: 'vehicles/:id',
+        loadComponent: () =>
+          import('./features/vehicles/vehicle-detail/vehicle-detail.component').then(m => m.VehicleDetailComponent)
+      },
+      {
+        path: 'vehicles/:id/edit',
+        loadComponent: () =>
+          import('./features/vehicles/vehicle-form/vehicle-form.component').then(m => m.VehicleFormComponent)
+      },
+
+      // Mileage
+      {
+        path: 'mileage',
+        loadComponent: () =>
+          import('./features/mileage/mileage-list/mileage-list.component').then(m => m.MileageListComponent)
+      },
+      {
+        path: 'mileage/new',
+        loadComponent: () =>
+          import('./features/mileage/mileage-form/mileage-form.component').then(m => m.MileageFormComponent)
+      },
+
+      // Fuel
+      {
+        path: 'fuel',
+        loadComponent: () =>
+          import('./features/fuel/fuel-list/fuel-list.component').then(m => m.FuelListComponent)
+      },
+      {
+        path: 'fuel/new',
+        loadComponent: () =>
+          import('./features/fuel/fuel-form/fuel-form.component').then(m => m.FuelFormComponent)
+      },
+
+      // Admin - Companies
+      {
+        path: 'admin/companies',
+        loadComponent: () =>
+          import('./features/admin/companies/company-list/company-list.component').then(m => m.CompanyListComponent)
+      },
+      {
+        path: 'admin/companies/new',
+        loadComponent: () =>
+          import('./features/admin/companies/company-form/company-form.component').then(m => m.CompanyFormComponent)
+      },
+      {
+        path: 'admin/companies/:id/edit',
+        loadComponent: () =>
+          import('./features/admin/companies/company-form/company-form.component').then(m => m.CompanyFormComponent)
+      },
+
+      // Admin - Users
+      {
+        path: 'admin/users',
+        loadComponent: () =>
+          import('./features/admin/users/user-list/user-list.component').then(m => m.UserListComponent)
+      },
+      {
+        path: 'admin/users/:id/edit',
+        loadComponent: () =>
+          import('./features/admin/users/user-edit/user-edit.component').then(m => m.UserEditComponent)
+      },
+
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

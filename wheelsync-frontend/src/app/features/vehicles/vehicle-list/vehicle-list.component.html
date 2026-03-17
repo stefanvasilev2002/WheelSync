@@ -1,0 +1,163 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="header-icon">directions_car</mat-icon>
+      <div>
+        <h1 class="page-title">Возила</h1>
+        <p class="page-subtitle">Управување со флотата на возила</p>
+      </div>
+    </div>
+    @if (isAdminOrManager()) {
+      <a mat-raised-button color="primary" routerLink="/vehicles/new" class="add-btn">
+        <mat-icon>add</mat-icon>
+        Додај возило
+      </a>
+    }
+  </div>
+
+  <!-- Search Bar -->
+  <mat-card class="search-card">
+    <mat-card-content>
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Пребарај возила</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput
+               [ngModel]="searchQuery()"
+               (ngModelChange)="onSearchChange($event)"
+               placeholder="Марка, модел или рег. таблица...">
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Се вчитуваат возилата...</p>
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!loading()) {
+    <mat-card class="table-card">
+      <mat-card-content>
+        @if (filteredVehicles().length === 0) {
+          <div class="empty-state">
+            <mat-icon>directions_car</mat-icon>
+            <h3>Нема возила</h3>
+            <p>{{ searchQuery() ? 'Нема резултати за пребарувањето' : 'Сè уште нема додадено возила' }}</p>
+          </div>
+        } @else {
+          <div class="table-wrapper">
+            <table mat-table [dataSource]="filteredVehicles()" class="vehicles-table">
+
+              <!-- Make/Model Column -->
+              <ng-container matColumnDef="make">
+                <th mat-header-cell *matHeaderCellDef>Марка / Модел</th>
+                <td mat-cell *matCellDef="let vehicle">
+                  <div class="vehicle-name">
+                    <div class="vehicle-icon-wrapper">
+                      <mat-icon>directions_car</mat-icon>
+                    </div>
+                    <div>
+                      <span class="vehicle-make">{{ vehicle.make }} {{ vehicle.model }}</span>
+                      <span class="vehicle-year">{{ vehicle.year }}</span>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- License Plate Column -->
+              <ng-container matColumnDef="licensePlate">
+                <th mat-header-cell *matHeaderCellDef>Рег. таблица</th>
+                <td mat-cell *matCellDef="let vehicle">
+                  <span class="license-plate">{{ vehicle.licensePlate }}</span>
+                </td>
+              </ng-container>
+
+              <!-- Fuel Type Column -->
+              <ng-container matColumnDef="fuelType">
+                <th mat-header-cell *matHeaderCellDef>Гориво</th>
+                <td mat-cell *matCellDef="let vehicle">
+                  <span class="fuel-chip fuel-{{ vehicle.fuelType.toLowerCase() }}">
+                    {{ fuelTypeLabels[vehicle.fuelType] }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Mileage Column -->
+              <ng-container matColumnDef="currentMileage">
+                <th mat-header-cell *matHeaderCellDef>Тековни км</th>
+                <td mat-cell *matCellDef="let vehicle">
+                  <div class="mileage-cell">
+                    <mat-icon class="mileage-icon">speed</mat-icon>
+                    {{ vehicle.currentMileage | number }} km
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Driver Column -->
+              <ng-container matColumnDef="driver">
+                <th mat-header-cell *matHeaderCellDef>Возач</th>
+                <td mat-cell *matCellDef="let vehicle">
+                  @if (vehicle.assignedDriverName) {
+                    <div class="driver-chip assigned">
+                      <mat-icon>person</mat-icon>
+                      {{ vehicle.assignedDriverName }}
+                    </div>
+                  } @else {
+                    <div class="driver-chip unassigned">
+                      <mat-icon>person_off</mat-icon>
+                      Без возач
+                    </div>
+                  }
+                </td>
+              </ng-container>
+
+              <!-- Status Column -->
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Статус</th>
+                <td mat-cell *matCellDef="let vehicle">
+                  <span class="status-chip" [class.active]="vehicle.isActive" [class.inactive]="!vehicle.isActive">
+                    <mat-icon>{{ vehicle.isActive ? 'check_circle' : 'cancel' }}</mat-icon>
+                    {{ vehicle.isActive ? 'Активно' : 'Неактивно' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              @if (isAdminOrManager()) {
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Акции</th>
+                  <td mat-cell *matCellDef="let vehicle">
+                    <div class="action-buttons">
+                      <button mat-icon-button
+                              color="primary"
+                              matTooltip="Уреди"
+                              (click)="navigateToEdit($event, vehicle.id)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button mat-icon-button
+                              color="warn"
+                              matTooltip="Избриши"
+                              (click)="deleteVehicle($event, vehicle.id)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </td>
+                </ng-container>
+              }
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+              <tr mat-row
+                  *matRowDef="let row; columns: displayedColumns();"
+                  class="vehicle-row"
+                  (click)="navigateToDetail(row)"></tr>
+            </table>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

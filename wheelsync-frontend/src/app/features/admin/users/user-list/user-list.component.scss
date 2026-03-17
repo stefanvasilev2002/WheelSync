@@ -1,0 +1,134 @@
+.page-container {
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 16px;
+
+  .page-title {
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a2e;
+  }
+
+  .page-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 4px 0 0;
+  }
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  .search-field {
+    flex: 1;
+    max-width: 400px;
+  }
+
+  .toolbar-info {
+    margin-left: auto;
+  }
+
+  .user-count {
+    font-size: 14px;
+    color: #666;
+  }
+}
+
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 64px 0;
+}
+
+.table-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+
+  mat-card-content {
+    padding: 0;
+  }
+}
+
+.users-table {
+  width: 100%;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #1a1a2e;
+}
+
+.role-chip {
+  font-size: 12px;
+  height: 26px;
+  font-weight: 500;
+
+  &.role-admin {
+    background: #fce4ec;
+    color: #c62828;
+  }
+
+  &.role-fleet_manager {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  &.role-driver {
+    background: #e3f2fd;
+    color: #1565c0;
+  }
+}
+
+.status-chip {
+  font-size: 12px;
+  height: 26px;
+  font-weight: 500;
+
+  &.active-chip {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  &.inactive-chip {
+    background: #ffebee;
+    color: #c62828;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 24px;
+  gap: 16px;
+  color: #999;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #ddd;
+  }
+
+  p {
+    font-size: 16px;
+    margin: 0;
+  }
+}

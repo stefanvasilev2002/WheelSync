@@ -1,0 +1,136 @@
+.page-container {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+
+  .back-btn {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+  }
+
+  .page-title {
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a2e;
+  }
+
+  .page-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 4px 0 0;
+  }
+}
+
+.form-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+
+  mat-card-header {
+    padding: 20px 20px 0;
+
+    mat-icon[mat-card-avatar] {
+      background: linear-gradient(135deg, #3f51b5, #7986cb);
+      color: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    mat-card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  mat-card-content {
+    padding: 20px;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .span-2 {
+    grid-column: 1 / -1;
+  }
+}
+
+.distance-preview {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+  border: 1px solid #c8e6c9;
+  border-radius: 10px;
+  padding: 14px 18px;
+  grid-column: 1 / -1;
+
+  mat-icon {
+    color: #2e7d32;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .distance-label {
+    display: block;
+    font-size: 11px;
+    color: #4caf50;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+
+  .distance-value {
+    display: block;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1b5e20;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  button {
+    border-radius: 8px;
+    padding: 0 24px;
+    height: 44px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.btn-spinner {
+  margin-right: 4px;
+}
+
+@media (max-width: 600px) {
+  .page-container { padding: 16px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .span-2 { grid-column: 1; }
+}
