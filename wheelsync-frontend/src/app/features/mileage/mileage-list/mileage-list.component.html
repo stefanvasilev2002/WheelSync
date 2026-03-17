@@ -66,17 +66,15 @@
           <div class="table-wrapper">
             <table mat-table [dataSource]="logs()" class="mileage-table">
 
-              @if (isManager()) {
-                <ng-container matColumnDef="driver">
-                  <th mat-header-cell *matHeaderCellDef>Возач</th>
-                  <td mat-cell *matCellDef="let row">
-                    <div class="driver-cell">
-                      <mat-icon>person</mat-icon>
-                      {{ row.driverName }}
-                    </div>
-                  </td>
-                </ng-container>
-              }
+              <ng-container matColumnDef="driver">
+                <th mat-header-cell *matHeaderCellDef>Возач</th>
+                <td mat-cell *matCellDef="let row">
+                  <div class="driver-cell">
+                    <mat-icon>person</mat-icon>
+                    {{ row.driverName }}
+                  </div>
+                </td>
+              </ng-container>
 
               <ng-container matColumnDef="vehicle">
                 <th mat-header-cell *matHeaderCellDef>Возило</th>

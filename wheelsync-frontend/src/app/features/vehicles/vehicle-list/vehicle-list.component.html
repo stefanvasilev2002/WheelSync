@@ -127,27 +127,25 @@
               </ng-container>
 
               <!-- Actions Column -->
-              @if (isAdminOrManager()) {
-                <ng-container matColumnDef="actions">
-                  <th mat-header-cell *matHeaderCellDef>Акции</th>
-                  <td mat-cell *matCellDef="let vehicle">
-                    <div class="action-buttons">
-                      <button mat-icon-button
-                              color="primary"
-                              matTooltip="Уреди"
-                              (click)="navigateToEdit($event, vehicle.id)">
-                        <mat-icon>edit</mat-icon>
-                      </button>
-                      <button mat-icon-button
-                              color="warn"
-                              matTooltip="Избриши"
-                              (click)="deleteVehicle($event, vehicle.id)">
-                        <mat-icon>delete</mat-icon>
-                      </button>
-                    </div>
-                  </td>
-                </ng-container>
-              }
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Акции</th>
+                <td mat-cell *matCellDef="let vehicle">
+                  <div class="action-buttons">
+                    <button mat-icon-button
+                            color="primary"
+                            matTooltip="Уреди"
+                            (click)="navigateToEdit($event, vehicle.id)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button
+                            color="warn"
+                            matTooltip="Избриши"
+                            (click)="deleteVehicle($event, vehicle.id)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
 
               <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
               <tr mat-row

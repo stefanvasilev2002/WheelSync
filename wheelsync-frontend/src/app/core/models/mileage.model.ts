@@ -8,7 +8,7 @@ export interface MileageLogResponse {
   startMileage: number;
   endMileage: number;
   distance: number;
-  note: string;
+  note: string | null;
   createdAt: string;
 }
 

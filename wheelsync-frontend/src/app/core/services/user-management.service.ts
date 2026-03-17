@@ -5,10 +5,12 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api.model';
 import { UserResponse, UserUpdateRequest } from '../models/user.model';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class UserManagementService {
   private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
   private readonly baseUrl = `${environment.apiUrl}/users`;
 
   getAll(): Observable<UserResponse[]> {
@@ -18,8 +20,13 @@ export class UserManagementService {
   }
 
   getDriversByCompany(): Observable<UserResponse[]> {
+    const companyId = this.authService.companyId();
     return this.getAll().pipe(
-      map(users => users.filter(u => u.role === 'DRIVER' && u.isActive))
+      map(users => users.filter(u =>
+        u.role === 'DRIVER' &&
+        u.isActive &&
+        (companyId === null || u.companyId === companyId)
+      ))
     );
   }
 
