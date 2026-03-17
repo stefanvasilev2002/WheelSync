@@ -1,0 +1,23 @@
+# Maven
+wheelsync-backend/target/
+wheelsync-backend/.mvn/wrapper/maven-wrapper.jar
+
+# Node / Angular
+wheelsync-frontend/node_modules/
+wheelsync-frontend/dist/
+wheelsync-frontend/.angular/
+
+# Uploads
+uploads/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
