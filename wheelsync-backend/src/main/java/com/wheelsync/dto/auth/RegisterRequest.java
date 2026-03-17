@@ -1,5 +1,6 @@
 package com.wheelsync.dto.auth;
 
+import com.wheelsync.entity.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -23,4 +24,10 @@ public class RegisterRequest {
     private String password;
 
     private String phone;
+
+    /** Optional role — defaults to DRIVER if not provided */
+    private Role role;
+
+    /** Optional company ID for FLEET_MANAGER / DRIVER self-registration */
+    private Long companyId;
 }

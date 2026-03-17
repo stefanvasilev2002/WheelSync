@@ -52,6 +52,29 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Улога</mat-label>
+          <mat-select formControlName="role">
+            @for (r of roles; track r.value) {
+              <mat-option [value]="r.value">{{ r.label }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matSuffix>badge</mat-icon>
+        </mat-form-field>
+
+        @if (selectedRole !== 'ADMIN' && companies.length > 0) {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Компанија (опционо)</mat-label>
+            <mat-select formControlName="companyId">
+              <mat-option [value]="null">— Без компанија —</mat-option>
+              @for (c of companies; track c.id) {
+                <mat-option [value]="c.id">{{ c.name }}</mat-option>
+              }
+            </mat-select>
+            <mat-icon matSuffix>business</mat-icon>
+          </mat-form-field>
+        }
+
+        <mat-form-field appearance="outline" class="full-width">
           <mat-label>Лозинка</mat-label>
           <input matInput [type]="hidePassword ? 'password' : 'text'"
                  formControlName="password" autocomplete="new-password">

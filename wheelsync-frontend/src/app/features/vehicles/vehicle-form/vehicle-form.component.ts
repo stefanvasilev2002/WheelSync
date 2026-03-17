@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,7 +12,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDividerModule } from '@angular/material/divider';
 import { VehicleService } from '../../../core/services/vehicle.service';
+import { CompanyService } from '../../../core/services/company.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { FuelType, FUEL_TYPE_LABELS } from '../../../core/models/vehicle.model';
+import { CompanyResponse } from '../../../core/models/company.model';
 
 @Component({
   selector: 'ws-vehicle-form',
@@ -37,6 +40,8 @@ import { FuelType, FUEL_TYPE_LABELS } from '../../../core/models/vehicle.model';
 export class VehicleFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly vehicleService = inject(VehicleService);
+  private readonly companyService = inject(CompanyService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
@@ -44,7 +49,9 @@ export class VehicleFormComponent implements OnInit {
   loading = signal(false);
   saving = signal(false);
   vehicleId = signal<number | null>(null);
+  companies = signal<CompanyResponse[]>([]);
 
+  readonly isAdmin = this.authService.isAdmin;
   readonly isEditMode = () => this.vehicleId() !== null;
 
   readonly fuelTypes: { value: FuelType; label: string }[] = [
@@ -56,6 +63,7 @@ export class VehicleFormComponent implements OnInit {
   ];
 
   form = this.fb.group({
+    companyId: [null as number | null],
     make: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
     model: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
     year: [new Date().getFullYear(), [Validators.required, Validators.min(1900), Validators.max(new Date().getFullYear() + 1)]],
@@ -68,6 +76,13 @@ export class VehicleFormComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    if (this.authService.isAdmin()) {
+      this.companyService.getAll().subscribe({
+        next: (list) => this.companies.set(list),
+        error: () => {}
+      });
+    }
+
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam && !isNaN(+idParam)) {
       this.vehicleId.set(+idParam);
@@ -80,6 +95,7 @@ export class VehicleFormComponent implements OnInit {
     this.vehicleService.getById(id).subscribe({
       next: (vehicle) => {
         this.form.patchValue({
+          companyId: vehicle.companyId,
           make: vehicle.make,
           model: vehicle.model,
           year: vehicle.year,
@@ -106,9 +122,14 @@ export class VehicleFormComponent implements OnInit {
       return;
     }
 
+    if (this.authService.isAdmin() && !this.form.value.companyId) {
+      this.snackBar.open('Изберете компанија за возилото', 'Затвори', { duration: 3000 });
+      return;
+    }
+
     this.saving.set(true);
     const value = this.form.value;
-    const request = {
+    const request: any = {
       make: value.make!,
       model: value.model!,
       year: value.year!,
@@ -119,6 +140,9 @@ export class VehicleFormComponent implements OnInit {
       fuelType: value.fuelType as FuelType,
       currentMileage: value.currentMileage!
     };
+    if (this.authService.isAdmin() && value.companyId) {
+      request.companyId = value.companyId;
+    }
 
     const op = this.isEditMode()
       ? this.vehicleService.update(this.vehicleId()!, request)

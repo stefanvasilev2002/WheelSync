@@ -1,11 +1,13 @@
 package com.wheelsync.service;
 
 import com.wheelsync.dto.auth.*;
+import com.wheelsync.entity.Company;
 import com.wheelsync.entity.User;
 import com.wheelsync.entity.enums.Role;
 import com.wheelsync.exception.EmailAlreadyExistsException;
 import com.wheelsync.exception.InvalidTokenException;
 import com.wheelsync.exception.ResourceNotFoundException;
+import com.wheelsync.repository.CompanyRepository;
 import com.wheelsync.repository.UserRepository;
 import com.wheelsync.security.JwtTokenProvider;
 import com.wheelsync.security.UserPrincipal;
@@ -25,6 +27,7 @@ import java.util.UUID;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
@@ -36,13 +39,22 @@ public class AuthService {
             throw new EmailAlreadyExistsException(request.getEmail());
         }
 
+        Role role = request.getRole() != null ? request.getRole() : Role.DRIVER;
+
+        Company company = null;
+        if (request.getCompanyId() != null) {
+            company = companyRepository.findById(request.getCompanyId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Компанија", request.getCompanyId()));
+        }
+
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
-                .role(Role.DRIVER) // default role; Admin assigns FLEET_MANAGER
+                .role(role)
+                .company(company)
                 .isActive(true)
                 .build();
 

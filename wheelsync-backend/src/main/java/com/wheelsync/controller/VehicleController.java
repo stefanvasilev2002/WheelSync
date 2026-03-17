@@ -33,6 +33,13 @@ public class VehicleController {
         return ResponseEntity.ok(ApiResponse.ok(vehicleService.getAll(principal)));
     }
 
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<ApiResponse<List<VehicleResponse>>> getMyVehicles(
+            @AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(ApiResponse.ok(vehicleService.getMyVehicles(principal)));
+    }
+
     @GetMapping("/search")
     @PreAuthorize("hasAnyRole('ADMIN', 'FLEET_MANAGER', 'DRIVER')")
     public ResponseEntity<ApiResponse<List<VehicleResponse>>> search(

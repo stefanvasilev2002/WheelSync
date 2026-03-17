@@ -40,4 +40,7 @@ public class VehicleRequest {
 
     @Min(value = 0, message = "Километражата не може да биде негативна")
     private Integer currentMileage;
+
+    /** Required when an ADMIN creates a vehicle (they have no company in JWT) */
+    private Long companyId;
 }

@@ -26,6 +26,13 @@ public class CompanyController {
         return ResponseEntity.ok(ApiResponse.ok(companyService.getAll()));
     }
 
+    /** Public endpoint used by the registration form to populate the company dropdown */
+    @GetMapping("/public")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<ApiResponse<List<CompanyResponse>>> getAllPublic() {
+        return ResponseEntity.ok(ApiResponse.ok(companyService.getAll()));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<CompanyResponse>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(companyService.getById(id)));

@@ -68,7 +68,9 @@ export class MileageFormComponent implements OnInit {
 
   loadVehicles(): void {
     this.loadingVehicles.set(true);
-    const obs = this.vehicleService.getAll();
+    const obs = this.authService.isDriver()
+      ? this.vehicleService.getMyVehicles()
+      : this.vehicleService.getAll();
     obs.subscribe({
       next: (vehicles) => {
         this.vehicles.set(vehicles.filter(v => v.isActive));

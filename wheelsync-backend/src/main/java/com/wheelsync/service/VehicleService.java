@@ -50,7 +50,15 @@ public class VehicleService {
 
     @Transactional
     public VehicleResponse create(VehicleRequest request, UserPrincipal principal) {
-        Long companyId = requireCompanyId(principal);
+        Long companyId;
+        if (isAdmin(principal)) {
+            if (request.getCompanyId() == null) {
+                throw new IllegalArgumentException("Администраторот мора да избере компанија за возилото");
+            }
+            companyId = request.getCompanyId();
+        } else {
+            companyId = requireCompanyId(principal);
+        }
 
         if (vehicleRepository.existsByVin(request.getVin())) {
             throw new IllegalArgumentException("Возило со VIN број " + request.getVin() + " веќе постои");
@@ -106,6 +114,14 @@ public class VehicleService {
         Vehicle vehicle = findVehicleWithCompanyCheck(id, principal);
         vehicle.setIsActive(false);
         vehicleRepository.save(vehicle);
+    }
+
+    @Transactional(readOnly = true)
+    public List<VehicleResponse> getMyVehicles(UserPrincipal principal) {
+        return vehicleAssignmentRepository.findByDriverIdAndIsActiveTrue(principal.getId())
+                .stream()
+                .map(a -> toResponse(a.getVehicle()))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

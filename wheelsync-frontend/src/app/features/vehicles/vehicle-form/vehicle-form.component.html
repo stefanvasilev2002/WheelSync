@@ -25,6 +25,17 @@
           <mat-card-title>Основни информации</mat-card-title>
         </mat-card-header>
         <mat-card-content>
+          @if (isAdmin()) {
+            <mat-form-field appearance="outline" style="width:100%; margin-bottom:8px">
+              <mat-label>Компанија *</mat-label>
+              <mat-select formControlName="companyId">
+                @for (c of companies(); track c.id) {
+                  <mat-option [value]="c.id">{{ c.name }}</mat-option>
+                }
+              </mat-select>
+              <mat-icon matSuffix>business</mat-icon>
+            </mat-form-field>
+          }
           <div class="form-grid">
             <mat-form-field appearance="outline">
               <mat-label>Марка *</mat-label>

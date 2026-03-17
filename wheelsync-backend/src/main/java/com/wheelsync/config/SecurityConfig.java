@@ -61,6 +61,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/forgot-password").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/reset-password").permitAll()
+                // Public company list for registration form
+                .requestMatchers(HttpMethod.GET, "/api/companies/public").permitAll()
                 // Everything else requires authentication
                 .anyRequest().authenticated()
             )

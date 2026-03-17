@@ -14,6 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FuelService } from '../../../core/services/fuel.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { VehicleResponse, FUEL_TYPE_LABELS } from '../../../core/models/vehicle.model';
 import { FuelType } from '../../../core/models/vehicle.model';
 
@@ -42,6 +43,7 @@ export class FuelFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly fuelService = inject(FuelService);
   private readonly vehicleService = inject(VehicleService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
 
@@ -76,7 +78,10 @@ export class FuelFormComponent implements OnInit {
 
   loadVehicles(): void {
     this.loadingVehicles.set(true);
-    this.vehicleService.getAll().subscribe({
+    const obs = this.authService.isDriver()
+      ? this.vehicleService.getMyVehicles()
+      : this.vehicleService.getAll();
+    obs.subscribe({
       next: (vehicles) => {
         this.vehicles.set(vehicles.filter(v => v.isActive));
         this.loadingVehicles.set(false);
