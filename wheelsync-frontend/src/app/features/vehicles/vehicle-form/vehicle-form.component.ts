@@ -51,7 +51,7 @@ export class VehicleFormComponent implements OnInit {
   vehicleId = signal<number | null>(null);
   companies = signal<CompanyResponse[]>([]);
 
-  readonly isAdmin = this.authService.isAdmin;
+  readonly isAdmin = () => this.authService.isAdmin();
   readonly isEditMode = () => this.vehicleId() !== null;
 
   readonly fuelTypes: { value: FuelType; label: string }[] = [
