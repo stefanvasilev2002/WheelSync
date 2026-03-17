@@ -1,0 +1,86 @@
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+  padding: 16px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 8px;
+
+  mat-card-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  .brand-icon {
+    font-size: 40px;
+    height: 40px;
+    width: 40px;
+    color: #1a237e;
+  }
+
+  .brand-name {
+    font-size: 28px;
+    font-weight: 500;
+    color: #1a237e;
+  }
+}
+
+.name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.submit-btn {
+  height: 48px;
+  font-size: 16px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #c62828;
+  background: #ffebee;
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.auth-links {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-size: 14px;
+
+  a {
+    color: #1a237e;
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+}

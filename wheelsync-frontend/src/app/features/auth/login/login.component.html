@@ -1,0 +1,66 @@
+<div class="auth-container">
+  <mat-card class="auth-card">
+    <mat-card-header>
+      <div class="brand">
+        <mat-icon class="brand-icon">directions_car</mat-icon>
+        <span class="brand-name">WheelSync</span>
+      </div>
+      <mat-card-title>Најава</mat-card-title>
+      <mat-card-subtitle>Пристапете до вашиот профил</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email адреса</mat-label>
+          <input matInput type="email" formControlName="email"
+                 placeholder="name@company.com" autocomplete="email">
+          <mat-icon matSuffix>email</mat-icon>
+          @if (emailCtrl.hasError('required') && emailCtrl.touched) {
+            <mat-error>Email адресата е задолжителна</mat-error>
+          }
+          @if (emailCtrl.hasError('email') && emailCtrl.touched) {
+            <mat-error>Email адресата не е во валиден формат</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Лозинка</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'"
+                 formControlName="password" autocomplete="current-password">
+          <button mat-icon-button matSuffix type="button"
+                  (click)="hidePassword = !hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (passwordCtrl.hasError('required') && passwordCtrl.touched) {
+            <mat-error>Лозинката е задолжителна</mat-error>
+          }
+        </mat-form-field>
+
+        @if (errorMessage) {
+          <div class="error-banner">
+            <mat-icon>error_outline</mat-icon>
+            {{ errorMessage }}
+          </div>
+        }
+
+        <button mat-raised-button color="primary" type="submit"
+                class="full-width submit-btn" [disabled]="loading">
+          @if (loading) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Најава
+          }
+        </button>
+
+        <div class="auth-links">
+          <a routerLink="/auth/forgot-password">Заборавена лозинка?</a>
+          <span class="separator">•</span>
+          <a routerLink="/auth/register">Регистрација</a>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

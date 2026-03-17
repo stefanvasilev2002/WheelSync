@@ -1,0 +1,104 @@
+<div class="auth-container">
+  <mat-card class="auth-card">
+    <mat-card-header>
+      <div class="brand">
+        <mat-icon class="brand-icon">directions_car</mat-icon>
+        <span class="brand-name">WheelSync</span>
+      </div>
+      <mat-card-title>Регистрација</mat-card-title>
+      <mat-card-subtitle>Креирајте нов кориснички профил</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+        <div class="name-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Име</mat-label>
+            <input matInput formControlName="firstName" autocomplete="given-name">
+            @if (f['firstName'].hasError('required') && f['firstName'].touched) {
+              <mat-error>Името е задолжително</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Презиме</mat-label>
+            <input matInput formControlName="lastName" autocomplete="family-name">
+            @if (f['lastName'].hasError('required') && f['lastName'].touched) {
+              <mat-error>Презимето е задолжително</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email адреса</mat-label>
+          <input matInput type="email" formControlName="email" autocomplete="email">
+          <mat-icon matSuffix>email</mat-icon>
+          @if (f['email'].hasError('required') && f['email'].touched) {
+            <mat-error>Email адресата е задолжителна</mat-error>
+          }
+          @if (f['email'].hasError('email') && f['email'].touched) {
+            <mat-error>Email адресата не е во валиден формат</mat-error>
+          }
+          @if (fieldErrors['email']) {
+            <mat-error>{{ fieldErrors['email'] }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Телефонски број (опционо)</mat-label>
+          <input matInput type="tel" formControlName="phone" autocomplete="tel">
+          <mat-icon matSuffix>phone</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Лозинка</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'"
+                 formControlName="password" autocomplete="new-password">
+          <button mat-icon-button matSuffix type="button"
+                  (click)="hidePassword = !hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (f['password'].hasError('required') && f['password'].touched) {
+            <mat-error>Лозинката е задолжителна</mat-error>
+          }
+          @if (f['password'].hasError('minlength') && f['password'].touched) {
+            <mat-error>Лозинката мора да содржи минимум 8 карактери</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Потврди лозинка</mat-label>
+          <input matInput type="password" formControlName="confirmPassword"
+                 autocomplete="new-password">
+          <mat-icon matSuffix>lock</mat-icon>
+          @if (form.hasError('passwordMismatch') && f['confirmPassword'].touched) {
+            <mat-error>Лозинките не се совпаѓаат</mat-error>
+          }
+        </mat-form-field>
+
+        @if (errorMessage) {
+          <div class="error-banner">
+            <mat-icon>error_outline</mat-icon>
+            {{ errorMessage }}
+          </div>
+        }
+
+        <button mat-raised-button color="primary" type="submit"
+                class="full-width submit-btn" [disabled]="loading">
+          @if (loading) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Регистрирај се
+          }
+        </button>
+
+        <div class="auth-links">
+          <span>Веќе имате профил?</span>
+          <a routerLink="/auth/login">Најавете се</a>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
