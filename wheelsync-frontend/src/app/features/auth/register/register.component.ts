@@ -72,6 +72,9 @@ export class RegisterComponent {
         this.loading = false;
         this.errorMessage = err.error?.message ?? 'Настана грешка при регистрација';
         this.fieldErrors = err.error?.fieldErrors ?? {};
+        if (err.status === 409) {
+          this.form.get('email')?.setErrors({ serverError: this.errorMessage });
+        }
       }
     });
   }

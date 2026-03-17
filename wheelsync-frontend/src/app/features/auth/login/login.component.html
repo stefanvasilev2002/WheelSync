@@ -1,15 +1,15 @@
 <div class="auth-container">
-  <mat-card class="auth-card">
-    <mat-card-header>
-      <div class="brand">
-        <mat-icon class="brand-icon">directions_car</mat-icon>
-        <span class="brand-name">WheelSync</span>
-      </div>
-      <mat-card-title>Најава</mat-card-title>
-      <mat-card-subtitle>Пристапете до вашиот профил</mat-card-subtitle>
-    </mat-card-header>
+  <div class="auth-card">
 
-    <mat-card-content>
+    <div class="card-header">
+      <div class="brand-icon-wrap">
+        <mat-icon>directions_car</mat-icon>
+      </div>
+      <h1>WheelSync</h1>
+      <p>Пристапете до вашиот профил</p>
+    </div>
+
+    <div class="card-body">
       <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
         <mat-form-field appearance="outline" class="full-width">
@@ -21,7 +21,7 @@
             <mat-error>Email адресата е задолжителна</mat-error>
           }
           @if (emailCtrl.hasError('email') && emailCtrl.touched) {
-            <mat-error>Email адресата не е во валиден формат</mat-error>
+            <mat-error>Невалиден формат</mat-error>
           }
         </mat-form-field>
 
@@ -45,8 +45,7 @@
           </div>
         }
 
-        <button mat-raised-button color="primary" type="submit"
-                class="full-width submit-btn" [disabled]="loading">
+        <button mat-flat-button type="submit" class="submit-btn" [disabled]="loading">
           @if (loading) {
             <mat-spinner diameter="20"></mat-spinner>
           } @else {
@@ -61,6 +60,6 @@
         </div>
 
       </form>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </div>
 </div>

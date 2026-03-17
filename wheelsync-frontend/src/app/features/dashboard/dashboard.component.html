@@ -1,0 +1,63 @@
+<div class="page-container">
+
+  <div class="welcome-banner">
+    <div class="welcome-text">
+      <h1>Добредојдовте, {{ auth.currentUser()?.firstName }}!</h1>
+      <p>{{ today | date:'EEEE, d MMMM yyyy' }}</p>
+    </div>
+    <div class="welcome-icon">
+      <mat-icon>directions_car</mat-icon>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <mat-card class="stat-card vehicles">
+      <div class="stat-icon">
+        <mat-icon>directions_car</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">—</span>
+        <span class="stat-label">Возила</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card drivers">
+      <div class="stat-icon">
+        <mat-icon>person</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">—</span>
+        <span class="stat-label">Возачи</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card fuel">
+      <div class="stat-icon">
+        <mat-icon>local_gas_station</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">—</span>
+        <span class="stat-label">Танкирања овој месец</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="stat-card defects">
+      <div class="stat-icon">
+        <mat-icon>report_problem</mat-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">—</span>
+        <span class="stat-label">Активни дефекти</span>
+      </div>
+    </mat-card>
+  </div>
+
+  <mat-card class="coming-soon-card">
+    <div class="coming-soon-inner">
+      <mat-icon>construction</mat-icon>
+      <h3>Статистики и активност</h3>
+      <p>Детален преглед на возниот парк ќе биде достапен во следната фаза.</p>
+    </div>
+  </mat-card>
+
+</div>
