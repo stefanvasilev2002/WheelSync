@@ -1,6 +1,6 @@
 export type FuelType = 'PETROL' | 'DIESEL' | 'LPG' | 'ELECTRIC' | 'HYBRID';
 
-export const FUEL_TYPE_LABELS: Record<FuelType, string> = {
+export const FUEL_TYPE_LABELS: Record<string, string> = {
   PETROL: 'Бензин',
   DIESEL: 'Дизел',
   LPG: 'Автогас',
