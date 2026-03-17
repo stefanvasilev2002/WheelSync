@@ -71,7 +71,7 @@ export class RegisterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.http.get<ApiResponse<CompanyOption[]>>(`${environment.apiUrl}/companies/public`).subscribe({
+    this.http.get<ApiResponse<CompanyOption[]>>(`${environment.apiUrl}/auth/companies`).subscribe({
       next: (res) => this.companies = res.data ?? [],
       error: () => this.companies = []
     });

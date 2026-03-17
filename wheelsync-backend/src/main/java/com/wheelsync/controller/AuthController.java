@@ -2,12 +2,16 @@ package com.wheelsync.controller;
 
 import com.wheelsync.dto.auth.*;
 import com.wheelsync.dto.common.ApiResponse;
+import com.wheelsync.dto.company.CompanyResponse;
 import com.wheelsync.service.AuthService;
+import com.wheelsync.service.CompanyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final CompanyService companyService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<AuthResponse>> register(
@@ -44,5 +49,11 @@ public class AuthController {
             @Valid @RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request);
         return ResponseEntity.ok(ApiResponse.ok("Лозинката е успешно ресетирана"));
+    }
+
+    /** Public endpoint for the registration form — returns company names and IDs only */
+    @GetMapping("/companies")
+    public ResponseEntity<ApiResponse<List<CompanyResponse>>> getCompaniesForRegistration() {
+        return ResponseEntity.ok(ApiResponse.ok(companyService.getAll()));
     }
 }
