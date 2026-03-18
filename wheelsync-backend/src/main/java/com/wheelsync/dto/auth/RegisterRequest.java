@@ -9,18 +9,18 @@ import lombok.Data;
 @Data
 public class RegisterRequest {
 
-    @NotBlank(message = "Името е задолжително")
+    @NotBlank(message = "First name is required")
     private String firstName;
 
-    @NotBlank(message = "Презимето е задолжително")
+    @NotBlank(message = "Last name is required")
     private String lastName;
 
-    @NotBlank(message = "Email адресата е задолжителна")
-    @Email(message = "Email адресата не е во валиден формат")
+    @NotBlank(message = "Email address is required")
+    @Email(message = "Email address is not in a valid format")
     private String email;
 
-    @NotBlank(message = "Лозинката е задолжителна")
-    @Size(min = 8, message = "Лозинката мора да содржи минимум 8 карактери")
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must contain at least 8 characters")
     private String password;
 
     private String phone;

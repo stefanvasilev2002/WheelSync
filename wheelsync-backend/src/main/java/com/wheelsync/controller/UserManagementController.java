@@ -43,7 +43,7 @@ public class UserManagementController {
             @Valid @RequestBody UserUpdateRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
         UserResponse response = userManagementService.update(id, request, principal);
-        return ResponseEntity.ok(ApiResponse.ok("Корисникот е успешно ажуриран", response));
+        return ResponseEntity.ok(ApiResponse.ok("User updated successfully", response));
     }
 
     @DeleteMapping("/{id}")
@@ -52,6 +52,6 @@ public class UserManagementController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal principal) {
         userManagementService.deactivate(id, principal);
-        return ResponseEntity.ok(ApiResponse.ok("Корисникот е успешно деактивиран"));
+        return ResponseEntity.ok(ApiResponse.ok("User deactivated successfully"));
     }
 }

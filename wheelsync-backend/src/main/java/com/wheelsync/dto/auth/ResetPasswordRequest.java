@@ -7,10 +7,10 @@ import lombok.Data;
 @Data
 public class ResetPasswordRequest {
 
-    @NotBlank(message = "Токенот е задолжителен")
+    @NotBlank(message = "Token is required")
     private String token;
 
-    @NotBlank(message = "Лозинката е задолжителна")
-    @Size(min = 8, message = "Лозинката мора да содржи минимум 8 карактери")
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must contain at least 8 characters")
     private String newPassword;
 }

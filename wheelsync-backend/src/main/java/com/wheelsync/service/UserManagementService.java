@@ -33,7 +33,7 @@ public class UserManagementService {
         } else {
             Long companyId = principal.getCompanyId();
             if (companyId == null) {
-                throw new AccessDeniedException("Немате пристап до корисниците");
+                throw new AccessDeniedException("Access denied to users");
             }
             users = userRepository.findAll().stream()
                     .filter(u -> u.getCompany() != null && companyId.equals(u.getCompany().getId()))
@@ -45,7 +45,7 @@ public class UserManagementService {
     @Transactional(readOnly = true)
     public UserResponse getById(Long id, UserPrincipal principal) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Корисник", id));
+                .orElseThrow(() -> new ResourceNotFoundException("User",id));
 
         boolean isAdmin = principal.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
@@ -54,7 +54,7 @@ public class UserManagementService {
             Long companyId = principal.getCompanyId();
             if (companyId == null || user.getCompany() == null
                     || !companyId.equals(user.getCompany().getId())) {
-                throw new AccessDeniedException("Немате пристап до овој корисник");
+                throw new AccessDeniedException("Access denied to this user");
             }
         }
 
@@ -64,7 +64,7 @@ public class UserManagementService {
     @Transactional
     public UserResponse update(Long id, UserUpdateRequest request, UserPrincipal principal) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Корисник", id));
+                .orElseThrow(() -> new ResourceNotFoundException("User",id));
 
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
@@ -80,7 +80,7 @@ public class UserManagementService {
 
         if (request.getCompanyId() != null) {
             Company company = companyRepository.findById(request.getCompanyId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Компанија", request.getCompanyId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Company", request.getCompanyId()));
             user.setCompany(company);
         } else if (request.getRole() != null && request.getRole() == Role.ADMIN) {
             user.setCompany(null);
@@ -93,10 +93,10 @@ public class UserManagementService {
     @Transactional
     public void deactivate(Long id, UserPrincipal principal) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Корисник", id));
+                .orElseThrow(() -> new ResourceNotFoundException("User",id));
 
         if (principal.getId().equals(id)) {
-            throw new IllegalArgumentException("Не можете да го деактивирате сопствениот профил");
+            throw new IllegalArgumentException("You cannot deactivate your own profile");
         }
 
         user.setIsActive(false);

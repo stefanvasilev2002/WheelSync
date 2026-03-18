@@ -28,7 +28,7 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
         ErrorResponse body = ErrorResponse.builder()
                 .status(401)
                 .error("Unauthorized")
-                .message("Пристапот е одбиен. Потребна е автентикација.")
+                .message("Access denied. Authentication is required.")
                 .path(request.getRequestURI())
                 .timestamp(LocalDateTime.now())
                 .build();

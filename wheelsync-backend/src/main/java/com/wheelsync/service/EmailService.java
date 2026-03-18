@@ -24,20 +24,20 @@ public class EmailService {
     @Async
     public void sendPasswordResetEmail(String toEmail, String resetToken) {
         String resetLink = frontendUrl + "/auth/reset-password?token=" + resetToken;
-        String subject = "WheelSync - Ресетирање на лозинка";
+        String subject = "WheelSync - Password Reset";
         String body = """
-                Здраво,
+                Hello,
 
-                Примивме барање за ресетирање на лозинката за вашата WheelSync сметка.
+                We received a request to reset the password for your WheelSync account.
 
-                Кликнете на следниот линк за да ресетирате ја лозинката:
+                Click the following link to reset your password:
                 %s
 
-                Овој линк е важечки 1 час.
+                This link is valid for 1 hour.
 
-                Ако не сте го испратиле ова барање, игнорирајте го овој email.
+                If you did not submit this request, please ignore this email.
 
-                WheelSync тим
+                WheelSync Team
                 """.formatted(resetLink);
 
         sendEmail(toEmail, subject, body);
@@ -45,15 +45,15 @@ public class EmailService {
 
     @Async
     public void sendVehicleAssignmentEmail(String toEmail, String driverName, String vehicleDisplay) {
-        String subject = "WheelSync - Задолжување на возило";
+        String subject = "WheelSync - Vehicle Assignment";
         String body = """
-                Здраво %s,
+                Hello %s,
 
-                Ви беше задолжено возилото: %s
+                You have been assigned the vehicle: %s
 
-                Можете да пристапите до апликацијата на: %s
+                You can access the application at: %s
 
-                WheelSync тим
+                WheelSync Team
                 """.formatted(driverName, vehicleDisplay, frontendUrl);
 
         sendEmail(toEmail, subject, body);
@@ -63,17 +63,17 @@ public class EmailService {
     public void sendDefectStatusUpdateEmail(String toEmail, String driverName,
                                              String vehicleDisplay, String defectTitle,
                                              String newStatus) {
-        String subject = "WheelSync - Промена на статус на дефект";
+        String subject = "WheelSync - Defect Status Update";
         String body = """
-                Здраво %s,
+                Hello %s,
 
-                Статусот на вашиот пријавен дефект е ажуриран:
+                The status of your reported defect has been updated:
 
-                Возило: %s
-                Дефект: %s
-                Нов статус: %s
+                Vehicle: %s
+                Defect: %s
+                New status: %s
 
-                WheelSync тим
+                WheelSync Team
                 """.formatted(driverName, vehicleDisplay, defectTitle, newStatus);
 
         sendEmail(toEmail, subject, body);
@@ -82,18 +82,18 @@ public class EmailService {
     @Async
     public void sendMaintenanceReminderEmail(String toEmail, String managerName,
                                               String vehicleDisplay, String serviceType) {
-        String subject = "WheelSync - Потсетник за одржување";
+        String subject = "WheelSync - Maintenance Reminder";
         String body = """
-                Здраво %s,
+                Hello %s,
 
-                Се приближува рокот за одржување:
+                A maintenance deadline is approaching:
 
-                Возило: %s
-                Тип на сервис: %s
+                Vehicle: %s
+                Service type: %s
 
-                Пристапете до апликацијата за повеќе детали: %s
+                Access the application for more details: %s
 
-                WheelSync тим
+                WheelSync Team
                 """.formatted(managerName, vehicleDisplay, serviceType, frontendUrl);
 
         sendEmail(toEmail, subject, body);

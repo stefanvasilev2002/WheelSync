@@ -46,14 +46,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex,
                                                               HttpServletRequest request) {
         return buildResponse(HttpStatus.UNAUTHORIZED,
-                "Невалиден email или лозинка", request.getRequestURI(), null);
+                "Invalid email or password", request.getRequestURI(), null);
     }
 
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<ErrorResponse> handleDisabled(DisabledException ex,
                                                         HttpServletRequest request) {
         return buildResponse(HttpStatus.UNAUTHORIZED,
-                "Корисничкиот профил е деактивиран", request.getRequestURI(), null);
+                "User account is deactivated", request.getRequestURI(), null);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
             fieldErrors.put(fe.getField(), fe.getDefaultMessage());
         }
         return buildResponse(HttpStatus.BAD_REQUEST,
-                "Внесените податоци се невалидни", request.getRequestURI(), fieldErrors);
+                "The submitted data is invalid", request.getRequestURI(), fieldErrors);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -76,7 +76,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneral(Exception ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR,
-                "Настана грешка во системот", request.getRequestURI(), null);
+                "An internal server error occurred", request.getRequestURI(), null);
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String message,

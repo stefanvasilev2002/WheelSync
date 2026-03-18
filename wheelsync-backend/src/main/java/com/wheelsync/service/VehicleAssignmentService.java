@@ -36,25 +36,25 @@ public class VehicleAssignmentService {
         Long companyId = requireCompanyId(principal);
 
         Vehicle vehicle = vehicleRepository.findByIdAndCompanyId(vehicleId, companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Возило", vehicleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", vehicleId));
 
         if (!Boolean.TRUE.equals(vehicle.getIsActive())) {
-            throw new IllegalArgumentException("Возилото е деактивирано и не може да се задолжи");
+            throw new IllegalArgumentException("Vehicle is deactivated and cannot be assigned");
         }
 
         User driver = userRepository.findById(request.getDriverId())
-                .orElseThrow(() -> new ResourceNotFoundException("Возач", request.getDriverId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Driver", request.getDriverId()));
 
         if (driver.getCompany() == null || !companyId.equals(driver.getCompany().getId())) {
-            throw new IllegalArgumentException("Возачот не припаѓа на вашата компанија");
+            throw new IllegalArgumentException("The driver does not belong to your company");
         }
 
         if (driver.getRole() != Role.DRIVER) {
-            throw new IllegalArgumentException("Корисникот нема улога ВОЗАЧ");
+            throw new IllegalArgumentException("The user does not have the DRIVER role");
         }
 
         if (!Boolean.TRUE.equals(driver.getIsActive())) {
-            throw new IllegalArgumentException("Возачот е деактивиран");
+            throw new IllegalArgumentException("Driver is deactivated");
         }
 
         // Unassign any existing active assignment for this vehicle
@@ -89,12 +89,12 @@ public class VehicleAssignmentService {
         Long companyId = requireCompanyId(principal);
 
         vehicleRepository.findByIdAndCompanyId(vehicleId, companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Возило", vehicleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", vehicleId));
 
         VehicleAssignment assignment = vehicleAssignmentRepository
                 .findByVehicleIdAndIsActiveTrue(vehicleId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Нема активно задолжување за возилото со ИД " + vehicleId));
+                        "No active assignment found for vehicle with ID " + vehicleId));
 
         assignment.setUnassignedDate(LocalDate.now());
         assignment.setIsActive(false);
@@ -108,7 +108,7 @@ public class VehicleAssignmentService {
         Long companyId = requireCompanyId(principal);
 
         vehicleRepository.findByIdAndCompanyId(vehicleId, companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Возило", vehicleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", vehicleId));
 
         return vehicleAssignmentRepository.findByVehicleIdOrderByAssignedDateDesc(vehicleId).stream()
                 .map(this::toResponse)
@@ -120,12 +120,12 @@ public class VehicleAssignmentService {
         Long companyId = requireCompanyId(principal);
 
         vehicleRepository.findByIdAndCompanyId(vehicleId, companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Возило", vehicleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", vehicleId));
 
         VehicleAssignment assignment = vehicleAssignmentRepository
                 .findByVehicleIdAndIsActiveTrue(vehicleId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Нема активно задолжување за возилото со ИД " + vehicleId));
+                        "No active assignment found for vehicle with ID " + vehicleId));
 
         return toResponse(assignment);
     }
@@ -147,7 +147,7 @@ public class VehicleAssignmentService {
     private Long requireCompanyId(UserPrincipal principal) {
         Long companyId = principal.getCompanyId();
         if (companyId == null) {
-            throw new AccessDeniedException("Корисникот не е поврзан со компанија");
+            throw new AccessDeniedException("User is not associated with a company");
         }
         return companyId;
     }

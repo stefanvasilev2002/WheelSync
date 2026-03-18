@@ -6,6 +6,6 @@ public class ResourceNotFoundException extends RuntimeException {
     }
 
     public ResourceNotFoundException(String resource, Long id) {
-        super(resource + " со ИД " + id + " не е пронајден");
+        super(resource + " with ID " + id + " not found");
     }
 }

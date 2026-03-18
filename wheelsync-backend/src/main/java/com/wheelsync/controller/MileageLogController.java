@@ -44,6 +44,6 @@ public class MileageLogController {
             @AuthenticationPrincipal UserPrincipal principal) {
         MileageLogResponse response = mileageLogService.create(request, principal);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("Записот за километража е успешно зачуван", response));
+                .body(ApiResponse.ok("Mileage log saved successfully", response));
     }
 }

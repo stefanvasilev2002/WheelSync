@@ -14,9 +14,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class AssignVehicleRequest {
 
-    @NotNull(message = "Возачот е задолжителен")
+    @NotNull(message = "Driver is required")
     private Long driverId;
 
-    @NotNull(message = "Датумот на задолжување е задолжителен")
+    @NotNull(message = "Assignment date is required")
     private LocalDate assignedDate;
 }

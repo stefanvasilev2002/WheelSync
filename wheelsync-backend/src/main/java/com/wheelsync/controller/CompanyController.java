@@ -36,7 +36,7 @@ public class CompanyController {
             @Valid @RequestBody CompanyRequest request) {
         CompanyResponse response = companyService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("Компанијата е успешно креирана", response));
+                .body(ApiResponse.ok("Company created successfully", response));
     }
 
     @PutMapping("/{id}")
@@ -44,7 +44,7 @@ public class CompanyController {
             @PathVariable Long id,
             @Valid @RequestBody CompanyRequest request) {
         CompanyResponse response = companyService.update(id, request);
-        return ResponseEntity.ok(ApiResponse.ok("Компанијата е успешно ажурирана", response));
+        return ResponseEntity.ok(ApiResponse.ok("Company updated successfully", response));
     }
 
     @DeleteMapping("/{id}")

@@ -35,7 +35,7 @@ public class FuelLogService {
     public List<FuelLogResponse> getByVehicle(Long vehicleId, UserPrincipal principal) {
         Long companyId = requireCompanyId(principal);
         vehicleRepository.findByIdAndCompanyId(vehicleId, companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Возило", vehicleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", vehicleId));
 
         return fuelLogRepository.findByVehicleIdOrderByDateDesc(vehicleId).stream()
                 .map(this::toResponse)
@@ -54,10 +54,21 @@ public class FuelLogService {
         if (isDriver(principal)) {
             return getMyLogs(principal);
         }
+        if (isAdmin(principal)) {
+            return fuelLogRepository.findAll().stream()
+                    .sorted((a, b) -> b.getDate().compareTo(a.getDate()))
+                    .map(this::toResponse)
+                    .collect(Collectors.toList());
+        }
         Long companyId = requireCompanyId(principal);
         return fuelLogRepository.findByVehicleCompanyIdOrderByDateDesc(companyId).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    private boolean isAdmin(UserPrincipal principal) {
+        return principal.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
     @Transactional
@@ -65,10 +76,10 @@ public class FuelLogService {
         Long companyId = requireCompanyId(principal);
 
         Vehicle vehicle = vehicleRepository.findByIdAndCompanyId(request.getVehicleId(), companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Возило", request.getVehicleId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", request.getVehicleId()));
 
         if (!Boolean.TRUE.equals(vehicle.getIsActive())) {
-            throw new IllegalArgumentException("Возилото е деактивирано");
+            throw new IllegalArgumentException("Vehicle is deactivated");
         }
 
         // Drivers must have an active assignment on this vehicle
@@ -79,12 +90,12 @@ public class FuelLogService {
                     .map(a -> a.getDriver().getId().equals(principal.getId()))
                     .orElse(false);
             if (!hasActiveAssignment) {
-                throw new AccessDeniedException("Немате активно задолжување за ова возило");
+                throw new AccessDeniedException("You do not have an active assignment for this vehicle");
             }
         }
 
         User driver = userRepository.findById(principal.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Корисник", principal.getId()));
+                .orElseThrow(() -> new ResourceNotFoundException("User", principal.getId()));
 
         // Compute total price
         BigDecimal totalPrice = request.getQuantityLiters()
@@ -174,7 +185,7 @@ public class FuelLogService {
     private Long requireCompanyId(UserPrincipal principal) {
         Long companyId = principal.getCompanyId();
         if (companyId == null) {
-            throw new AccessDeniedException("Корисникот не е поврзан со компанија");
+            throw new AccessDeniedException("User is not associated with a company");
         }
         return companyId;
     }

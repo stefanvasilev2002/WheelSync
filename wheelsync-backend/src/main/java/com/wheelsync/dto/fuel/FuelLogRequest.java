@@ -18,25 +18,25 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class FuelLogRequest {
 
-    @NotNull(message = "Возилото е задолжително")
+    @NotNull(message = "Vehicle is required")
     private Long vehicleId;
 
-    @NotNull(message = "Датумот е задолжителен")
+    @NotNull(message = "Date is required")
     private LocalDate date;
 
-    @NotNull(message = "Типот на гориво е задолжителен")
+    @NotNull(message = "Fuel type is required")
     private FuelType fuelType;
 
-    @NotNull(message = "Количеството е задолжително")
-    @DecimalMin(value = "0.01", message = "Количеството мора да биде поголемо од 0")
+    @NotNull(message = "Quantity is required")
+    @DecimalMin(value = "0.01", message = "Quantity must be greater than 0")
     private BigDecimal quantityLiters;
 
-    @NotNull(message = "Цената по литар е задолжителна")
-    @DecimalMin(value = "0.01", message = "Цената по литар мора да биде поголема од 0")
+    @NotNull(message = "Price per liter is required")
+    @DecimalMin(value = "0.01", message = "Price per liter must be greater than 0")
     private BigDecimal pricePerLiter;
 
-    @NotNull(message = "Километражата при точење е задолжителна")
-    @Min(value = 0, message = "Километражата не може да биде негативна")
+    @NotNull(message = "Mileage at refuel is required")
+    @Min(value = 0, message = "Mileage cannot be negative")
     private Integer mileageAtRefuel;
 
     private String location;

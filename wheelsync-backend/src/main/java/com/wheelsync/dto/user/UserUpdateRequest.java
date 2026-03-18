@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserUpdateRequest {
 
-    @NotBlank(message = "Името е задолжително")
+    @NotBlank(message = "First name is required")
     private String firstName;
 
-    @NotBlank(message = "Презимето е задолжително")
+    @NotBlank(message = "Last name is required")
     private String lastName;
 
     private String phone;

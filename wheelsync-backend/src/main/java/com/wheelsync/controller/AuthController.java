@@ -26,7 +26,7 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("Регистрацијата е успешна", response));
+                .body(ApiResponse.ok("Registration successful", response));
     }
 
     @PostMapping("/login")
@@ -41,14 +41,14 @@ public class AuthController {
             @Valid @RequestBody ForgotPasswordRequest request) {
         authService.forgotPassword(request);
         return ResponseEntity.ok(ApiResponse.ok(
-                "Ако email адресата постои во системот, ќе добиете линк за ресетирање"));
+                "If the email address exists in the system, you will receive a reset link"));
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse<Void>> resetPassword(
             @Valid @RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request);
-        return ResponseEntity.ok(ApiResponse.ok("Лозинката е успешно ресетирана"));
+        return ResponseEntity.ok(ApiResponse.ok("Password reset successfully"));
     }
 
     /** Public endpoint for the registration form — returns company names and IDs only */

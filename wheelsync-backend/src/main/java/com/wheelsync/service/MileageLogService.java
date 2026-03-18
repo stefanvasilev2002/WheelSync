@@ -33,7 +33,7 @@ public class MileageLogService {
     public List<MileageLogResponse> getByVehicle(Long vehicleId, UserPrincipal principal) {
         Long companyId = requireCompanyId(principal);
         vehicleRepository.findByIdAndCompanyId(vehicleId, companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Возило", vehicleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", vehicleId));
 
         return mileageLogRepository.findByVehicleIdOrderByDateDesc(vehicleId).stream()
                 .map(this::toResponse)
@@ -46,9 +46,9 @@ public class MileageLogService {
         if (!isAdmin) {
             Long companyId = requireCompanyId(principal);
             User driver = userRepository.findById(driverId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Возач", driverId));
+                    .orElseThrow(() -> new ResourceNotFoundException("Driver", driverId));
             if (driver.getCompany() == null || !companyId.equals(driver.getCompany().getId())) {
-                throw new AccessDeniedException("Немате пристап до логовите на овој возач");
+                throw new AccessDeniedException("Access denied to this driver's logs");
             }
         }
 
@@ -69,6 +69,12 @@ public class MileageLogService {
         if (isDriver(principal)) {
             return getMyLogs(principal);
         }
+        if (isAdmin(principal)) {
+            return mileageLogRepository.findAll().stream()
+                    .sorted((a, b) -> b.getDate().compareTo(a.getDate()))
+                    .map(this::toResponse)
+                    .collect(Collectors.toList());
+        }
         Long companyId = requireCompanyId(principal);
         return mileageLogRepository.findByVehicleCompanyIdOrderByDateDesc(companyId).stream()
                 .map(this::toResponse)
@@ -80,10 +86,10 @@ public class MileageLogService {
         Long companyId = requireCompanyId(principal);
 
         Vehicle vehicle = vehicleRepository.findByIdAndCompanyId(request.getVehicleId(), companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Возило", request.getVehicleId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", request.getVehicleId()));
 
         if (!Boolean.TRUE.equals(vehicle.getIsActive())) {
-            throw new IllegalArgumentException("Возилото е деактивирано");
+            throw new IllegalArgumentException("Vehicle is deactivated");
         }
 
         // Drivers must have an active assignment on this vehicle
@@ -94,16 +100,16 @@ public class MileageLogService {
                     .map(a -> a.getDriver().getId().equals(principal.getId()))
                     .orElse(false);
             if (!hasActiveAssignment) {
-                throw new AccessDeniedException("Немате активно задолжување за ова возило");
+                throw new AccessDeniedException("You do not have an active assignment for this vehicle");
             }
         }
 
         if (request.getEndMileage() < request.getStartMileage()) {
-            throw new IllegalArgumentException("Крајната километража не може да биде помала од почетната");
+            throw new IllegalArgumentException("End mileage cannot be less than start mileage");
         }
 
         User driver = userRepository.findById(principal.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Корисник", principal.getId()));
+                .orElseThrow(() -> new ResourceNotFoundException("User", principal.getId()));
 
         MileageLog log = MileageLog.builder()
                 .vehicle(vehicle)
@@ -159,7 +165,7 @@ public class MileageLogService {
     private Long requireCompanyId(UserPrincipal principal) {
         Long companyId = principal.getCompanyId();
         if (companyId == null) {
-            throw new AccessDeniedException("Корисникот не е поврзан со компанија");
+            throw new AccessDeniedException("User is not associated with a company");
         }
         return companyId;
     }

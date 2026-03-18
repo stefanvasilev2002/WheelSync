@@ -44,7 +44,7 @@ public class AuthService {
         Company company = null;
         if (request.getCompanyId() != null) {
             company = companyRepository.findById(request.getCompanyId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Компанија", request.getCompanyId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Company", request.getCompanyId()));
         }
 
         User user = User.builder()
@@ -73,7 +73,7 @@ public class AuthService {
         UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 
         User user = userRepository.findByEmail(principal.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("Корисник", null));
+                .orElseThrow(() -> new ResourceNotFoundException("User", null));
 
         return buildAuthResponse(token, user);
     }
@@ -93,11 +93,11 @@ public class AuthService {
     @Transactional
     public void resetPassword(ResetPasswordRequest request) {
         User user = userRepository.findByResetToken(request.getToken())
-                .orElseThrow(() -> new InvalidTokenException("Токенот за ресетирање е невалиден"));
+                .orElseThrow(() -> new InvalidTokenException("The reset token is invalid"));
 
         if (user.getResetTokenExpiry() == null ||
                 user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
-            throw new InvalidTokenException("Токенот за ресетирање е истечен");
+            throw new InvalidTokenException("The reset token has expired");
         }
 
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));

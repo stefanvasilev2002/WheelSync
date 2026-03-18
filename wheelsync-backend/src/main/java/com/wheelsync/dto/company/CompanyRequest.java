@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CompanyRequest {
 
-    @NotBlank(message = "Името на компанијата е задолжително")
+    @NotBlank(message = "Company name is required")
     private String name;
 
     private String address;

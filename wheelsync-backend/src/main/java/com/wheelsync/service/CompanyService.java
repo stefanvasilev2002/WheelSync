@@ -29,7 +29,7 @@ public class CompanyService {
     @Transactional(readOnly = true)
     public CompanyResponse getById(Long id) {
         Company company = companyRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Компанија", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Company",id));
         return toResponse(company);
     }
 
@@ -48,7 +48,7 @@ public class CompanyService {
     @Transactional
     public CompanyResponse update(Long id, CompanyRequest request) {
         Company company = companyRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Компанија", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Company",id));
 
         company.setName(request.getName());
         company.setAddress(request.getAddress());
@@ -62,7 +62,7 @@ public class CompanyService {
     @Transactional
     public void delete(Long id) {
         if (!companyRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Компанија", id);
+            throw new ResourceNotFoundException("Company",id);
         }
         companyRepository.deleteById(id);
     }

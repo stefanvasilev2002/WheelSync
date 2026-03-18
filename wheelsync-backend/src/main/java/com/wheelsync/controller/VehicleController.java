@@ -64,7 +64,7 @@ public class VehicleController {
             @AuthenticationPrincipal UserPrincipal principal) {
         VehicleResponse response = vehicleService.create(request, principal);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("Возилото е успешно креирано", response));
+                .body(ApiResponse.ok("Vehicle created successfully", response));
     }
 
     @PutMapping("/{id}")
@@ -74,7 +74,7 @@ public class VehicleController {
             @Valid @RequestBody VehicleRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
         VehicleResponse response = vehicleService.update(id, request, principal);
-        return ResponseEntity.ok(ApiResponse.ok("Возилото е успешно ажурирано", response));
+        return ResponseEntity.ok(ApiResponse.ok("Vehicle updated successfully", response));
     }
 
     @DeleteMapping("/{id}")
@@ -83,7 +83,7 @@ public class VehicleController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal principal) {
         vehicleService.softDelete(id, principal);
-        return ResponseEntity.ok(ApiResponse.ok("Возилото е успешно деактивирано"));
+        return ResponseEntity.ok(ApiResponse.ok("Vehicle deactivated successfully"));
     }
 
     @PostMapping("/{id}/assign")
@@ -94,7 +94,7 @@ public class VehicleController {
             @AuthenticationPrincipal UserPrincipal principal) {
         VehicleAssignmentResponse response = vehicleAssignmentService.assign(id, request, principal);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("Возилото е успешно задолжено", response));
+                .body(ApiResponse.ok("Vehicle assigned successfully", response));
     }
 
     @DeleteMapping("/{id}/assign")
@@ -103,7 +103,7 @@ public class VehicleController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal principal) {
         VehicleAssignmentResponse response = vehicleAssignmentService.unassign(id, principal);
-        return ResponseEntity.ok(ApiResponse.ok("Возилото е успешно раздолжено", response));
+        return ResponseEntity.ok(ApiResponse.ok("Vehicle unassigned successfully", response));
     }
 
     @GetMapping("/{id}/assignments")

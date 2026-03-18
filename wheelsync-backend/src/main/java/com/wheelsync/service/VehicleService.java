@@ -53,7 +53,7 @@ public class VehicleService {
         Long companyId;
         if (isAdmin(principal)) {
             if (request.getCompanyId() == null) {
-                throw new IllegalArgumentException("Администраторот мора да избере компанија за возилото");
+                throw new IllegalArgumentException("Admin must select a company for the vehicle");
             }
             companyId = request.getCompanyId();
         } else {
@@ -61,11 +61,11 @@ public class VehicleService {
         }
 
         if (vehicleRepository.existsByVin(request.getVin())) {
-            throw new IllegalArgumentException("Возило со VIN број " + request.getVin() + " веќе постои");
+            throw new IllegalArgumentException("Vehicle with VIN " + request.getVin() + " already exists");
         }
 
         Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Компанија", companyId));
+                .orElseThrow(() -> new ResourceNotFoundException("Company", companyId));
 
         Vehicle vehicle = Vehicle.builder()
                 .company(company)
@@ -90,7 +90,7 @@ public class VehicleService {
         Vehicle vehicle = findVehicleWithCompanyCheck(id, principal);
 
         if (vehicleRepository.existsByVinAndIdNot(request.getVin(), id)) {
-            throw new IllegalArgumentException("Возило со VIN број " + request.getVin() + " веќе постои");
+            throw new IllegalArgumentException("Vehicle with VIN " + request.getVin() + " already exists");
         }
 
         vehicle.setMake(request.getMake());
@@ -166,11 +166,11 @@ public class VehicleService {
     private Vehicle findVehicleWithCompanyCheck(Long id, UserPrincipal principal) {
         if (isAdmin(principal)) {
             return vehicleRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Возило", id));
+                    .orElseThrow(() -> new ResourceNotFoundException("Vehicle", id));
         }
         Long companyId = requireCompanyId(principal);
         return vehicleRepository.findByIdAndCompanyId(id, companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Возило", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", id));
     }
 
     private boolean isAdmin(UserPrincipal principal) {
@@ -181,7 +181,7 @@ public class VehicleService {
     private Long requireCompanyId(UserPrincipal principal) {
         Long companyId = principal.getCompanyId();
         if (companyId == null) {
-            throw new AccessDeniedException("Корисникот не е поврзан со компанија");
+            throw new AccessDeniedException("User is not associated with a company");
         }
         return companyId;
     }

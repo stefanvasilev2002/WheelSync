@@ -44,6 +44,6 @@ public class FuelLogController {
             @AuthenticationPrincipal UserPrincipal principal) {
         FuelLogResponse response = fuelLogService.create(request, principal);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.ok("Записот за гориво е успешно зачуван", response));
+                .body(ApiResponse.ok("Fuel log saved successfully", response));
     }
 }

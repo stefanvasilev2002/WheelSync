@@ -15,18 +15,18 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class MileageLogRequest {
 
-    @NotNull(message = "Возилото е задолжително")
+    @NotNull(message = "Vehicle is required")
     private Long vehicleId;
 
-    @NotNull(message = "Датумот е задолжителен")
+    @NotNull(message = "Date is required")
     private LocalDate date;
 
-    @NotNull(message = "Почетната километража е задолжителна")
-    @Min(value = 0, message = "Почетната километража не може да биде негативна")
+    @NotNull(message = "Start mileage is required")
+    @Min(value = 0, message = "Start mileage cannot be negative")
     private Integer startMileage;
 
-    @NotNull(message = "Крајната километража е задолжителна")
-    @Min(value = 0, message = "Крајната километража не може да биде негативна")
+    @NotNull(message = "End mileage is required")
+    @Min(value = 0, message = "End mileage cannot be negative")
     private Integer endMileage;
 
     private String note;
