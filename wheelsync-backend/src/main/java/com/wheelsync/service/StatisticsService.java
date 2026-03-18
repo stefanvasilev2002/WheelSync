@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,11 +34,18 @@ public class StatisticsService {
     private final DefectRepository defectRepository;
     private final MaintenanceReminderRepository reminderRepository;
 
+    private boolean isAdmin(UserPrincipal principal) {
+        return principal.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
     @Transactional(readOnly = true)
     public StatsResponse getStats(UserPrincipal principal) {
-        Long companyId = requireCompanyId(principal);
+        boolean admin = isAdmin(principal);
 
-        List<Vehicle> vehicles = vehicleRepository.findByCompanyId(companyId);
+        List<Vehicle> vehicles = admin
+                ? vehicleRepository.findAll().stream().filter(v -> Boolean.TRUE.equals(v.getIsActive())).collect(Collectors.toList())
+                : vehicleRepository.findByCompanyId(requireCompanyId(principal));
         int totalVehicles = vehicles.size();
 
         long assignedVehicles = vehicles.stream()
@@ -45,19 +53,25 @@ public class StatisticsService {
                 .count();
         long unassignedVehicles = totalVehicles - assignedVehicles;
 
+        Set<Long> vehicleIds = vehicles.stream().map(Vehicle::getId).collect(Collectors.toSet());
+
         // Mileage logs
-        List<MileageLog> mileageLogs = mileageLogRepository.findByVehicleCompanyIdOrderByDateDesc(companyId);
+        List<MileageLog> mileageLogs = admin
+                ? mileageLogRepository.findAll()
+                : mileageLogRepository.findByVehicleCompanyIdOrderByDateDesc(requireCompanyId(principal));
         long totalDistanceKm = mileageLogs.stream()
                 .mapToLong(l -> l.getDistance() != null ? l.getDistance() : 0L)
                 .sum();
 
         // Fuel logs
-        List<FuelLog> fuelLogs = fuelLogRepository.findByVehicleCompanyIdOrderByDateDesc(companyId);
+        List<FuelLog> fuelLogs = admin
+                ? fuelLogRepository.findAll()
+                : fuelLogRepository.findByVehicleCompanyIdOrderByDateDesc(requireCompanyId(principal));
         BigDecimal totalFuelCost = fuelLogs.stream()
                 .map(FuelLog::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Service records
+        // Service records — derived from vehicle list so admin is already handled
         List<ServiceRecord> serviceRecords = vehicles.stream()
                 .flatMap(v -> serviceRecordRepository.findByVehicleIdOrderByDateDesc(v.getId()).stream())
                 .collect(Collectors.toList());
@@ -66,16 +80,19 @@ public class StatisticsService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Defects
-        long openDefects = defectRepository.countByVehicleCompanyIdAndStatusNot(companyId, DefectStatus.RESOLVED);
-        long resolvedDefects = defectRepository.findByVehicleCompanyIdAndStatusNotOrderByCreatedAtDesc(
-                companyId, DefectStatus.REPORTED).stream()
-                .filter(d -> d.getStatus() == DefectStatus.RESOLVED)
-                .count();
+        long openDefects = admin
+                ? defectRepository.findAll().stream().filter(d -> d.getStatus() != DefectStatus.RESOLVED).count()
+                : defectRepository.countByVehicleCompanyIdAndStatusNot(requireCompanyId(principal), DefectStatus.RESOLVED);
+        long resolvedDefects = admin
+                ? defectRepository.findAll().stream().filter(d -> d.getStatus() == DefectStatus.RESOLVED).count()
+                : defectRepository.findByVehicleCompanyIdAndStatusNotOrderByCreatedAtDesc(
+                        requireCompanyId(principal), DefectStatus.REPORTED).stream()
+                        .filter(d -> d.getStatus() == DefectStatus.RESOLVED).count();
 
         // Due-soon reminders
         LocalDate checkDate = LocalDate.now().plusDays(14);
         long dueSoonReminders = reminderRepository.findAllDueSoon(checkDate).stream()
-                .filter(r -> r.getVehicle().getCompany().getId().equals(companyId))
+                .filter(r -> vehicleIds.contains(r.getVehicle().getId()))
                 .count();
 
         // Per-vehicle breakdown: top 5 by distance

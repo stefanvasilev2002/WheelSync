@@ -35,6 +35,12 @@ public class DefectService {
                     .map(this::toResponse)
                     .collect(Collectors.toList());
         }
+        if (isAdmin(principal)) {
+            return defectRepository.findAll().stream()
+                    .filter(d -> d.getStatus() != DefectStatus.RESOLVED)
+                    .map(this::toResponse)
+                    .collect(Collectors.toList());
+        }
         Long companyId = requireCompanyId(principal);
         return defectRepository.findByVehicleCompanyIdAndStatusNotOrderByCreatedAtDesc(companyId, DefectStatus.RESOLVED)
                 .stream()
@@ -62,10 +68,11 @@ public class DefectService {
 
     @Transactional
     public DefectResponse create(DefectRequest req, UserPrincipal principal) {
-        Long companyId = requireCompanyId(principal);
-
-        Vehicle vehicle = vehicleRepository.findByIdAndCompanyId(req.getVehicleId(), companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
+        Vehicle vehicle = isAdmin(principal)
+                ? vehicleRepository.findById(req.getVehicleId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()))
+                : vehicleRepository.findByIdAndCompanyId(req.getVehicleId(), requireCompanyId(principal))
+                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
 
         User reportedBy = userRepository.findById(principal.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", principal.getId()));

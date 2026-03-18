@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +28,12 @@ public class MaintenanceReminderService {
 
     @Transactional(readOnly = true)
     public List<MaintenanceReminderResponse> getByVehicle(Long vehicleId, UserPrincipal principal) {
-        Long companyId = requireCompanyId(principal);
-        vehicleRepository.findByIdAndCompanyId(vehicleId, companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", vehicleId));
+        Vehicle v = isAdmin(principal)
+                ? vehicleRepository.findById(vehicleId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", vehicleId))
+                : vehicleRepository.findByIdAndCompanyId(vehicleId, requireCompanyId(principal))
+                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", vehicleId));
+        // v used only for access check — actual query uses vehicleId below
         return reminderRepository.findByVehicleIdAndIsActiveTrue(vehicleId).stream()
                 .map(r -> toResponse(r, r.getVehicle()))
                 .collect(Collectors.toList());
@@ -37,8 +41,9 @@ public class MaintenanceReminderService {
 
     @Transactional(readOnly = true)
     public List<MaintenanceReminderResponse> getByCompany(UserPrincipal principal) {
-        Long companyId = requireCompanyId(principal);
-        List<Vehicle> vehicles = vehicleRepository.findByCompanyId(companyId);
+        List<Vehicle> vehicles = isAdmin(principal)
+                ? vehicleRepository.findAll().stream().filter(v -> Boolean.TRUE.equals(v.getIsActive())).collect(Collectors.toList())
+                : vehicleRepository.findByCompanyId(requireCompanyId(principal));
         return vehicles.stream()
                 .flatMap(v -> reminderRepository.findByVehicleIdAndIsActiveTrue(v.getId()).stream()
                         .map(r -> toResponse(r, v)))
@@ -47,9 +52,11 @@ public class MaintenanceReminderService {
 
     @Transactional
     public MaintenanceReminderResponse create(MaintenanceReminderRequest req, UserPrincipal principal) {
-        Long companyId = requireCompanyId(principal);
-        Vehicle vehicle = vehicleRepository.findByIdAndCompanyId(req.getVehicleId(), companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
+        Vehicle vehicle = isAdmin(principal)
+                ? vehicleRepository.findById(req.getVehicleId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()))
+                : vehicleRepository.findByIdAndCompanyId(req.getVehicleId(), requireCompanyId(principal))
+                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
 
         LocalDate nextDueDate = computeNextDueDate(req);
         Integer nextDueMileage = computeNextDueMileage(req);
@@ -76,10 +83,11 @@ public class MaintenanceReminderService {
     @Transactional
     public MaintenanceReminderResponse update(Long id, MaintenanceReminderRequest req, UserPrincipal principal) {
         MaintenanceReminder reminder = findAndVerifyAccess(id, principal);
-        Long companyId = requireCompanyId(principal);
-
-        Vehicle vehicle = vehicleRepository.findByIdAndCompanyId(req.getVehicleId(), companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
+        Vehicle vehicle = isAdmin(principal)
+                ? vehicleRepository.findById(req.getVehicleId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()))
+                : vehicleRepository.findByIdAndCompanyId(req.getVehicleId(), requireCompanyId(principal))
+                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
 
         LocalDate nextDueDate = computeNextDueDate(req);
         Integer nextDueMileage = computeNextDueMileage(req);

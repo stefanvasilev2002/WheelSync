@@ -59,8 +59,9 @@ public class ServiceRecordService {
 
     @Transactional(readOnly = true)
     public List<ServiceRecordResponse> getByCompany(UserPrincipal principal) {
-        Long companyId = requireCompanyId(principal);
-        List<Vehicle> vehicles = vehicleRepository.findByCompanyId(companyId);
+        List<Vehicle> vehicles = isAdmin(principal)
+                ? vehicleRepository.findAll().stream().filter(v -> Boolean.TRUE.equals(v.getIsActive())).collect(Collectors.toList())
+                : vehicleRepository.findByCompanyId(requireCompanyId(principal));
         return vehicles.stream()
                 .flatMap(v -> serviceRecordRepository.findByVehicleIdOrderByDateDesc(v.getId()).stream())
                 .sorted((a, b) -> b.getDate().compareTo(a.getDate()))
@@ -76,10 +77,11 @@ public class ServiceRecordService {
 
     @Transactional
     public ServiceRecordResponse create(ServiceRecordRequest req, UserPrincipal principal) {
-        Long companyId = requireCompanyId(principal);
-
-        Vehicle vehicle = vehicleRepository.findByIdAndCompanyId(req.getVehicleId(), companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
+        Vehicle vehicle = isAdmin(principal)
+                ? vehicleRepository.findById(req.getVehicleId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()))
+                : vehicleRepository.findByIdAndCompanyId(req.getVehicleId(), requireCompanyId(principal))
+                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
 
         User createdBy = userRepository.findById(principal.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", principal.getId()));
@@ -103,10 +105,11 @@ public class ServiceRecordService {
     @Transactional
     public ServiceRecordResponse update(Long id, ServiceRecordRequest req, UserPrincipal principal) {
         ServiceRecord record = findAndVerifyAccess(id, principal);
-        Long companyId = requireCompanyId(principal);
-
-        Vehicle vehicle = vehicleRepository.findByIdAndCompanyId(req.getVehicleId(), companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
+        Vehicle vehicle = isAdmin(principal)
+                ? vehicleRepository.findById(req.getVehicleId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()))
+                : vehicleRepository.findByIdAndCompanyId(req.getVehicleId(), requireCompanyId(principal))
+                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
 
         record.setVehicle(vehicle);
         record.setServiceType(req.getServiceType());
