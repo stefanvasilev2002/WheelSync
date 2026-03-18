@@ -49,6 +49,7 @@ export class ReminderFormComponent implements OnInit {
   loading = signal(false);
   saving = signal(false);
   editId = signal<number | null>(null);
+  intervalType = signal<'MILEAGE' | 'DATE'>('MILEAGE');
 
   readonly serviceTypes = [
     { value: 'OIL_CHANGE', label: 'Oil Change' },
@@ -76,7 +77,7 @@ export class ReminderFormComponent implements OnInit {
     warningThresholdDays:[14]
   });
 
-  readonly isMileage = computed(() => this.form.get('intervalType')?.value === 'MILEAGE');
+  readonly isMileage = computed(() => this.intervalType() === 'MILEAGE');
 
   ngOnInit(): void {
     this.loadVehicles();
@@ -85,9 +86,12 @@ export class ReminderFormComponent implements OnInit {
       this.editId.set(Number(id));
       this.loadReminder(Number(id));
     }
-    this.form.get('intervalType')?.valueChanges.subscribe(() => {
+    this.form.get('intervalType')?.valueChanges.subscribe((val) => {
+      this.intervalType.set((val as 'MILEAGE' | 'DATE') ?? 'MILEAGE');
       this.form.get('mileageInterval')?.reset();
       this.form.get('dateIntervalMonths')?.reset();
+      this.form.get('lastServiceMileage')?.reset();
+      this.form.get('lastServiceDate')?.reset();
     });
   }
 
@@ -104,6 +108,7 @@ export class ReminderFormComponent implements OnInit {
       next: (reminders) => {
         const r = reminders.find(x => x.id === id);
         if (r) {
+          this.intervalType.set(r.intervalType);
           this.form.patchValue({
             vehicleId: r.vehicleId,
             serviceType: r.serviceType,
