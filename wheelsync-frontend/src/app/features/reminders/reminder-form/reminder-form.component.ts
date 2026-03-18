@@ -35,7 +35,8 @@ import { MaintenanceReminderRequest } from '../../../core/models/reminder.model'
     MatProgressSpinnerModule,
     MatSnackBarModule
   ],
-  templateUrl: './reminder-form.component.html'
+  templateUrl: './reminder-form.component.html',
+  styleUrl: './reminder-form.component.scss'
 })
 export class ReminderFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
