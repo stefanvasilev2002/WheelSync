@@ -78,7 +78,7 @@ export class MileageFormComponent implements OnInit {
       },
       error: () => {
         this.loadingVehicles.set(false);
-        this.snackBar.open('Грешка при вчитување на возилата', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Error loading vehicles', 'Close', { duration: 3000 });
       }
     });
   }
@@ -110,13 +110,13 @@ export class MileageFormComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.saving.set(false);
-        this.snackBar.open('Записот е успешно зачуван', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Record saved successfully', 'Close', { duration: 3000 });
         this.router.navigate(['/mileage']);
       },
       error: (err) => {
         this.saving.set(false);
-        const msg = err?.error?.message || 'Грешка при зачувување';
-        this.snackBar.open(msg, 'Затвори', { duration: 4000 });
+        const msg = err?.error?.message || 'Error saving record';
+        this.snackBar.open(msg, 'Close', { duration: 4000 });
       }
     });
   }
@@ -124,8 +124,8 @@ export class MileageFormComponent implements OnInit {
   getFieldError(fieldName: string): string {
     const control = this.form.get(fieldName);
     if (!control?.errors || !control.touched) return '';
-    if (control.errors['required']) return 'Ова поле е задолжително';
-    if (control.errors['min']) return `Минималната вредност е ${control.errors['min'].min}`;
-    return 'Невалидна вредност';
+    if (control.errors['required']) return 'This field is required';
+    if (control.errors['min']) return `Minimum value is ${control.errors['min'].min}`;
+    return 'Invalid value';
   }
 }

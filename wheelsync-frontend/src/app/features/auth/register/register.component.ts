@@ -47,9 +47,9 @@ export class RegisterComponent implements OnInit {
   companies: CompanyOption[] = [];
 
   readonly roles = [
-    { value: 'DRIVER', label: 'Возач' },
-    { value: 'FLEET_MANAGER', label: 'Менаџер на флота' },
-    { value: 'ADMIN', label: 'Администратор' }
+    { value: 'DRIVER', label: 'Driver' },
+    { value: 'FLEET_MANAGER', label: 'Fleet Manager' },
+    { value: 'ADMIN', label: 'Administrator' }
   ];
 
   constructor(
@@ -96,7 +96,7 @@ export class RegisterComponent implements OnInit {
       next: () => this.router.navigate(['/dashboard']),
       error: (err: HttpErrorResponse) => {
         this.loading = false;
-        this.errorMessage = err.error?.message ?? 'Настана грешка при регистрација';
+        this.errorMessage = err.error?.message ?? 'An error occurred during registration';
         this.fieldErrors = err.error?.fieldErrors ?? {};
         if (err.status === 409) {
           this.form.get('email')?.setErrors({ serverError: this.errorMessage });

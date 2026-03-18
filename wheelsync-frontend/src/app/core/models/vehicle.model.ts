@@ -1,11 +1,11 @@
 export type FuelType = 'PETROL' | 'DIESEL' | 'LPG' | 'ELECTRIC' | 'HYBRID';
 
 export const FUEL_TYPE_LABELS: Record<string, string> = {
-  PETROL: 'Бензин',
-  DIESEL: 'Дизел',
-  LPG: 'Автогас',
-  ELECTRIC: 'Електричен',
-  HYBRID: 'Хибрид'
+  PETROL: 'Petrol',
+  DIESEL: 'Diesel',
+  LPG: 'LPG',
+  ELECTRIC: 'Electric',
+  HYBRID: 'Hybrid'
 };
 
 export interface VehicleResponse {

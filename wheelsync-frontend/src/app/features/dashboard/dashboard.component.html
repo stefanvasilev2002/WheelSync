@@ -2,7 +2,7 @@
 
   <div class="welcome-banner">
     <div class="welcome-text">
-      <h1>Добредојдовте, {{ auth.currentUser()?.firstName }}!</h1>
+      <h1>Welcome, {{ auth.currentUser()?.firstName }}!</h1>
       <p>{{ today | date:'EEEE, d MMMM yyyy' }}</p>
     </div>
     <div class="welcome-icon">
@@ -17,7 +17,7 @@
       </div>
       <div class="stat-info">
         <span class="stat-value">—</span>
-        <span class="stat-label">Возила</span>
+        <span class="stat-label">Vehicles</span>
       </div>
     </mat-card>
 
@@ -27,7 +27,7 @@
       </div>
       <div class="stat-info">
         <span class="stat-value">—</span>
-        <span class="stat-label">Возачи</span>
+        <span class="stat-label">Drivers</span>
       </div>
     </mat-card>
 
@@ -37,7 +37,7 @@
       </div>
       <div class="stat-info">
         <span class="stat-value">—</span>
-        <span class="stat-label">Танкирања овој месец</span>
+        <span class="stat-label">Fuel Logs This Month</span>
       </div>
     </mat-card>
 
@@ -47,7 +47,7 @@
       </div>
       <div class="stat-info">
         <span class="stat-value">—</span>
-        <span class="stat-label">Активни дефекти</span>
+        <span class="stat-label">Active Defects</span>
       </div>
     </mat-card>
   </div>
@@ -55,8 +55,8 @@
   <mat-card class="coming-soon-card">
     <div class="coming-soon-inner">
       <mat-icon>construction</mat-icon>
-      <h3>Статистики и активност</h3>
-      <p>Детален преглед на возниот парк ќе биде достапен во следната фаза.</p>
+      <h3>Statistics &amp; Activity</h3>
+      <p>A detailed fleet overview will be available in the next phase.</p>
     </div>
   </mat-card>
 

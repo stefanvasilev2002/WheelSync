@@ -55,7 +55,7 @@ export class CompanyListComponent implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Грешка при вчитување на компаниите', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Error loading companies', 'Close', { duration: 3000 });
       }
     });
   }
@@ -70,18 +70,18 @@ export class CompanyListComponent implements OnInit {
 
   deleteCompany(company: CompanyResponse): void {
     const confirmed = window.confirm(
-      `Дали сте сигурни дека сакате да ја избришете компанијата „${company.name}"?`
+      `Are you sure you want to delete the company "${company.name}"?`
     );
     if (!confirmed) return;
 
     this.companyService.delete(company.id).subscribe({
       next: () => {
-        this.snackBar.open('Компанијата е успешно избришана', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Company deleted successfully', 'Close', { duration: 3000 });
         this.loadCompanies();
       },
       error: (err) => {
-        const msg = err?.error?.message || 'Грешка при бришење на компанијата';
-        this.snackBar.open(msg, 'Затвори', { duration: 4000 });
+        const msg = err?.error?.message || 'Error deleting company';
+        this.snackBar.open(msg, 'Close', { duration: 4000 });
       }
     });
   }

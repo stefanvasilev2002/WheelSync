@@ -4,8 +4,8 @@
       <mat-icon>arrow_back</mat-icon>
     </button>
     <div>
-      <h1 class="page-title">Уреди корисник</h1>
-      <p class="page-subtitle">Ажурирање на податоците за корисникот</p>
+      <h1 class="page-title">Edit User</h1>
+      <p class="page-subtitle">Update user details</p>
     </div>
   </div>
 
@@ -18,16 +18,16 @@
       <mat-card class="form-card">
         <mat-card-header>
           <mat-icon mat-card-avatar>manage_accounts</mat-icon>
-          <mat-card-title>Лични податоци</mat-card-title>
+          <mat-card-title>Personal Details</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <div class="form-grid">
 
             <!-- First name -->
             <mat-form-field appearance="outline">
-              <mat-label>Иmе *</mat-label>
+              <mat-label>First Name *</mat-label>
               <mat-icon matPrefix>person</mat-icon>
-              <input matInput formControlName="firstName" placeholder="Внеси иmе...">
+              <input matInput formControlName="firstName" placeholder="Enter first name...">
               @if (getFieldError('firstName')) {
                 <mat-error>{{ getFieldError('firstName') }}</mat-error>
               }
@@ -35,9 +35,9 @@
 
             <!-- Last name -->
             <mat-form-field appearance="outline">
-              <mat-label>Презиме *</mat-label>
+              <mat-label>Last Name *</mat-label>
               <mat-icon matPrefix>person</mat-icon>
-              <input matInput formControlName="lastName" placeholder="Внеси презиме...">
+              <input matInput formControlName="lastName" placeholder="Enter last name...">
               @if (getFieldError('lastName')) {
                 <mat-error>{{ getFieldError('lastName') }}</mat-error>
               }
@@ -45,14 +45,14 @@
 
             <!-- Phone -->
             <mat-form-field appearance="outline">
-              <mat-label>Телефон</mat-label>
+              <mat-label>Phone</mat-label>
               <mat-icon matPrefix>phone</mat-icon>
               <input matInput formControlName="phone" placeholder="+389 ...">
             </mat-form-field>
 
             <!-- Role -->
             <mat-form-field appearance="outline">
-              <mat-label>Улога *</mat-label>
+              <mat-label>Role *</mat-label>
               <mat-icon matPrefix>badge</mat-icon>
               <mat-select formControlName="role">
                 @for (r of roles; track r.value) {
@@ -66,10 +66,10 @@
 
             <!-- Company -->
             <mat-form-field appearance="outline">
-              <mat-label>Компанија</mat-label>
+              <mat-label>Company</mat-label>
               <mat-icon matPrefix>business</mat-icon>
               <mat-select formControlName="companyId">
-                <mat-option [value]="null">— Без компанија —</mat-option>
+                <mat-option [value]="null">— No company —</mat-option>
                 @for (c of companies(); track c.id) {
                   <mat-option [value]="c.id">{{ c.name }}</mat-option>
                 }
@@ -78,9 +78,9 @@
 
             <!-- Active toggle -->
             <div class="toggle-field">
-              <label class="toggle-label">Статус на корисникот</label>
+              <label class="toggle-label">User Status</label>
               <mat-slide-toggle formControlName="isActive" color="primary">
-                {{ form.get('isActive')?.value ? 'Активен' : 'Неактивен' }}
+                {{ form.get('isActive')?.value ? 'Active' : 'Inactive' }}
               </mat-slide-toggle>
             </div>
 
@@ -91,7 +91,7 @@
       <div class="form-actions">
         <button mat-stroked-button type="button" routerLink="/admin/users">
           <mat-icon>close</mat-icon>
-          Откажи
+          Cancel
         </button>
         <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
           @if (saving()) {
@@ -99,7 +99,7 @@
           } @else {
             <mat-icon>save</mat-icon>
           }
-          Зачувај промени
+          Save Changes
         </button>
       </div>
     </form>

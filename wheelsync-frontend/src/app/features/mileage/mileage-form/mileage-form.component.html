@@ -4,8 +4,8 @@
       <mat-icon>arrow_back</mat-icon>
     </button>
     <div>
-      <h1 class="page-title">Внеси километри</h1>
-      <p class="page-subtitle">Евидентирање на изминато патување</p>
+      <h1 class="page-title">Add Mileage</h1>
+      <p class="page-subtitle">Record a completed trip</p>
     </div>
   </div>
 
@@ -13,17 +13,17 @@
     <mat-card class="form-card">
       <mat-card-header>
         <mat-icon mat-card-avatar>speed</mat-icon>
-        <mat-card-title>Детали за патувањето</mat-card-title>
+        <mat-card-title>Trip Details</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <div class="form-grid">
           <!-- Vehicle select -->
           <mat-form-field appearance="outline" class="span-2">
-            <mat-label>Возило *</mat-label>
+            <mat-label>Vehicle *</mat-label>
             <mat-icon matPrefix>directions_car</mat-icon>
             <mat-select formControlName="vehicleId">
               @if (loadingVehicles()) {
-                <mat-option disabled>Се вчитуваат возилата...</mat-option>
+                <mat-option disabled>Loading vehicles...</mat-option>
               }
               @for (v of vehicles(); track v.id) {
                 <mat-option [value]="v.id">
@@ -38,7 +38,7 @@
 
           <!-- Date -->
           <mat-form-field appearance="outline">
-            <mat-label>Датум *</mat-label>
+            <mat-label>Date *</mat-label>
             <mat-icon matPrefix>calendar_today</mat-icon>
             <input matInput [matDatepicker]="picker" formControlName="date">
             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
@@ -53,7 +53,7 @@
             <div class="distance-preview">
               <mat-icon>straighten</mat-icon>
               <div>
-                <span class="distance-label">Пресметано растојание</span>
+                <span class="distance-label">Calculated distance</span>
                 <span class="distance-value">{{ calculatedDistance() | number }} km</span>
               </div>
             </div>
@@ -61,7 +61,7 @@
 
           <!-- Start mileage -->
           <mat-form-field appearance="outline">
-            <mat-label>Почетна километража *</mat-label>
+            <mat-label>Start Mileage *</mat-label>
             <mat-icon matPrefix>trip_origin</mat-icon>
             <input matInput type="number" formControlName="startMileage" placeholder="0">
             <span matSuffix>km</span>
@@ -72,7 +72,7 @@
 
           <!-- End mileage -->
           <mat-form-field appearance="outline">
-            <mat-label>Крајна километража *</mat-label>
+            <mat-label>End Mileage *</mat-label>
             <mat-icon matPrefix>place</mat-icon>
             <input matInput type="number" formControlName="endMileage" placeholder="0">
             <span matSuffix>km</span>
@@ -83,10 +83,10 @@
 
           <!-- Note -->
           <mat-form-field appearance="outline" class="span-2">
-            <mat-label>Белешка</mat-label>
+            <mat-label>Note</mat-label>
             <mat-icon matPrefix>notes</mat-icon>
             <textarea matInput formControlName="note" rows="3"
-                      placeholder="Опис на патувањето..."></textarea>
+                      placeholder="Description of the trip..."></textarea>
           </mat-form-field>
         </div>
       </mat-card-content>
@@ -95,7 +95,7 @@
     <div class="form-actions">
       <button mat-stroked-button type="button" routerLink="/mileage">
         <mat-icon>close</mat-icon>
-        Откажи
+        Cancel
       </button>
       <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
         @if (saving()) {
@@ -103,7 +103,7 @@
         } @else {
           <mat-icon>save</mat-icon>
         }
-        Зачувај запис
+        Save Record
       </button>
     </div>
   </form>

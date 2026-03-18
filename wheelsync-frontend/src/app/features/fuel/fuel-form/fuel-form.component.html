@@ -4,8 +4,8 @@
       <mat-icon>arrow_back</mat-icon>
     </button>
     <div>
-      <h1 class="page-title">Внеси гориво</h1>
-      <p class="page-subtitle">Евидентирање на точење гориво</p>
+      <h1 class="page-title">Add Fuel Log</h1>
+      <p class="page-subtitle">Record a fuel refill</p>
     </div>
   </div>
 
@@ -13,18 +13,18 @@
     <mat-card class="form-card">
       <mat-card-header>
         <mat-icon mat-card-avatar>local_gas_station</mat-icon>
-        <mat-card-title>Детали за точење</mat-card-title>
+        <mat-card-title>Refuel Details</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <div class="form-grid">
 
           <!-- Vehicle select -->
           <mat-form-field appearance="outline" class="span-2">
-            <mat-label>Возило *</mat-label>
+            <mat-label>Vehicle *</mat-label>
             <mat-icon matPrefix>directions_car</mat-icon>
             <mat-select formControlName="vehicleId">
               @if (loadingVehicles()) {
-                <mat-option disabled>Се вчитуваат возилата...</mat-option>
+                <mat-option disabled>Loading vehicles...</mat-option>
               }
               @for (v of vehicles(); track v.id) {
                 <mat-option [value]="v.id">
@@ -39,7 +39,7 @@
 
           <!-- Date -->
           <mat-form-field appearance="outline">
-            <mat-label>Датум *</mat-label>
+            <mat-label>Date *</mat-label>
             <mat-icon matPrefix>calendar_today</mat-icon>
             <input matInput [matDatepicker]="picker" formControlName="date">
             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
@@ -51,7 +51,7 @@
 
           <!-- Fuel type -->
           <mat-form-field appearance="outline">
-            <mat-label>Тип на гориво *</mat-label>
+            <mat-label>Fuel Type *</mat-label>
             <mat-icon matPrefix>opacity</mat-icon>
             <mat-select formControlName="fuelType">
               @for (ft of fuelTypes; track ft.value) {
@@ -65,10 +65,10 @@
 
           <!-- Quantity -->
           <mat-form-field appearance="outline">
-            <mat-label>Количина *</mat-label>
+            <mat-label>Quantity *</mat-label>
             <mat-icon matPrefix>water_drop</mat-icon>
             <input matInput type="number" formControlName="quantityLiters" placeholder="0.00" step="0.01">
-            <span matSuffix>л</span>
+            <span matSuffix>L</span>
             @if (getFieldError('quantityLiters')) {
               <mat-error>{{ getFieldError('quantityLiters') }}</mat-error>
             }
@@ -76,10 +76,10 @@
 
           <!-- Price per litre -->
           <mat-form-field appearance="outline">
-            <mat-label>Цена по литар *</mat-label>
+            <mat-label>Price per liter *</mat-label>
             <mat-icon matPrefix>payments</mat-icon>
             <input matInput type="number" formControlName="pricePerLiter" placeholder="0.00" step="0.01">
-            <span matSuffix>ден/л</span>
+            <span matSuffix>MKD/L</span>
             @if (getFieldError('pricePerLiter')) {
               <mat-error>{{ getFieldError('pricePerLiter') }}</mat-error>
             }
@@ -90,15 +90,15 @@
             <div class="total-preview">
               <mat-icon>receipt_long</mat-icon>
               <div>
-                <span class="total-label">Пресметана вкупна цена</span>
-                <span class="total-value">{{ calculatedTotal() | number:'1.2-2' }} ден</span>
+                <span class="total-label">Calculated total price</span>
+                <span class="total-value">{{ calculatedTotal() | number:'1.2-2' }} MKD</span>
               </div>
             </div>
           }
 
           <!-- Mileage at refuel -->
           <mat-form-field appearance="outline">
-            <mat-label>Километража при точење *</mat-label>
+            <mat-label>Mileage at Refuel *</mat-label>
             <mat-icon matPrefix>speed</mat-icon>
             <input matInput type="number" formControlName="mileageAtRefuel" placeholder="0">
             <span matSuffix>km</span>
@@ -109,9 +109,9 @@
 
           <!-- Location -->
           <mat-form-field appearance="outline">
-            <mat-label>Локација</mat-label>
+            <mat-label>Location</mat-label>
             <mat-icon matPrefix>place</mat-icon>
-            <input matInput formControlName="location" placeholder="Бензинска станица...">
+            <input matInput formControlName="location" placeholder="Gas station...">
           </mat-form-field>
 
         </div>
@@ -121,7 +121,7 @@
     <div class="form-actions">
       <button mat-stroked-button type="button" routerLink="/fuel">
         <mat-icon>close</mat-icon>
-        Откажи
+        Cancel
       </button>
       <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
         @if (saving()) {
@@ -129,7 +129,7 @@
         } @else {
           <mat-icon>save</mat-icon>
         }
-        Зачувај запис
+        Save Record
       </button>
     </div>
   </form>

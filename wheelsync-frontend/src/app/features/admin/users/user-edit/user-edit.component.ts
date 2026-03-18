@@ -50,9 +50,9 @@ export class UserEditComponent implements OnInit {
   saving = signal(false);
 
   readonly roles: { value: Role; label: string }[] = [
-    { value: 'ADMIN',         label: 'Администратор' },
-    { value: 'FLEET_MANAGER', label: 'Менаџер на флота' },
-    { value: 'DRIVER',        label: 'Возач' }
+    { value: 'ADMIN',         label: 'Administrator' },
+    { value: 'FLEET_MANAGER', label: 'Fleet Manager' },
+    { value: 'DRIVER',        label: 'Driver' }
   ];
 
   form = this.fb.group({
@@ -78,7 +78,7 @@ export class UserEditComponent implements OnInit {
   loadCompanies(): void {
     this.companyService.getAll().subscribe({
       next: (companies) => this.companies.set(companies),
-      error: () => this.snackBar.open('Грешка при вчитување на компаниите', 'Затвори', { duration: 3000 })
+      error: () => this.snackBar.open('Error loading companies', 'Close', { duration: 3000 })
     });
   }
 
@@ -98,7 +98,7 @@ export class UserEditComponent implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Грешка при вчитување на корисникот', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Error loading user', 'Close', { duration: 3000 });
         this.router.navigate(['/admin/users']);
       }
     });
@@ -123,13 +123,13 @@ export class UserEditComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.saving.set(false);
-        this.snackBar.open('Корисникот е успешно ажуриран', 'Затвори', { duration: 3000 });
+        this.snackBar.open('User updated successfully', 'Close', { duration: 3000 });
         this.router.navigate(['/admin/users']);
       },
       error: (err) => {
         this.saving.set(false);
-        const msg = err?.error?.message || 'Грешка при зачувување';
-        this.snackBar.open(msg, 'Затвори', { duration: 4000 });
+        const msg = err?.error?.message || 'Error saving changes';
+        this.snackBar.open(msg, 'Close', { duration: 4000 });
       }
     });
   }
@@ -137,7 +137,7 @@ export class UserEditComponent implements OnInit {
   getFieldError(fieldName: string): string {
     const control = this.form.get(fieldName);
     if (!control?.errors || !control.touched) return '';
-    if (control.errors['required']) return 'Ова поле е задолжително';
-    return 'Невалидна вредност';
+    if (control.errors['required']) return 'This field is required';
+    return 'Invalid value';
   }
 }

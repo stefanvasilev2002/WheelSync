@@ -50,7 +50,7 @@ export class LoginComponent {
       next: () => this.router.navigate(['/dashboard']),
       error: (err: HttpErrorResponse) => {
         this.loading = false;
-        this.errorMessage = err.error?.message ?? 'Настана грешка при најава';
+        this.errorMessage = err.error?.message ?? 'An error occurred during sign in';
       }
     });
   }

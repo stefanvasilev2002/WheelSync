@@ -20,7 +20,7 @@
           <span class="license-plate">{{ vehicle()!.licensePlate }}</span>
           <span class="year-badge">{{ vehicle()!.year }}</span>
           <span class="status-chip" [class.active]="vehicle()!.isActive" [class.inactive]="!vehicle()!.isActive">
-            {{ vehicle()!.isActive ? 'Активно' : 'Неактивно' }}
+            {{ vehicle()!.isActive ? 'Active' : 'Inactive' }}
           </span>
         </p>
       </div>
@@ -28,7 +28,7 @@
         <div class="header-actions">
           <a mat-stroked-button [routerLink]="['/vehicles', vehicle()!.id, 'edit']">
             <mat-icon>edit</mat-icon>
-            Уреди
+            Edit
           </a>
         </div>
       }
@@ -41,7 +41,7 @@
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">info</mat-icon>
-          Информации
+          Information
         </ng-template>
 
         <div class="tab-content">
@@ -51,32 +51,32 @@
               <mat-card-header>
                 <mat-card-title>
                   <mat-icon>directions_car</mat-icon>
-                  Основни податоци
+                  Basic Details
                 </mat-card-title>
               </mat-card-header>
               <mat-card-content>
                 <div class="info-row">
-                  <span class="info-label">Марка</span>
+                  <span class="info-label">Make</span>
                   <span class="info-value">{{ vehicle()!.make }}</span>
                 </div>
                 <mat-divider></mat-divider>
                 <div class="info-row">
-                  <span class="info-label">Модел</span>
+                  <span class="info-label">Model</span>
                   <span class="info-value">{{ vehicle()!.model }}</span>
                 </div>
                 <mat-divider></mat-divider>
                 <div class="info-row">
-                  <span class="info-label">Година</span>
+                  <span class="info-label">Year</span>
                   <span class="info-value">{{ vehicle()!.year }}</span>
                 </div>
                 <mat-divider></mat-divider>
                 <div class="info-row">
-                  <span class="info-label">Боја</span>
+                  <span class="info-label">Color</span>
                   <span class="info-value">{{ vehicle()!.color || '—' }}</span>
                 </div>
                 <mat-divider></mat-divider>
                 <div class="info-row">
-                  <span class="info-label">Тип мотор</span>
+                  <span class="info-label">Engine Type</span>
                   <span class="info-value">{{ vehicle()!.engineType || '—' }}</span>
                 </div>
               </mat-card-content>
@@ -87,29 +87,29 @@
               <mat-card-header>
                 <mat-card-title>
                   <mat-icon>build</mat-icon>
-                  Технички податоци
+                  Technical Details
                 </mat-card-title>
               </mat-card-header>
               <mat-card-content>
                 <div class="info-row">
-                  <span class="info-label">VIN број</span>
+                  <span class="info-label">VIN Number</span>
                   <span class="info-value vin">{{ vehicle()!.vin }}</span>
                 </div>
                 <mat-divider></mat-divider>
                 <div class="info-row">
-                  <span class="info-label">Рег. таблица</span>
+                  <span class="info-label">License Plate</span>
                   <span class="info-value">
                     <span class="license-plate-display">{{ vehicle()!.licensePlate }}</span>
                   </span>
                 </div>
                 <mat-divider></mat-divider>
                 <div class="info-row">
-                  <span class="info-label">Гориво</span>
+                  <span class="info-label">Fuel</span>
                   <span class="info-value">{{ fuelTypeLabels[vehicle()!.fuelType] }}</span>
                 </div>
                 <mat-divider></mat-divider>
                 <div class="info-row">
-                  <span class="info-label">Тековни km</span>
+                  <span class="info-label">Current Mileage</span>
                   <span class="info-value mileage">
                     <mat-icon>speed</mat-icon>
                     {{ vehicle()!.currentMileage | number }} km
@@ -123,7 +123,7 @@
               <mat-card-header>
                 <mat-card-title>
                   <mat-icon>person</mat-icon>
-                  Тековен возач
+                  Current Driver
                 </mat-card-title>
               </mat-card-header>
               <mat-card-content>
@@ -134,24 +134,24 @@
                     </div>
                     <div>
                       <p class="driver-name">{{ vehicle()!.assignedDriverName }}</p>
-                      <p class="driver-label">Активен возач</p>
+                      <p class="driver-label">Active driver</p>
                     </div>
                   </div>
                   @if (isAdminOrManager()) {
                     <button mat-stroked-button color="warn" class="unassign-btn" (click)="unassignDriver()">
                       <mat-icon>person_remove</mat-icon>
-                      Отдодели возач
+                      Unassign Driver
                     </button>
                   }
                 } @else {
                   <div class="no-driver">
                     <mat-icon>person_off</mat-icon>
-                    <p>Нема доделен возач</p>
+                    <p>No driver assigned</p>
                   </div>
                   @if (isAdminOrManager()) {
                     <button mat-raised-button color="primary" (click)="openAssignDialog()">
                       <mat-icon>person_add</mat-icon>
-                      Додели возач
+                      Assign Driver
                     </button>
                   }
                 }
@@ -165,20 +165,20 @@
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">history</mat-icon>
-          Историја на доделување
+          Assignment History
         </ng-template>
         <div class="tab-content">
           @if (assignments().length === 0) {
             <div class="empty-tab">
               <mat-icon>history</mat-icon>
-              <p>Нема историја на доделување</p>
+              <p>No assignment history</p>
             </div>
           } @else {
             <mat-card class="table-card">
               <mat-card-content>
                 <table mat-table [dataSource]="assignments()" class="detail-table">
                   <ng-container matColumnDef="driverName">
-                    <th mat-header-cell *matHeaderCellDef>Возач</th>
+                    <th mat-header-cell *matHeaderCellDef>Driver</th>
                     <td mat-cell *matCellDef="let row">
                       <div class="driver-cell">
                         <mat-icon>person</mat-icon>
@@ -190,18 +190,18 @@
                     </td>
                   </ng-container>
                   <ng-container matColumnDef="assignedDate">
-                    <th mat-header-cell *matHeaderCellDef>Доделен на</th>
+                    <th mat-header-cell *matHeaderCellDef>Assigned On</th>
                     <td mat-cell *matCellDef="let row">{{ row.assignedDate }}</td>
                   </ng-container>
                   <ng-container matColumnDef="unassignedDate">
-                    <th mat-header-cell *matHeaderCellDef>Отдоделен на</th>
+                    <th mat-header-cell *matHeaderCellDef>Unassigned On</th>
                     <td mat-cell *matCellDef="let row">{{ row.unassignedDate || '—' }}</td>
                   </ng-container>
                   <ng-container matColumnDef="status">
-                    <th mat-header-cell *matHeaderCellDef>Статус</th>
+                    <th mat-header-cell *matHeaderCellDef>Status</th>
                     <td mat-cell *matCellDef="let row">
                       <span class="status-chip" [class.active]="row.isActive" [class.inactive]="!row.isActive">
-                        {{ row.isActive ? 'Активен' : 'Завршен' }}
+                        {{ row.isActive ? 'Active' : 'Ended' }}
                       </span>
                     </td>
                   </ng-container>
@@ -218,38 +218,38 @@
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">speed</mat-icon>
-          Километри
+          Mileage
         </ng-template>
         <div class="tab-content">
           @if (mileageLogs().length === 0) {
             <div class="empty-tab">
               <mat-icon>speed</mat-icon>
-              <p>Нема евидентирани километри</p>
+              <p>No mileage records</p>
             </div>
           } @else {
             <mat-card class="table-card">
               <mat-card-content>
                 <table mat-table [dataSource]="mileageLogs()" class="detail-table">
                   <ng-container matColumnDef="date">
-                    <th mat-header-cell *matHeaderCellDef>Датум</th>
+                    <th mat-header-cell *matHeaderCellDef>Date</th>
                     <td mat-cell *matCellDef="let row">{{ row.date }}</td>
                   </ng-container>
                   <ng-container matColumnDef="startMileage">
-                    <th mat-header-cell *matHeaderCellDef>Почеток km</th>
+                    <th mat-header-cell *matHeaderCellDef>Start km</th>
                     <td mat-cell *matCellDef="let row">{{ row.startMileage | number }}</td>
                   </ng-container>
                   <ng-container matColumnDef="endMileage">
-                    <th mat-header-cell *matHeaderCellDef>Крај km</th>
+                    <th mat-header-cell *matHeaderCellDef>End km</th>
                     <td mat-cell *matCellDef="let row">{{ row.endMileage | number }}</td>
                   </ng-container>
                   <ng-container matColumnDef="distance">
-                    <th mat-header-cell *matHeaderCellDef>Растојание</th>
+                    <th mat-header-cell *matHeaderCellDef>Distance</th>
                     <td mat-cell *matCellDef="let row">
                       <span class="distance-badge">{{ row.distance | number }} km</span>
                     </td>
                   </ng-container>
                   <ng-container matColumnDef="note">
-                    <th mat-header-cell *matHeaderCellDef>Белешка</th>
+                    <th mat-header-cell *matHeaderCellDef>Note</th>
                     <td mat-cell *matCellDef="let row">{{ row.note || '—' }}</td>
                   </ng-container>
                   <tr mat-header-row *matHeaderRowDef="mileageColumns"></tr>
@@ -265,13 +265,13 @@
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">local_gas_station</mat-icon>
-          Танкирања
+          Fuel Logs
         </ng-template>
         <div class="tab-content">
           @if (fuelLogs().length === 0) {
             <div class="empty-tab">
               <mat-icon>local_gas_station</mat-icon>
-              <p>Нема евидентирани танкирања</p>
+              <p>No fuel records</p>
             </div>
           } @else {
             <mat-card class="table-card">
@@ -279,29 +279,29 @@
                 <div class="table-wrapper">
                   <table mat-table [dataSource]="fuelLogs()" class="detail-table">
                     <ng-container matColumnDef="date">
-                      <th mat-header-cell *matHeaderCellDef>Датум</th>
+                      <th mat-header-cell *matHeaderCellDef>Date</th>
                       <td mat-cell *matCellDef="let row">{{ row.date }}</td>
                     </ng-container>
                     <ng-container matColumnDef="fuelType">
-                      <th mat-header-cell *matHeaderCellDef>Гориво</th>
+                      <th mat-header-cell *matHeaderCellDef>Fuel Type</th>
                       <td mat-cell *matCellDef="let row">{{ fuelTypeLabels[row.fuelType] }}</td>
                     </ng-container>
                     <ng-container matColumnDef="quantityLiters">
-                      <th mat-header-cell *matHeaderCellDef>Количина (L)</th>
+                      <th mat-header-cell *matHeaderCellDef>Quantity (L)</th>
                       <td mat-cell *matCellDef="let row">{{ row.quantityLiters | number:'1.2-2' }} L</td>
                     </ng-container>
                     <ng-container matColumnDef="pricePerLiter">
-                      <th mat-header-cell *matHeaderCellDef>Цена/л</th>
-                      <td mat-cell *matCellDef="let row">{{ row.pricePerLiter | number:'1.2-2' }} МКД</td>
+                      <th mat-header-cell *matHeaderCellDef>Price/L</th>
+                      <td mat-cell *matCellDef="let row">{{ row.pricePerLiter | number:'1.2-2' }} MKD</td>
                     </ng-container>
                     <ng-container matColumnDef="totalPrice">
-                      <th mat-header-cell *matHeaderCellDef>Вкупно</th>
+                      <th mat-header-cell *matHeaderCellDef>Total</th>
                       <td mat-cell *matCellDef="let row">
-                        <span class="total-price">{{ row.totalPrice | number:'1.0-0' }} МКД</span>
+                        <span class="total-price">{{ row.totalPrice | number:'1.0-0' }} MKD</span>
                       </td>
                     </ng-container>
                     <ng-container matColumnDef="mileageAtRefuel">
-                      <th mat-header-cell *matHeaderCellDef>км при полнење</th>
+                      <th mat-header-cell *matHeaderCellDef>km at Refuel</th>
                       <td mat-cell *matCellDef="let row">{{ row.mileageAtRefuel | number }}</td>
                     </ng-container>
                     <tr mat-header-row *matHeaderRowDef="fuelColumns"></tr>

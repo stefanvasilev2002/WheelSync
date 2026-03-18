@@ -17,9 +17,9 @@ import { UserResponse } from '../../../../core/models/user.model';
 import { Role } from '../../../../core/models/auth.model';
 
 export const ROLE_LABELS: Record<Role, string> = {
-  ADMIN:         'Администратор',
-  FLEET_MANAGER: 'Менаџер',
-  DRIVER:        'Возач'
+  ADMIN:         'Administrator',
+  FLEET_MANAGER: 'Manager',
+  DRIVER:        'Driver'
 };
 
 @Component({
@@ -78,7 +78,7 @@ export class UserListComponent implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Грешка при вчитување на корисниците', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Error loading users', 'Close', { duration: 3000 });
       }
     });
   }
@@ -92,20 +92,20 @@ export class UserListComponent implements OnInit {
   }
 
   deactivateUser(user: UserResponse): void {
-    const action = user.isActive ? 'деактивирате' : 'активирате';
+    const action = user.isActive ? 'deactivate' : 'activate';
     const confirmed = window.confirm(
-      `Дали сте сигурни дека сакате да го ${action} корисникот „${user.firstName} ${user.lastName}"?`
+      `Are you sure you want to ${action} the user "${user.firstName} ${user.lastName}"?`
     );
     if (!confirmed) return;
 
     this.userService.deactivate(user.id).subscribe({
       next: () => {
-        this.snackBar.open('Статусот на корисникот е ажуриран', 'Затвори', { duration: 3000 });
+        this.snackBar.open('User status updated', 'Close', { duration: 3000 });
         this.loadUsers();
       },
       error: (err) => {
-        const msg = err?.error?.message || 'Грешка при ажурирање на корисникот';
-        this.snackBar.open(msg, 'Затвори', { duration: 4000 });
+        const msg = err?.error?.message || 'Error updating user';
+        this.snackBar.open(msg, 'Close', { duration: 4000 });
       }
     });
   }

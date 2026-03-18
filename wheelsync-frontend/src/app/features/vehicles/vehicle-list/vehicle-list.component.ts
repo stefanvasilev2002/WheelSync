@@ -85,7 +85,7 @@ export class VehicleListComponent implements OnInit {
       },
       error: (err) => {
         this.loading.set(false);
-        this.snackBar.open('Грешка при вчитување на возила', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Error loading vehicles', 'Close', { duration: 3000 });
       }
     });
   }
@@ -101,14 +101,14 @@ export class VehicleListComponent implements OnInit {
 
   deleteVehicle(event: Event, vehicleId: number): void {
     event.stopPropagation();
-    if (!confirm('Дали сте сигурни дека сакате да го избришете ова возило?')) return;
+    if (!confirm('Are you sure you want to delete this vehicle?')) return;
     this.vehicleService.delete(vehicleId).subscribe({
       next: () => {
-        this.snackBar.open('Возилото е успешно избришано', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Vehicle deleted successfully', 'Close', { duration: 3000 });
         this.loadVehicles();
       },
       error: () => {
-        this.snackBar.open('Грешка при бришење на возило', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Error deleting vehicle', 'Close', { duration: 3000 });
       }
     });
   }

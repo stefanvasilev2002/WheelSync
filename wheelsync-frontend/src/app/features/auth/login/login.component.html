@@ -6,27 +6,27 @@
         <mat-icon>directions_car</mat-icon>
       </div>
       <h1>WheelSync</h1>
-      <p>Пристапете до вашиот профил</p>
+      <p>Sign in to your account</p>
     </div>
 
     <div class="card-body">
       <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email адреса</mat-label>
+          <mat-label>Email address</mat-label>
           <input matInput type="email" formControlName="email"
                  placeholder="name@company.com" autocomplete="email">
           <mat-icon matSuffix>email</mat-icon>
           @if (emailCtrl.hasError('required') && emailCtrl.touched) {
-            <mat-error>Email адресата е задолжителна</mat-error>
+            <mat-error>Email address is required</mat-error>
           }
           @if (emailCtrl.hasError('email') && emailCtrl.touched) {
-            <mat-error>Невалиден формат</mat-error>
+            <mat-error>Invalid format</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Лозинка</mat-label>
+          <mat-label>Password</mat-label>
           <input matInput [type]="hidePassword ? 'password' : 'text'"
                  formControlName="password" autocomplete="current-password">
           <button mat-icon-button matSuffix type="button"
@@ -34,7 +34,7 @@
             <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
           @if (passwordCtrl.hasError('required') && passwordCtrl.touched) {
-            <mat-error>Лозинката е задолжителна</mat-error>
+            <mat-error>Password is required</mat-error>
           }
         </mat-form-field>
 
@@ -49,14 +49,14 @@
           @if (loading) {
             <mat-spinner diameter="20"></mat-spinner>
           } @else {
-            Најава
+            Sign In
           }
         </button>
 
         <div class="auth-links">
-          <a routerLink="/auth/forgot-password">Заборавена лозинка?</a>
+          <a routerLink="/auth/forgot-password">Forgot password?</a>
           <span class="separator">•</span>
-          <a routerLink="/auth/register">Регистрација</a>
+          <a routerLink="/auth/register">Register</a>
         </div>
 
       </form>

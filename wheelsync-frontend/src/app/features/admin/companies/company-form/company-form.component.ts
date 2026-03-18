@@ -74,7 +74,7 @@ export class CompanyFormComponent implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Грешка при вчитување на компанијата', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Error loading company', 'Close', { duration: 3000 });
         this.router.navigate(['/admin/companies']);
       }
     });
@@ -104,15 +104,15 @@ export class CompanyFormComponent implements OnInit {
       next: () => {
         this.saving.set(false);
         const msg = this.isEditMode
-          ? 'Компанијата е успешно ажурирана'
-          : 'Компанијата е успешно креирана';
-        this.snackBar.open(msg, 'Затвори', { duration: 3000 });
+          ? 'Company updated successfully'
+          : 'Company created successfully';
+        this.snackBar.open(msg, 'Close', { duration: 3000 });
         this.router.navigate(['/admin/companies']);
       },
       error: (err) => {
         this.saving.set(false);
-        const msg = err?.error?.message || 'Грешка при зачувување';
-        this.snackBar.open(msg, 'Затвори', { duration: 4000 });
+        const msg = err?.error?.message || 'Error saving company';
+        this.snackBar.open(msg, 'Close', { duration: 4000 });
       }
     });
   }
@@ -120,7 +120,7 @@ export class CompanyFormComponent implements OnInit {
   getFieldError(fieldName: string): string {
     const control = this.form.get(fieldName);
     if (!control?.errors || !control.touched) return '';
-    if (control.errors['required']) return 'Ова поле е задолжително';
-    return 'Невалидна вредност';
+    if (control.errors['required']) return 'This field is required';
+    return 'Invalid value';
   }
 }

@@ -5,8 +5,8 @@
       <mat-icon>arrow_back</mat-icon>
     </button>
     <div>
-      <h1 class="page-title">{{ isEditMode() ? 'Уреди возило' : 'Додај возило' }}</h1>
-      <p class="page-subtitle">{{ isEditMode() ? 'Ажурирање на податоците за возилото' : 'Внесување на ново возило во флотата' }}</p>
+      <h1 class="page-title">{{ isEditMode() ? 'Edit Vehicle' : 'Add Vehicle' }}</h1>
+      <p class="page-subtitle">{{ isEditMode() ? 'Update vehicle details' : 'Add a new vehicle to the fleet' }}</p>
     </div>
   </div>
 
@@ -22,12 +22,12 @@
       <mat-card class="form-card">
         <mat-card-header>
           <mat-icon mat-card-avatar>info</mat-icon>
-          <mat-card-title>Основни информации</mat-card-title>
+          <mat-card-title>Basic Information</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           @if (isAdmin()) {
             <mat-form-field appearance="outline" style="width:100%; margin-bottom:8px">
-              <mat-label>Компанија *</mat-label>
+              <mat-label>Company *</mat-label>
               <mat-select formControlName="companyId">
                 @for (c of companies(); track c.id) {
                   <mat-option [value]="c.id">{{ c.name }}</mat-option>
@@ -38,32 +38,32 @@
           }
           <div class="form-grid">
             <mat-form-field appearance="outline">
-              <mat-label>Марка *</mat-label>
-              <input matInput formControlName="make" placeholder="пр. Toyota, BMW...">
+              <mat-label>Make *</mat-label>
+              <input matInput formControlName="make" placeholder="e.g. Toyota, BMW...">
               @if (getFieldError('make')) {
                 <mat-error>{{ getFieldError('make') }}</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Модел *</mat-label>
-              <input matInput formControlName="model" placeholder="пр. Corolla, X5...">
+              <mat-label>Model *</mat-label>
+              <input matInput formControlName="model" placeholder="e.g. Corolla, X5...">
               @if (getFieldError('model')) {
                 <mat-error>{{ getFieldError('model') }}</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Година *</mat-label>
-              <input matInput type="number" formControlName="year" placeholder="пр. 2020">
+              <mat-label>Year *</mat-label>
+              <input matInput type="number" formControlName="year" placeholder="e.g. 2020">
               @if (getFieldError('year')) {
                 <mat-error>{{ getFieldError('year') }}</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Боја</mat-label>
-              <input matInput formControlName="color" placeholder="пр. Бела, Сребрена...">
+              <mat-label>Color</mat-label>
+              <input matInput formControlName="color" placeholder="e.g. White, Silver...">
               @if (getFieldError('color')) {
                 <mat-error>{{ getFieldError('color') }}</mat-error>
               }
@@ -76,22 +76,22 @@
       <mat-card class="form-card">
         <mat-card-header>
           <mat-icon mat-card-avatar>article</mat-icon>
-          <mat-card-title>Регистрација и идентификација</mat-card-title>
+          <mat-card-title>Registration &amp; Identification</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <div class="form-grid">
             <mat-form-field appearance="outline">
-              <mat-label>VIN број *</mat-label>
-              <input matInput formControlName="vin" placeholder="17 карактери" maxlength="17">
-              <mat-hint>Точно 17 карактери</mat-hint>
+              <mat-label>VIN Number *</mat-label>
+              <input matInput formControlName="vin" placeholder="17 characters" maxlength="17">
+              <mat-hint>Exactly 17 characters</mat-hint>
               @if (getFieldError('vin')) {
                 <mat-error>{{ getFieldError('vin') }}</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Регистарски број *</mat-label>
-              <input matInput formControlName="licensePlate" placeholder="пр. SK-1234-AB">
+              <mat-label>License Plate *</mat-label>
+              <input matInput formControlName="licensePlate" placeholder="e.g. SK-1234-AB">
               @if (getFieldError('licensePlate')) {
                 <mat-error>{{ getFieldError('licensePlate') }}</mat-error>
               }
@@ -104,12 +104,12 @@
       <mat-card class="form-card">
         <mat-card-header>
           <mat-icon mat-card-avatar>build</mat-icon>
-          <mat-card-title>Технички податоци</mat-card-title>
+          <mat-card-title>Technical Details</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <div class="form-grid">
             <mat-form-field appearance="outline">
-              <mat-label>Вид гориво *</mat-label>
+              <mat-label>Fuel Type *</mat-label>
               <mat-select formControlName="fuelType">
                 @for (ft of fuelTypes; track ft.value) {
                   <mat-option [value]="ft.value">{{ ft.label }}</mat-option>
@@ -121,17 +121,17 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Тип на мотор</mat-label>
-              <input matInput formControlName="engineType" placeholder="пр. 2.0 TDI, 1.6 бензин...">
+              <mat-label>Engine Type</mat-label>
+              <input matInput formControlName="engineType" placeholder="e.g. 2.0 TDI, 1.6 petrol...">
               @if (getFieldError('engineType')) {
                 <mat-error>{{ getFieldError('engineType') }}</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Тековна километража *</mat-label>
+              <mat-label>Current Mileage *</mat-label>
               <input matInput type="number" formControlName="currentMileage" placeholder="0">
-              <mat-hint>Внесете тековната километража на возилото</mat-hint>
+              <mat-hint>Enter the current mileage of the vehicle</mat-hint>
               @if (getFieldError('currentMileage')) {
                 <mat-error>{{ getFieldError('currentMileage') }}</mat-error>
               }
@@ -144,7 +144,7 @@
       <div class="form-actions">
         <button mat-stroked-button type="button" routerLink="/vehicles">
           <mat-icon>close</mat-icon>
-          Откажи
+          Cancel
         </button>
         <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
           @if (saving()) {
@@ -152,7 +152,7 @@
           } @else {
             <mat-icon>save</mat-icon>
           }
-          {{ isEditMode() ? 'Зачувај промени' : 'Додај возило' }}
+          {{ isEditMode() ? 'Save Changes' : 'Add Vehicle' }}
         </button>
       </div>
     </form>

@@ -55,11 +55,11 @@ export class VehicleFormComponent implements OnInit {
   readonly isEditMode = () => this.vehicleId() !== null;
 
   readonly fuelTypes: { value: FuelType; label: string }[] = [
-    { value: 'PETROL', label: 'Бензин' },
-    { value: 'DIESEL', label: 'Дизел' },
-    { value: 'LPG', label: 'Автогас' },
-    { value: 'ELECTRIC', label: 'Електричен' },
-    { value: 'HYBRID', label: 'Хибрид' }
+    { value: 'PETROL', label: 'Petrol' },
+    { value: 'DIESEL', label: 'Diesel' },
+    { value: 'LPG', label: 'LPG' },
+    { value: 'ELECTRIC', label: 'Electric' },
+    { value: 'HYBRID', label: 'Hybrid' }
   ];
 
   form = this.fb.group({
@@ -110,7 +110,7 @@ export class VehicleFormComponent implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Грешка при вчитување на возилото', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Error loading vehicle', 'Close', { duration: 3000 });
         this.router.navigate(['/vehicles']);
       }
     });
@@ -123,7 +123,7 @@ export class VehicleFormComponent implements OnInit {
     }
 
     if (this.authService.isAdmin() && !this.form.value.companyId) {
-      this.snackBar.open('Изберете компанија за возилото', 'Затвори', { duration: 3000 });
+      this.snackBar.open('Please select a company for the vehicle', 'Close', { duration: 3000 });
       return;
     }
 
@@ -151,14 +151,14 @@ export class VehicleFormComponent implements OnInit {
     op.subscribe({
       next: (vehicle) => {
         this.saving.set(false);
-        const msg = this.isEditMode() ? 'Возилото е успешно ажурирано' : 'Возилото е успешно додадено';
-        this.snackBar.open(msg, 'Затвори', { duration: 3000 });
+        const msg = this.isEditMode() ? 'Vehicle updated successfully' : 'Vehicle added successfully';
+        this.snackBar.open(msg, 'Close', { duration: 3000 });
         this.router.navigate(['/vehicles', vehicle.id]);
       },
       error: (err) => {
         this.saving.set(false);
-        const msg = err?.error?.message || 'Грешка при зачувување на возилото';
-        this.snackBar.open(msg, 'Затвори', { duration: 4000 });
+        const msg = err?.error?.message || 'Error saving vehicle';
+        this.snackBar.open(msg, 'Close', { duration: 4000 });
       }
     });
   }
@@ -166,11 +166,11 @@ export class VehicleFormComponent implements OnInit {
   getFieldError(fieldName: string): string {
     const control = this.form.get(fieldName);
     if (!control?.errors || !control.touched) return '';
-    if (control.errors['required']) return 'Ова поле е задолжително';
-    if (control.errors['minlength']) return `Минимум ${control.errors['minlength'].requiredLength} карактери`;
-    if (control.errors['maxlength']) return `Максимум ${control.errors['maxlength'].requiredLength} карактери`;
-    if (control.errors['min']) return `Минималната вредност е ${control.errors['min'].min}`;
-    if (control.errors['max']) return `Максималната вредност е ${control.errors['max'].max}`;
-    return 'Невалидна вредност';
+    if (control.errors['required']) return 'This field is required';
+    if (control.errors['minlength']) return `Minimum ${control.errors['minlength'].requiredLength} characters`;
+    if (control.errors['maxlength']) return `Maximum ${control.errors['maxlength'].requiredLength} characters`;
+    if (control.errors['min']) return `Minimum value is ${control.errors['min'].min}`;
+    if (control.errors['max']) return `Maximum value is ${control.errors['max'].max}`;
+    return 'Invalid value';
   }
 }

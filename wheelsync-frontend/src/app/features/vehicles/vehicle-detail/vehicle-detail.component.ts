@@ -87,7 +87,7 @@ export class VehicleDetailComponent implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Возилото не е пронајдено', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Vehicle not found', 'Close', { duration: 3000 });
         this.router.navigate(['/vehicles']);
       }
     });
@@ -129,12 +129,12 @@ export class VehicleDetailComponent implements OnInit {
       if (result) {
         this.vehicleService.assign(v.id, result).subscribe({
           next: () => {
-            this.snackBar.open('Возачот е успешно доделен', 'Затвори', { duration: 3000 });
+            this.snackBar.open('Driver assigned successfully', 'Close', { duration: 3000 });
             this.loadVehicle(v.id);
           },
           error: (err) => {
-            const msg = err?.error?.message || 'Грешка при доделување';
-            this.snackBar.open(msg, 'Затвори', { duration: 4000 });
+            const msg = err?.error?.message || 'Error assigning driver';
+            this.snackBar.open(msg, 'Close', { duration: 4000 });
           }
         });
       }
@@ -143,14 +143,14 @@ export class VehicleDetailComponent implements OnInit {
 
   unassignDriver(): void {
     const v = this.vehicle();
-    if (!v || !confirm('Дали сте сигурни дека сакате да го отдоделите возачот?')) return;
+    if (!v || !confirm('Are you sure you want to unassign the driver?')) return;
     this.vehicleService.unassign(v.id).subscribe({
       next: () => {
-        this.snackBar.open('Возачот е успешно отдоделен', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Driver unassigned successfully', 'Close', { duration: 3000 });
         this.loadVehicle(v.id);
       },
       error: () => {
-        this.snackBar.open('Грешка при отдоделување', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Error unassigning driver', 'Close', { duration: 3000 });
       }
     });
   }

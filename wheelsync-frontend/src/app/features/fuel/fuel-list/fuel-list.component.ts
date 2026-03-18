@@ -75,7 +75,7 @@ export class FuelListComponent implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Грешка при вчитување', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Error loading records', 'Close', { duration: 3000 });
       }
     });
   }

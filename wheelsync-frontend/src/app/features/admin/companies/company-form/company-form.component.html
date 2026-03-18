@@ -4,8 +4,8 @@
       <mat-icon>arrow_back</mat-icon>
     </button>
     <div>
-      <h1 class="page-title">{{ isEditMode ? 'Уреди компанија' : 'Нова компанија' }}</h1>
-      <p class="page-subtitle">{{ isEditMode ? 'Ажурирање на податоците за компанијата' : 'Регистрирање на нова компанија' }}</p>
+      <h1 class="page-title">{{ isEditMode ? 'Edit Company' : 'New Company' }}</h1>
+      <p class="page-subtitle">{{ isEditMode ? 'Update company details' : 'Register a new company' }}</p>
     </div>
   </div>
 
@@ -18,16 +18,16 @@
       <mat-card class="form-card">
         <mat-card-header>
           <mat-icon mat-card-avatar>business</mat-icon>
-          <mat-card-title>Податоци за компанијата</mat-card-title>
+          <mat-card-title>Company Details</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <div class="form-grid">
 
             <!-- Name -->
             <mat-form-field appearance="outline" class="span-2">
-              <mat-label>Назив на компанијата *</mat-label>
+              <mat-label>Company Name *</mat-label>
               <mat-icon matPrefix>business</mat-icon>
-              <input matInput formControlName="name" placeholder="Внеси назив...">
+              <input matInput formControlName="name" placeholder="Enter name...">
               @if (getFieldError('name')) {
                 <mat-error>{{ getFieldError('name') }}</mat-error>
               }
@@ -35,23 +35,23 @@
 
             <!-- Address -->
             <mat-form-field appearance="outline" class="span-2">
-              <mat-label>Адреса</mat-label>
+              <mat-label>Address</mat-label>
               <mat-icon matPrefix>location_on</mat-icon>
-              <input matInput formControlName="address" placeholder="Улица, број, град...">
+              <input matInput formControlName="address" placeholder="Street, number, city...">
             </mat-form-field>
 
             <!-- Phone -->
             <mat-form-field appearance="outline">
-              <mat-label>Телефон</mat-label>
+              <mat-label>Phone</mat-label>
               <mat-icon matPrefix>phone</mat-icon>
               <input matInput formControlName="phone" placeholder="+389 ...">
             </mat-form-field>
 
             <!-- Contact person -->
             <mat-form-field appearance="outline">
-              <mat-label>Контакт лице</mat-label>
+              <mat-label>Contact Person</mat-label>
               <mat-icon matPrefix>person</mat-icon>
-              <input matInput formControlName="contactPerson" placeholder="Ime и презиме...">
+              <input matInput formControlName="contactPerson" placeholder="First and last name...">
             </mat-form-field>
 
           </div>
@@ -61,7 +61,7 @@
       <div class="form-actions">
         <button mat-stroked-button type="button" routerLink="/admin/companies">
           <mat-icon>close</mat-icon>
-          Откажи
+          Cancel
         </button>
         <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
           @if (saving()) {
@@ -69,7 +69,7 @@
           } @else {
             <mat-icon>save</mat-icon>
           }
-          {{ isEditMode ? 'Зачувај промени' : 'Креирај компанија' }}
+          {{ isEditMode ? 'Save Changes' : 'Create Company' }}
         </button>
       </div>
     </form>
