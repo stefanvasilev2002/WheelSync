@@ -1,0 +1,120 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="header-icon">build</mat-icon>
+      <div>
+        <h1 class="page-title">Service Records</h1>
+        <p class="page-subtitle">Vehicle maintenance and service history</p>
+      </div>
+    </div>
+    @if (isManager()) {
+      <a mat-raised-button color="primary" routerLink="/service-records/new" class="add-btn">
+        <mat-icon>add</mat-icon>
+        Add Service Record
+      </a>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading records...</p>
+    </div>
+  }
+
+  @if (!loading()) {
+    <mat-card class="table-card">
+      <mat-card-content>
+        @if (records().length === 0) {
+          <div class="empty-state">
+            <mat-icon>build</mat-icon>
+            <h3>No service records</h3>
+            <p>Click "Add Service Record" to log a service</p>
+            @if (isManager()) {
+              <a mat-raised-button color="primary" routerLink="/service-records/new">
+                <mat-icon>add</mat-icon>
+                Add Service Record
+              </a>
+            }
+          </div>
+        } @else {
+          <div class="table-wrapper">
+            <table mat-table [dataSource]="records()" class="data-table">
+
+              <ng-container matColumnDef="vehicle">
+                <th mat-header-cell *matHeaderCellDef>Vehicle</th>
+                <td mat-cell *matCellDef="let row">
+                  <div class="vehicle-cell">
+                    <mat-icon>directions_car</mat-icon>
+                    {{ row.vehicleName }}
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="serviceType">
+                <th mat-header-cell *matHeaderCellDef>Service Type</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="type-chip">{{ serviceTypeLabels[row.serviceType] }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef>Date</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="date-badge">{{ row.date }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="mileage">
+                <th mat-header-cell *matHeaderCellDef>Mileage (km)</th>
+                <td mat-cell *matCellDef="let row">{{ row.mileage | number }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="cost">
+                <th mat-header-cell *matHeaderCellDef>Cost (MKD)</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="total-price">{{ row.cost | number:'1.0-0' }} MKD</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="status-chip status-{{ row.status.toLowerCase() }}">
+                    {{ statusLabels[row.status] }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let row">
+                  <button mat-icon-button matTooltip="View Details"
+                          (click)="goToDetail(row.id)">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  @if (isManager()) {
+                    <a mat-icon-button matTooltip="Edit"
+                       [routerLink]="['/service-records', row.id, 'edit']"
+                       (click)="$event.stopPropagation()">
+                      <mat-icon>edit</mat-icon>
+                    </a>
+                    <button mat-icon-button matTooltip="Delete" color="warn"
+                            (click)="delete(row.id, $event)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  }
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                  class="table-row clickable-row"
+                  (click)="goToDetail(row.id)"></tr>
+            </table>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

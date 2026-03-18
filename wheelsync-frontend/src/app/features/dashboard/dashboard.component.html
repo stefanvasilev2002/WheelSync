@@ -10,54 +10,134 @@
     </div>
   </div>
 
-  <div class="stats-grid">
-    <mat-card class="stat-card vehicles">
-      <div class="stat-icon">
-        <mat-icon>directions_car</mat-icon>
-      </div>
-      <div class="stat-info">
-        <span class="stat-value">—</span>
-        <span class="stat-label">Vehicles</span>
-      </div>
-    </mat-card>
-
-    <mat-card class="stat-card drivers">
-      <div class="stat-icon">
-        <mat-icon>person</mat-icon>
-      </div>
-      <div class="stat-info">
-        <span class="stat-value">—</span>
-        <span class="stat-label">Drivers</span>
-      </div>
-    </mat-card>
-
-    <mat-card class="stat-card fuel">
-      <div class="stat-icon">
-        <mat-icon>local_gas_station</mat-icon>
-      </div>
-      <div class="stat-info">
-        <span class="stat-value">—</span>
-        <span class="stat-label">Fuel Logs This Month</span>
-      </div>
-    </mat-card>
-
-    <mat-card class="stat-card defects">
-      <div class="stat-icon">
-        <mat-icon>report_problem</mat-icon>
-      </div>
-      <div class="stat-info">
-        <span class="stat-value">—</span>
-        <span class="stat-label">Active Defects</span>
-      </div>
-    </mat-card>
-  </div>
-
-  <mat-card class="coming-soon-card">
-    <div class="coming-soon-inner">
-      <mat-icon>construction</mat-icon>
-      <h3>Statistics &amp; Activity</h3>
-      <p>A detailed fleet overview will be available in the next phase.</p>
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
     </div>
-  </mat-card>
+  }
+
+  @if (isManager() && !loading() && stats()) {
+    <div class="stats-grid">
+
+      <mat-card class="stat-card vehicles">
+        <div class="stat-icon">
+          <mat-icon>directions_car</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats()!.totalVehicles }}</span>
+          <span class="stat-label">Total Vehicles</span>
+          <span class="stat-sub">{{ stats()!.assignedVehicles }} assigned</span>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card defects">
+        <div class="stat-icon">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats()!.openDefects }}</span>
+          <span class="stat-label">Open Defects</span>
+          <span class="stat-sub">{{ stats()!.resolvedDefects }} resolved</span>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card reminders">
+        <div class="stat-icon">
+          <mat-icon>notifications</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats()!.dueSoonReminders }}</span>
+          <span class="stat-label">Due Soon</span>
+          <span class="stat-sub">Maintenance reminders</span>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card fuel">
+        <div class="stat-icon">
+          <mat-icon>local_gas_station</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats()!.totalFuelCost | number:'1.0-0' }}</span>
+          <span class="stat-label">Fuel Cost (MKD)</span>
+          <span class="stat-sub">{{ stats()!.totalFuelLogs }} logs</span>
+        </div>
+      </mat-card>
+
+    </div>
+
+    <div class="quick-links">
+      <h2>Quick Access</h2>
+      <div class="link-grid">
+        <a mat-stroked-button routerLink="/service-records">
+          <mat-icon>build</mat-icon>
+          Service Records
+        </a>
+        <a mat-stroked-button routerLink="/defects">
+          <mat-icon>warning</mat-icon>
+          Defects
+        </a>
+        <a mat-stroked-button routerLink="/reminders">
+          <mat-icon>notifications</mat-icon>
+          Reminders
+        </a>
+        <a mat-stroked-button routerLink="/stats">
+          <mat-icon>bar_chart</mat-icon>
+          Full Statistics
+        </a>
+      </div>
+    </div>
+  }
+
+  @if (!isManager() || (!loading() && !stats())) {
+    <div class="stats-grid">
+      <mat-card class="stat-card vehicles">
+        <div class="stat-icon">
+          <mat-icon>directions_car</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">—</span>
+          <span class="stat-label">Vehicles</span>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card fuel">
+        <div class="stat-icon">
+          <mat-icon>local_gas_station</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">—</span>
+          <span class="stat-label">Fuel Logs</span>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card defects">
+        <div class="stat-icon">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">—</span>
+          <span class="stat-label">Active Defects</span>
+        </div>
+      </mat-card>
+    </div>
+
+    <div class="quick-links">
+      <h2>Quick Access</h2>
+      <div class="link-grid">
+        <a mat-stroked-button routerLink="/mileage">
+          <mat-icon>speed</mat-icon>
+          Mileage
+        </a>
+        <a mat-stroked-button routerLink="/fuel">
+          <mat-icon>local_gas_station</mat-icon>
+          Fuel Logs
+        </a>
+        <a mat-stroked-button routerLink="/defects">
+          <mat-icon>warning</mat-icon>
+          Defects
+        </a>
+      </div>
+    </div>
+  }
 
 </div>

@@ -1,0 +1,73 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="header-icon">warning</mat-icon>
+      <div>
+        <h1 class="page-title">Report Defect</h1>
+        <p class="page-subtitle">Log a vehicle issue or defect</p>
+      </div>
+    </div>
+    <a mat-button routerLink="/defects">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </a>
+  </div>
+
+  <mat-card class="form-card">
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-grid">
+
+        <mat-form-field appearance="outline">
+          <mat-label>Vehicle</mat-label>
+          <mat-select formControlName="vehicleId">
+            @for (v of vehicles(); track v.id) {
+              <mat-option [value]="v.id">{{ v.make }} {{ v.model }} - {{ v.licensePlate }}</mat-option>
+            }
+          </mat-select>
+          @if (getFieldError('vehicleId')) {
+            <mat-error>{{ getFieldError('vehicleId') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Priority</mat-label>
+          <mat-select formControlName="priority">
+            @for (p of priorities; track p.value) {
+              <mat-option [value]="p.value">{{ p.label }}</mat-option>
+            }
+          </mat-select>
+          @if (getFieldError('priority')) {
+            <mat-error>{{ getFieldError('priority') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Title</mat-label>
+          <input matInput formControlName="title" placeholder="Brief description of the defect">
+          @if (getFieldError('title')) {
+            <mat-error>{{ getFieldError('title') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="4"
+                    placeholder="Detailed description (optional)"></textarea>
+        </mat-form-field>
+
+        <div class="form-actions full-width">
+          <a mat-button routerLink="/defects">Cancel</a>
+          <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+            @if (saving()) {
+              <mat-spinner diameter="20" style="display:inline-block"></mat-spinner>
+            } @else {
+              <mat-icon>send</mat-icon>
+            }
+            Report Defect
+          </button>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

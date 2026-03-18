@@ -1,0 +1,107 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="header-icon">warning</mat-icon>
+      <div>
+        <h1 class="page-title">Defects</h1>
+        <p class="page-subtitle">Reported vehicle defects and issues</p>
+      </div>
+    </div>
+    <a mat-raised-button color="primary" routerLink="/defects/new" class="add-btn">
+      <mat-icon>add</mat-icon>
+      Report Defect
+    </a>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading defects...</p>
+    </div>
+  }
+
+  @if (!loading()) {
+    <mat-card class="table-card">
+      <mat-card-content>
+        @if (defects().length === 0) {
+          <div class="empty-state">
+            <mat-icon>check_circle</mat-icon>
+            <h3>No defects reported</h3>
+            <p>All vehicles are in good condition</p>
+            <a mat-raised-button color="primary" routerLink="/defects/new">
+              <mat-icon>add</mat-icon>
+              Report Defect
+            </a>
+          </div>
+        } @else {
+          <div class="table-wrapper">
+            <table mat-table [dataSource]="defects()" class="data-table">
+
+              <ng-container matColumnDef="vehicle">
+                <th mat-header-cell *matHeaderCellDef>Vehicle</th>
+                <td mat-cell *matCellDef="let row">
+                  <div class="vehicle-cell">
+                    <mat-icon>directions_car</mat-icon>
+                    {{ row.vehicleName }}
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="title">
+                <th mat-header-cell *matHeaderCellDef>Title</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="defect-title">{{ row.title }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="priority">
+                <th mat-header-cell *matHeaderCellDef>Priority</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="priority-chip color-{{ priorityClass(row.priority) }}">
+                    {{ priorityLabels[row.priority] }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="status-chip color-{{ statusClass(row.status) }}">
+                    {{ statusLabels[row.status] }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="reportedBy">
+                <th mat-header-cell *matHeaderCellDef>Reported By</th>
+                <td mat-cell *matCellDef="let row">{{ row.reportedByName }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef>Date</th>
+                <td mat-cell *matCellDef="let row">
+                  <span class="date-badge">{{ row.createdAt | date:'yyyy-MM-dd' }}</span>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let row">
+                  @if (isManager()) {
+                    <button mat-icon-button matTooltip="Update Status"
+                            (click)="openStatusDialog(row)">
+                      <mat-icon>edit_note</mat-icon>
+                    </button>
+                  }
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+            </table>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

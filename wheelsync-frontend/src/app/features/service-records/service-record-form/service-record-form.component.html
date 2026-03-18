@@ -1,0 +1,113 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="header-icon">build</mat-icon>
+      <div>
+        <h1 class="page-title">{{ editId() ? 'Edit Service Record' : 'Add Service Record' }}</h1>
+        <p class="page-subtitle">{{ editId() ? 'Update service record details' : 'Log a new service' }}</p>
+      </div>
+    </div>
+    <a mat-button routerLink="/service-records">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </a>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading()) {
+    <mat-card class="form-card">
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-grid">
+
+          <mat-form-field appearance="outline">
+            <mat-label>Vehicle</mat-label>
+            <mat-select formControlName="vehicleId">
+              @for (v of vehicles(); track v.id) {
+                <mat-option [value]="v.id">{{ v.make }} {{ v.model }} - {{ v.licensePlate }}</mat-option>
+              }
+            </mat-select>
+            @if (getFieldError('vehicleId')) {
+              <mat-error>{{ getFieldError('vehicleId') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Service Type</mat-label>
+            <mat-select formControlName="serviceType">
+              @for (t of serviceTypes; track t.value) {
+                <mat-option [value]="t.value">{{ t.label }}</mat-option>
+              }
+            </mat-select>
+            @if (getFieldError('serviceType')) {
+              <mat-error>{{ getFieldError('serviceType') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="date">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            @if (getFieldError('date')) {
+              <mat-error>{{ getFieldError('date') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Mileage (km)</mat-label>
+            <input matInput type="number" formControlName="mileage" min="0">
+            @if (getFieldError('mileage')) {
+              <mat-error>{{ getFieldError('mileage') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Cost (MKD)</mat-label>
+            <input matInput type="number" formControlName="cost" min="0" step="0.01">
+            @if (getFieldError('cost')) {
+              <mat-error>{{ getFieldError('cost') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Location</mat-label>
+            <input matInput formControlName="location" placeholder="Service location (optional)">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              @for (s of statusOptions; track s.value) {
+                <mat-option [value]="s.value">{{ s.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" rows="3"
+                      placeholder="Service details (optional)"></textarea>
+          </mat-form-field>
+
+          <div class="form-actions full-width">
+            <a mat-button routerLink="/service-records">Cancel</a>
+            <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+              @if (saving()) {
+                <mat-spinner diameter="20" style="display:inline-block"></mat-spinner>
+              } @else {
+                <mat-icon>save</mat-icon>
+              }
+              {{ editId() ? 'Update' : 'Save' }}
+            </button>
+          </div>
+
+        </form>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

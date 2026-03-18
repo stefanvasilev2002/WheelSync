@@ -84,6 +84,74 @@ export const routes: Routes = [
           import('./features/fuel/fuel-form/fuel-form.component').then(m => m.FuelFormComponent)
       },
 
+      // Service Records
+      {
+        path: 'service-records',
+        loadComponent: () =>
+          import('./features/service-records/service-record-list/service-record-list.component')
+            .then(m => m.ServiceRecordListComponent)
+      },
+      {
+        path: 'service-records/new',
+        loadComponent: () =>
+          import('./features/service-records/service-record-form/service-record-form.component')
+            .then(m => m.ServiceRecordFormComponent)
+      },
+      {
+        path: 'service-records/:id/edit',
+        loadComponent: () =>
+          import('./features/service-records/service-record-form/service-record-form.component')
+            .then(m => m.ServiceRecordFormComponent)
+      },
+      {
+        path: 'service-records/:id',
+        loadComponent: () =>
+          import('./features/service-records/service-record-detail/service-record-detail.component')
+            .then(m => m.ServiceRecordDetailComponent)
+      },
+
+      // Defects
+      {
+        path: 'defects',
+        loadComponent: () =>
+          import('./features/defects/defect-list/defect-list.component')
+            .then(m => m.DefectListComponent)
+      },
+      {
+        path: 'defects/new',
+        loadComponent: () =>
+          import('./features/defects/defect-form/defect-form.component')
+            .then(m => m.DefectFormComponent)
+      },
+
+      // Reminders
+      {
+        path: 'reminders',
+        loadComponent: () =>
+          import('./features/reminders/reminder-list/reminder-list.component')
+            .then(m => m.ReminderListComponent)
+      },
+      {
+        path: 'reminders/new',
+        loadComponent: () =>
+          import('./features/reminders/reminder-form/reminder-form.component')
+            .then(m => m.ReminderFormComponent)
+      },
+      {
+        path: 'reminders/:id/edit',
+        loadComponent: () =>
+          import('./features/reminders/reminder-form/reminder-form.component')
+            .then(m => m.ReminderFormComponent)
+      },
+
+      // Statistics
+      {
+        path: 'stats',
+        loadComponent: () =>
+          import('./features/stats/stats.component')
+            .then(m => m.StatsComponent)
+      },
+
       // Admin - Companies
       {
         path: 'admin/companies',

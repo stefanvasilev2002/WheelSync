@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>Update Defect Status</h2>
+
+<mat-dialog-content>
+  <p class="dialog-subtitle">{{ defect.title }}</p>
+
+  <form [formGroup]="form" class="dialog-form">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        @for (s of statusOptions; track s.value) {
+          <mat-option [value]="s.value">{{ s.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Resolution Note</mat-label>
+      <textarea matInput formControlName="resolutionNote" rows="3"
+                placeholder="Describe the resolution (optional)"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Resolved Date</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="resolvedDate">
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()">
+    <mat-icon>save</mat-icon>
+    Update
+  </button>
+</mat-dialog-actions>

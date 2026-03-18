@@ -1,0 +1,167 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="header-icon">build</mat-icon>
+      <div>
+        <h1 class="page-title">Service Record Details</h1>
+        <p class="page-subtitle">Full service record information and documents</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      @if (isManager() && record()) {
+        <a mat-button [routerLink]="['/service-records', record()!.id, 'edit']">
+          <mat-icon>edit</mat-icon>
+          Edit
+        </a>
+      }
+      <a mat-button routerLink="/service-records">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </a>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading() && record()) {
+    <div class="detail-grid">
+      <mat-card class="detail-card">
+        <mat-card-header>
+          <mat-card-title>Service Information</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="detail-rows">
+            <div class="detail-row">
+              <span class="detail-label">Vehicle</span>
+              <span class="detail-value">{{ record()!.vehicleName }}</span>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="detail-row">
+              <span class="detail-label">Service Type</span>
+              <span class="detail-value">
+                <span class="type-chip">{{ serviceTypeLabels[record()!.serviceType] }}</span>
+              </span>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="detail-row">
+              <span class="detail-label">Date</span>
+              <span class="detail-value">{{ record()!.date }}</span>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="detail-row">
+              <span class="detail-label">Mileage</span>
+              <span class="detail-value">{{ record()!.mileage | number }} km</span>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="detail-row">
+              <span class="detail-label">Cost</span>
+              <span class="detail-value total-price">{{ record()!.cost | number:'1.0-0' }} MKD</span>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="detail-row">
+              <span class="detail-label">Status</span>
+              <span class="detail-value">
+                <span class="status-chip status-{{ record()!.status.toLowerCase() }}">
+                  {{ statusLabels[record()!.status] }}
+                </span>
+              </span>
+            </div>
+            @if (record()!.location) {
+              <mat-divider></mat-divider>
+              <div class="detail-row">
+                <span class="detail-label">Location</span>
+                <span class="detail-value">{{ record()!.location }}</span>
+              </div>
+            }
+            @if (record()!.description) {
+              <mat-divider></mat-divider>
+              <div class="detail-row">
+                <span class="detail-label">Description</span>
+                <span class="detail-value">{{ record()!.description }}</span>
+              </div>
+            }
+            @if (record()!.createdByName) {
+              <mat-divider></mat-divider>
+              <div class="detail-row">
+                <span class="detail-label">Created By</span>
+                <span class="detail-value">{{ record()!.createdByName }}</span>
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="documents-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>attach_file</mat-icon>
+            Documents ({{ record()!.documents.length }})
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (record()!.documents.length === 0) {
+            <div class="empty-docs">
+              <mat-icon>description</mat-icon>
+              <p>No documents attached</p>
+            </div>
+          } @else {
+            <div class="doc-list">
+              @for (doc of record()!.documents; track doc.id) {
+                <div class="doc-item">
+                  <mat-icon class="doc-icon">
+                    {{ doc.fileType === 'pdf' ? 'picture_as_pdf' : 'image' }}
+                  </mat-icon>
+                  <div class="doc-info">
+                    <span class="doc-name">{{ doc.fileName }}</span>
+                    <span class="doc-meta">{{ doc.fileType.toUpperCase() }} · {{ formatFileSize(doc.fileSize) }}</span>
+                  </div>
+                  <div class="doc-actions">
+                    <button mat-icon-button matTooltip="Download" (click)="downloadDocument(doc)">
+                      <mat-icon>download</mat-icon>
+                    </button>
+                    @if (isManager()) {
+                      <button mat-icon-button matTooltip="Delete" color="warn"
+                              (click)="deleteDocument(doc.id)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          @if (isManager()) {
+            <mat-divider style="margin: 16px 0"></mat-divider>
+            <div class="upload-section">
+              <h4>Upload Document</h4>
+              <div class="upload-row">
+                <input type="file" #fileInput accept=".pdf,.jpg,.jpeg,.png"
+                       (change)="onFileSelected($event)" style="display:none">
+                <button mat-stroked-button (click)="fileInput.click()">
+                  <mat-icon>attach_file</mat-icon>
+                  {{ selectedFile() ? selectedFile()!.name : 'Choose File' }}
+                </button>
+                <button mat-raised-button color="primary"
+                        [disabled]="!selectedFile() || uploading()"
+                        (click)="uploadDocument()">
+                  @if (uploading()) {
+                    <mat-spinner diameter="20" style="display:inline-block"></mat-spinner>
+                  } @else {
+                    <mat-icon>upload</mat-icon>
+                  }
+                  Upload
+                </button>
+              </div>
+              <p class="upload-hint">Allowed: PDF, JPG, PNG — max 10 MB</p>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+</div>
