@@ -44,6 +44,17 @@
       <span class="toolbar-title">WheelSync</span>
       <span class="spacer"></span>
 
+      @if (notificationCount() > 0) {
+        <button mat-icon-button
+                routerLink="/stats"
+                [matTooltip]="notificationTooltip()"
+                aria-label="Notifications">
+          <mat-icon [matBadge]="notificationCount()"
+                    matBadgeColor="warn"
+                    matBadgeSize="small">notifications</mat-icon>
+        </button>
+      }
+
       <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="User menu">
         <mat-icon>account_circle</mat-icon>
       </button>

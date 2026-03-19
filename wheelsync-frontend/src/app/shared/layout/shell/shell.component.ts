@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -8,10 +8,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth.service';
+import { StatsService } from '../../../core/services/stats.service';
 
 interface NavItem {
   label: string;
@@ -26,12 +29,18 @@ interface NavItem {
   imports: [
     CommonModule, RouterOutlet, RouterLink, RouterLinkActive,
     MatSidenavModule, MatToolbarModule, MatListModule,
-    MatIconModule, MatButtonModule, MatMenuModule, MatDividerModule
+    MatIconModule, MatButtonModule, MatMenuModule, MatDividerModule,
+    MatBadgeModule, MatTooltipModule
   ],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss'
 })
-export class ShellComponent {
+export class ShellComponent implements OnInit {
+
+  private readonly statsService = inject(StatsService);
+
+  notificationCount = signal(0);
+  notificationTooltip = signal('');
 
   private isMobile = toSignal(
     this.breakpointObserver.observe(Breakpoints.Handset).pipe(
@@ -79,6 +88,24 @@ export class ShellComponent {
     private authService: AuthService,
     private breakpointObserver: BreakpointObserver
   ) {}
+
+  ngOnInit(): void {
+    this.loadNotifications();
+  }
+
+  loadNotifications(): void {
+    if (!this.authService.isAdmin() && !this.authService.isManager()) return;
+    this.statsService.getStats().subscribe({
+      next: (stats) => {
+        const count = (stats.openDefects ?? 0) + (stats.dueSoonReminders ?? 0);
+        this.notificationCount.set(count);
+        const parts: string[] = [];
+        if (stats.openDefects) parts.push(`${stats.openDefects} open defect${stats.openDefects > 1 ? 's' : ''}`);
+        if (stats.dueSoonReminders) parts.push(`${stats.dueSoonReminders} reminder${stats.dueSoonReminders > 1 ? 's' : ''} due soon`);
+        this.notificationTooltip.set(parts.length ? parts.join(', ') : 'All clear');
+      }
+    });
+  }
 
   logout(): void {
     this.authService.logout();

@@ -8,6 +8,10 @@
         <p class="page-subtitle">Overview of trips and distance covered</p>
       </div>
     </div>
+    <button mat-stroked-button (click)="exportCsv()" [disabled]="!logs().length">
+      <mat-icon>download</mat-icon>
+      Export CSV
+    </button>
     <a mat-raised-button color="primary" routerLink="/mileage/new" class="add-btn">
       <mat-icon>add</mat-icon>
       Add Mileage

@@ -10,6 +10,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ServiceRecordService } from '../../../core/services/service-record.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ExportService } from '../../../core/services/export.service';
 import { ServiceRecordResponse, SERVICE_TYPE_LABELS, SERVICE_RECORD_STATUS_LABELS } from '../../../core/models/service-record.model';
 
 @Component({
@@ -31,6 +32,7 @@ import { ServiceRecordResponse, SERVICE_TYPE_LABELS, SERVICE_RECORD_STATUS_LABEL
 export class ServiceRecordListComponent implements OnInit {
   private readonly serviceRecordService = inject(ServiceRecordService);
   private readonly authService = inject(AuthService);
+  private readonly exportService = inject(ExportService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
 
@@ -62,6 +64,21 @@ export class ServiceRecordListComponent implements OnInit {
         this.snackBar.open('Error loading service records', 'Close', { duration: 3000 });
       }
     });
+  }
+
+  exportCsv(): void {
+    const rows = this.records().map(r => ({
+      Date: r.date,
+      Vehicle: r.vehicleName,
+      'Service Type': this.serviceTypeLabels[r.serviceType] ?? r.serviceType,
+      'Mileage (km)': r.mileage,
+      'Cost (MKD)': r.cost,
+      Location: r.location ?? '',
+      Status: r.status,
+      Description: r.description ?? '',
+      'Created By': r.createdByName ?? ''
+    }));
+    this.exportService.exportToCsv('service_records', rows);
   }
 
   goToDetail(id: number): void {

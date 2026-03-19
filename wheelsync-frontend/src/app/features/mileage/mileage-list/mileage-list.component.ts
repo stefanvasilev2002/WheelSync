@@ -11,6 +11,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MileageService } from '../../../core/services/mileage.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ExportService } from '../../../core/services/export.service';
 import { MileageLogResponse } from '../../../core/models/mileage.model';
 
 @Component({
@@ -34,6 +35,7 @@ import { MileageLogResponse } from '../../../core/models/mileage.model';
 export class MileageListComponent implements OnInit {
   private readonly mileageService = inject(MileageService);
   private readonly authService = inject(AuthService);
+  private readonly exportService = inject(ExportService);
   private readonly snackBar = inject(MatSnackBar);
 
   logs = signal<MileageLogResponse[]>([]);
@@ -55,6 +57,19 @@ export class MileageListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadLogs();
+  }
+
+  exportCsv(): void {
+    const rows = this.logs().map(l => ({
+      Date: l.date,
+      Vehicle: l.vehicleDisplayName,
+      Driver: l.driverName,
+      'Start (km)': l.startMileage,
+      'End (km)': l.endMileage,
+      'Distance (km)': l.distance,
+      Note: l.note ?? ''
+    }));
+    this.exportService.exportToCsv('mileage_log', rows);
   }
 
   loadLogs(): void {

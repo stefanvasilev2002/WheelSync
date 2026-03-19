@@ -7,12 +7,18 @@
         <p class="page-subtitle">Vehicle maintenance and service history</p>
       </div>
     </div>
-    @if (isManager()) {
-      <a mat-raised-button color="primary" routerLink="/service-records/new" class="add-btn">
-        <mat-icon>add</mat-icon>
-        Add Service Record
-      </a>
-    }
+    <div class="header-actions">
+      <button mat-stroked-button (click)="exportCsv()" [disabled]="!records().length">
+        <mat-icon>download</mat-icon>
+        Export CSV
+      </button>
+      @if (isManager()) {
+        <a mat-raised-button color="primary" routerLink="/service-records/new" class="add-btn">
+          <mat-icon>add</mat-icon>
+          Add Service Record
+        </a>
+      }
+    </div>
   </div>
 
   @if (loading()) {

@@ -10,6 +10,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FuelService } from '../../../core/services/fuel.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ExportService } from '../../../core/services/export.service';
 import { FuelLogResponse } from '../../../core/models/fuel.model';
 import { FUEL_TYPE_LABELS } from '../../../core/models/vehicle.model';
 
@@ -33,6 +34,7 @@ import { FUEL_TYPE_LABELS } from '../../../core/models/vehicle.model';
 export class FuelListComponent implements OnInit {
   private readonly fuelService = inject(FuelService);
   private readonly authService = inject(AuthService);
+  private readonly exportService = inject(ExportService);
   private readonly snackBar = inject(MatSnackBar);
 
   logs = signal<FuelLogResponse[]>([]);
@@ -60,6 +62,21 @@ export class FuelListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadLogs();
+  }
+
+  exportCsv(): void {
+    const rows = this.logs().map(l => ({
+      Date: l.date,
+      Vehicle: l.vehicleDisplayName,
+      Driver: l.driverName,
+      'Fuel Type': l.fuelType,
+      'Quantity (L)': l.quantityLiters,
+      'Price/L (MKD)': l.pricePerLiter,
+      'Total (MKD)': l.totalPrice,
+      'Mileage at Refuel (km)': l.mileageAtRefuel,
+      'Consumption (L/100km)': l.consumption ?? ''
+    }));
+    this.exportService.exportToCsv('fuel_log', rows);
   }
 
   loadLogs(): void {
