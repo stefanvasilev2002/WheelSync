@@ -105,7 +105,54 @@
 
     </div>
 
-    <!-- Top Vehicles -->
+    <!-- Charts Row -->
+    <h2 class="section-title" style="margin-top: 32px">Charts</h2>
+    <div class="charts-grid">
+
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Fleet Assignment</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="chart-content">
+          <canvas baseChart
+            [data]="fleetChartData()"
+            [type]="'doughnut'"
+            [options]="doughnutOptions">
+          </canvas>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Defect Status</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="chart-content">
+          <canvas baseChart
+            [data]="defectChartData()"
+            [type]="'doughnut'"
+            [options]="doughnutOptions">
+          </canvas>
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+
+    @if (stats()!.topVehiclesByDistance.length > 0) {
+      <mat-card class="chart-card" style="margin-top: 24px">
+        <mat-card-header>
+          <mat-card-title>Top Vehicles by Distance</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="chart-content" style="height: 240px">
+          <canvas baseChart
+            [data]="vehicleBarData()"
+            [type]="'bar'"
+            [options]="barOptions">
+          </canvas>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    <!-- Top Vehicles Table -->
     @if (stats()!.topVehiclesByDistance.length > 0) {
       <h2 class="section-title" style="margin-top: 32px">Top Vehicles by Distance</h2>
       <mat-card class="table-card">
