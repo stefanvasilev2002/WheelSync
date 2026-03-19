@@ -181,6 +181,12 @@ export const routes: Routes = [
           import('./features/admin/users/user-edit/user-edit.component').then(m => m.UserEditComponent)
       },
 
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/profile.component').then(m => m.ProfileComponent)
+      },
+
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

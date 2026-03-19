@@ -1,0 +1,180 @@
+<div class="page-container">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="header-icon">account_circle</mat-icon>
+      <div>
+        <h1 class="page-title">My Profile</h1>
+        <p class="page-subtitle">Manage your account settings</p>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading profile...</p>
+    </div>
+  } @else {
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+
+      <!-- Card 1: Profile Info -->
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>person</mat-icon>
+          <mat-card-title>Profile Information</mat-card-title>
+          <mat-card-subtitle>View and edit your personal details</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+
+          @if (!editMode()) {
+            <!-- View Mode -->
+            <div style="display: flex; flex-direction: column; align-items: center; padding: 24px 0 16px;">
+              <div style="
+                width: 72px; height: 72px; border-radius: 50%;
+                background: linear-gradient(135deg, #3949ab, #1976d2);
+                display: flex; align-items: center; justify-content: center;
+                font-size: 32px; font-weight: 700; color: white; margin-bottom: 16px;">
+                {{ getAvatarLetter() }}
+              </div>
+              <h2 style="font-size: 20px; font-weight: 600; color: #1a237e; margin: 0 0 4px;">
+                {{ profile()?.firstName }} {{ profile()?.lastName }}
+              </h2>
+              <p style="font-size: 14px; color: #666; margin: 0 0 12px;">{{ profile()?.email }}</p>
+              <span style="
+                display: inline-block; padding: 4px 12px; border-radius: 12px;
+                background: #e8eaf6; color: #3949ab; font-size: 12px; font-weight: 600;">
+                {{ getRoleLabel(profile()?.role) }}
+              </span>
+              @if (profile()?.companyName) {
+                <p style="font-size: 13px; color: #555; margin: 12px 0 0;">
+                  <mat-icon style="font-size: 16px; vertical-align: middle; color: #888;">business</mat-icon>
+                  {{ profile()?.companyName }}
+                </p>
+              }
+              @if (profile()?.phone) {
+                <p style="font-size: 13px; color: #555; margin: 8px 0 0;">
+                  <mat-icon style="font-size: 16px; vertical-align: middle; color: #888;">phone</mat-icon>
+                  {{ profile()?.phone }}
+                </p>
+              }
+            </div>
+          } @else {
+            <!-- Edit Mode -->
+            <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" style="margin-top: 16px;">
+              <div class="form-grid">
+
+                <mat-form-field appearance="outline">
+                  <mat-label>First Name *</mat-label>
+                  <mat-icon matPrefix>person</mat-icon>
+                  <input matInput formControlName="firstName" placeholder="First name">
+                  @if (getFieldError('profile', 'firstName')) {
+                    <mat-error>{{ getFieldError('profile', 'firstName') }}</mat-error>
+                  }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Last Name *</mat-label>
+                  <mat-icon matPrefix>person</mat-icon>
+                  <input matInput formControlName="lastName" placeholder="Last name">
+                  @if (getFieldError('profile', 'lastName')) {
+                    <mat-error>{{ getFieldError('profile', 'lastName') }}</mat-error>
+                  }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="span-2">
+                  <mat-label>Phone</mat-label>
+                  <mat-icon matPrefix>phone</mat-icon>
+                  <input matInput formControlName="phone" placeholder="+389 ...">
+                </mat-form-field>
+
+              </div>
+
+              <div class="form-actions" style="margin-top: 8px;">
+                <button mat-stroked-button type="button" (click)="cancelEdit()" [disabled]="saving()">
+                  <mat-icon>close</mat-icon>
+                  Cancel
+                </button>
+                <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+                  @if (saving()) {
+                    <mat-spinner diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+                  } @else {
+                    <mat-icon>save</mat-icon>
+                  }
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          }
+
+        </mat-card-content>
+
+        @if (!editMode()) {
+          <mat-card-actions align="end" style="padding: 0 16px 16px;">
+            <button mat-raised-button color="primary" (click)="enterEditMode()">
+              <mat-icon>edit</mat-icon>
+              Edit Profile
+            </button>
+          </mat-card-actions>
+        }
+      </mat-card>
+
+      <!-- Card 2: Change Password -->
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>lock</mat-icon>
+          <mat-card-title>Change Password</mat-card-title>
+          <mat-card-subtitle>Update your account password</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" style="margin-top: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+
+              <mat-form-field appearance="outline">
+                <mat-label>Current Password *</mat-label>
+                <mat-icon matPrefix>lock_outline</mat-icon>
+                <input matInput type="password" formControlName="currentPassword" placeholder="Enter current password">
+                @if (getFieldError('password', 'currentPassword')) {
+                  <mat-error>{{ getFieldError('password', 'currentPassword') }}</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>New Password *</mat-label>
+                <mat-icon matPrefix>lock</mat-icon>
+                <input matInput type="password" formControlName="newPassword" placeholder="At least 6 characters">
+                @if (getFieldError('password', 'newPassword')) {
+                  <mat-error>{{ getFieldError('password', 'newPassword') }}</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Confirm New Password *</mat-label>
+                <mat-icon matPrefix>lock</mat-icon>
+                <input matInput type="password" formControlName="confirmPassword" placeholder="Repeat new password">
+                @if (getFieldError('password', 'confirmPassword')) {
+                  <mat-error>{{ getFieldError('password', 'confirmPassword') }}</mat-error>
+                }
+              </mat-form-field>
+
+            </div>
+
+            <div class="form-actions" style="margin-top: 8px;">
+              <button mat-raised-button color="primary" type="submit" [disabled]="changingPassword()">
+                @if (changingPassword()) {
+                  <mat-spinner diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+                } @else {
+                  <mat-icon>key</mat-icon>
+                }
+                Change Password
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+  }
+
+</div>
