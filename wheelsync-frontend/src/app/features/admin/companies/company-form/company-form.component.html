@@ -1,12 +1,16 @@
 <div class="page-container">
   <div class="page-header">
-    <button mat-icon-button routerLink="/admin/companies" class="back-btn">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <div>
-      <h1 class="page-title">{{ isEditMode ? 'Edit Company' : 'New Company' }}</h1>
-      <p class="page-subtitle">{{ isEditMode ? 'Update company details' : 'Register a new company' }}</p>
+    <div class="header-left">
+      <mat-icon class="header-icon">business</mat-icon>
+      <div>
+        <h1 class="page-title">{{ isEditMode ? 'Edit Company' : 'New Company' }}</h1>
+        <p class="page-subtitle">{{ isEditMode ? 'Update company details' : 'Register a new company' }}</p>
+      </div>
     </div>
+    <a mat-button routerLink="/admin/companies">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </a>
   </div>
 
   @if (loading()) {

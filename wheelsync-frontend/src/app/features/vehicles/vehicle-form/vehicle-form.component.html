@@ -1,13 +1,17 @@
 <div class="page-container">
   <!-- Header -->
   <div class="page-header">
-    <button mat-icon-button routerLink="/vehicles" class="back-btn">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <div>
-      <h1 class="page-title">{{ isEditMode() ? 'Edit Vehicle' : 'Add Vehicle' }}</h1>
-      <p class="page-subtitle">{{ isEditMode() ? 'Update vehicle details' : 'Add a new vehicle to the fleet' }}</p>
+    <div class="header-left">
+      <mat-icon class="header-icon">directions_car</mat-icon>
+      <div>
+        <h1 class="page-title">{{ isEditMode() ? 'Edit Vehicle' : 'Add Vehicle' }}</h1>
+        <p class="page-subtitle">{{ isEditMode() ? 'Update vehicle details' : 'Add a new vehicle to the fleet' }}</p>
+      </div>
     </div>
+    <a mat-button routerLink="/vehicles">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </a>
   </div>
 
   @if (loading()) {

@@ -8,30 +8,31 @@
   @if (!loading() && vehicle()) {
     <!-- Header -->
     <div class="page-header">
-      <button mat-icon-button routerLink="/vehicles" class="back-btn">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
-      <div class="vehicle-icon-wrapper">
-        <mat-icon>directions_car</mat-icon>
+      <div class="header-left">
+        <mat-icon class="header-icon">directions_car</mat-icon>
+        <div>
+          <h1 class="page-title">{{ vehicle()!.make }} {{ vehicle()!.model }}</h1>
+          <p class="page-subtitle">
+            <span class="license-plate">{{ vehicle()!.licensePlate }}</span>
+            <span class="year-badge">{{ vehicle()!.year }}</span>
+            <span class="status-chip" [class.active]="vehicle()!.isActive" [class.inactive]="!vehicle()!.isActive">
+              {{ vehicle()!.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </p>
+        </div>
       </div>
-      <div class="header-info">
-        <h1 class="page-title">{{ vehicle()!.make }} {{ vehicle()!.model }}</h1>
-        <p class="page-subtitle">
-          <span class="license-plate">{{ vehicle()!.licensePlate }}</span>
-          <span class="year-badge">{{ vehicle()!.year }}</span>
-          <span class="status-chip" [class.active]="vehicle()!.isActive" [class.inactive]="!vehicle()!.isActive">
-            {{ vehicle()!.isActive ? 'Active' : 'Inactive' }}
-          </span>
-        </p>
-      </div>
-      @if (isAdminOrManager()) {
-        <div class="header-actions">
+      <div class="header-actions">
+        @if (isAdminOrManager()) {
           <a mat-stroked-button [routerLink]="['/vehicles', vehicle()!.id, 'edit']">
             <mat-icon>edit</mat-icon>
             Edit
           </a>
-        </div>
-      }
+        }
+        <a mat-button routerLink="/vehicles">
+          <mat-icon>arrow_back</mat-icon>
+          Back
+        </a>
+      </div>
     </div>
 
     <!-- Tabs -->

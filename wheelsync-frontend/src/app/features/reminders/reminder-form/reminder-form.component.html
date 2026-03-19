@@ -50,7 +50,7 @@
 
           <mat-form-field appearance="outline">
             <mat-label>Interval Type</mat-label>
-            <mat-select formControlName="intervalType">
+            <mat-select formControlName="intervalType" (selectionChange)="onIntervalTypeChange($event.value)">
               @for (t of intervalTypes; track t.value) {
                 <mat-option [value]="t.value">{{ t.label }}</mat-option>
               }

@@ -87,13 +87,6 @@ export class ReminderFormComponent implements OnInit {
       this.editId.set(Number(id));
       this.loadReminder(Number(id));
     }
-    this.form.get('intervalType')?.valueChanges.subscribe((val) => {
-      this.intervalType.set((val as 'MILEAGE' | 'DATE') ?? 'MILEAGE');
-      this.form.get('mileageInterval')?.reset();
-      this.form.get('dateIntervalMonths')?.reset();
-      this.form.get('lastServiceMileage')?.reset();
-      this.form.get('lastServiceDate')?.reset();
-    });
   }
 
   loadVehicles(): void {
@@ -173,6 +166,14 @@ export class ReminderFormComponent implements OnInit {
         this.snackBar.open(msg, 'Close', { duration: 4000 });
       }
     });
+  }
+
+  onIntervalTypeChange(value: 'MILEAGE' | 'DATE'): void {
+    this.intervalType.set(value);
+    this.form.get('mileageInterval')?.reset();
+    this.form.get('dateIntervalMonths')?.reset();
+    this.form.get('lastServiceMileage')?.reset();
+    this.form.get('lastServiceDate')?.reset();
   }
 
   getFieldError(field: string): string {

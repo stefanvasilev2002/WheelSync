@@ -1,12 +1,16 @@
 <div class="page-container">
   <div class="page-header">
-    <button mat-icon-button routerLink="/mileage" class="back-btn">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <div>
-      <h1 class="page-title">Add Mileage</h1>
-      <p class="page-subtitle">Record a completed trip</p>
+    <div class="header-left">
+      <mat-icon class="header-icon">speed</mat-icon>
+      <div>
+        <h1 class="page-title">Add Mileage</h1>
+        <p class="page-subtitle">Record a completed trip</p>
+      </div>
     </div>
+    <a mat-button routerLink="/mileage">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </a>
   </div>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()">

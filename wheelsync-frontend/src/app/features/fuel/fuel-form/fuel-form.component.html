@@ -1,12 +1,16 @@
 <div class="page-container">
   <div class="page-header">
-    <button mat-icon-button routerLink="/fuel" class="back-btn">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <div>
-      <h1 class="page-title">Add Fuel Log</h1>
-      <p class="page-subtitle">Record a fuel refill</p>
+    <div class="header-left">
+      <mat-icon class="header-icon">local_gas_station</mat-icon>
+      <div>
+        <h1 class="page-title">Add Fuel Log</h1>
+        <p class="page-subtitle">Record a fuel refill</p>
+      </div>
     </div>
+    <a mat-button routerLink="/fuel">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </a>
   </div>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
