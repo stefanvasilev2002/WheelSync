@@ -94,6 +94,13 @@ public class FuelLogService {
             }
         }
 
+        if (request.getMileageAtRefuel() < vehicle.getCurrentMileage()) {
+            throw new IllegalArgumentException(
+                "Mileage at refuel (" + request.getMileageAtRefuel() +
+                " km) cannot be less than the vehicle's current mileage (" +
+                vehicle.getCurrentMileage() + " km)");
+        }
+
         User driver = userRepository.findById(principal.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", principal.getId()));
 

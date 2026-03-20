@@ -335,3 +335,57 @@ mat-toolbar.toolbar {
 @media (max-width: 768px) {
   .charts-grid { grid-template-columns: 1fr; }
 }
+
+// --- Defect photo upload ---
+.photo-section {
+  .photo-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(0,0,0,0.6);
+    margin-bottom: 10px;
+  }
+
+  .photo-upload-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 2px dashed rgba(0,0,0,0.2);
+    border-radius: 12px;
+    padding: 32px 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+
+    mat-icon { font-size: 36px; height: 36px; width: 36px; color: rgba(0,0,0,0.35); }
+    span { font-size: 14px; color: rgba(0,0,0,0.55); }
+    small { font-size: 12px; color: rgba(0,0,0,0.38); }
+
+    &:hover { border-color: #3949ab; background: rgba(57,73,171,0.04); }
+  }
+
+  .photo-preview {
+    position: relative;
+    display: inline-block;
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 320px;
+
+    img { display: block; width: 100%; max-height: 240px; object-fit: cover; }
+
+    .remove-photo-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      mat-icon { color: white; }
+    }
+  }
+}
+
+// --- Stats wide chart card ---
+.chart-card-wide {
+  width: 100%;
+  margin-bottom: 0;
+}

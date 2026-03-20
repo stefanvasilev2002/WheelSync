@@ -10,6 +10,7 @@ import {
   VehicleAssignmentResponse,
   AssignVehicleRequest
 } from '../models/vehicle.model';
+import { VehicleReportResponse } from '../models/report.model';
 
 @Injectable({ providedIn: 'root' })
 export class VehicleService {
@@ -79,6 +80,12 @@ export class VehicleService {
 
   getMyVehicles(): Observable<VehicleResponse[]> {
     return this.http.get<ApiResponse<VehicleResponse[]>>(`${this.baseUrl}/my`).pipe(
+      map(res => res.data)
+    );
+  }
+
+  getReport(id: number): Observable<VehicleReportResponse> {
+    return this.http.get<ApiResponse<VehicleReportResponse>>(`${this.baseUrl}/${id}/report`).pipe(
       map(res => res.data)
     );
   }

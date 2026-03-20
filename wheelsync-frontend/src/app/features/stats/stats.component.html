@@ -21,15 +21,14 @@
   }
 
   @if (!loading() && stats()) {
-    <!-- Fleet Overview -->
+
+    <!-- Fleet Overview Cards -->
     <h2 class="section-title">Fleet Overview</h2>
     <div class="stats-grid">
 
       <mat-card class="stat-card vehicles">
         <mat-card-content>
-          <div class="stat-icon-wrap blue">
-            <mat-icon>directions_car</mat-icon>
-          </div>
+          <div class="stat-icon-wrap blue"><mat-icon>directions_car</mat-icon></div>
           <div class="stat-info">
             <p class="stat-label">Total Vehicles</p>
             <p class="stat-big-value">{{ stats()!.totalVehicles }}</p>
@@ -40,9 +39,7 @@
 
       <mat-card class="stat-card defects">
         <mat-card-content>
-          <div class="stat-icon-wrap red">
-            <mat-icon>warning</mat-icon>
-          </div>
+          <div class="stat-icon-wrap red"><mat-icon>warning</mat-icon></div>
           <div class="stat-info">
             <p class="stat-label">Open Defects</p>
             <p class="stat-big-value">{{ stats()!.openDefects }}</p>
@@ -53,9 +50,7 @@
 
       <mat-card class="stat-card reminders">
         <mat-card-content>
-          <div class="stat-icon-wrap orange">
-            <mat-icon>notifications</mat-icon>
-          </div>
+          <div class="stat-icon-wrap orange"><mat-icon>notifications</mat-icon></div>
           <div class="stat-info">
             <p class="stat-label">Due Soon Reminders</p>
             <p class="stat-big-value">{{ stats()!.dueSoonReminders }}</p>
@@ -66,9 +61,7 @@
 
       <mat-card class="stat-card distance">
         <mat-card-content>
-          <div class="stat-icon-wrap green">
-            <mat-icon>speed</mat-icon>
-          </div>
+          <div class="stat-icon-wrap green"><mat-icon>speed</mat-icon></div>
           <div class="stat-info">
             <p class="stat-label">Total Distance</p>
             <p class="stat-big-value">{{ stats()!.totalDistanceKm | number }} km</p>
@@ -79,9 +72,7 @@
 
       <mat-card class="stat-card fuel">
         <mat-card-content>
-          <div class="stat-icon-wrap purple">
-            <mat-icon>local_gas_station</mat-icon>
-          </div>
+          <div class="stat-icon-wrap purple"><mat-icon>local_gas_station</mat-icon></div>
           <div class="stat-info">
             <p class="stat-label">Total Fuel Cost</p>
             <p class="stat-big-value">{{ stats()!.totalFuelCost | number:'1.0-0' }} MKD</p>
@@ -92,9 +83,7 @@
 
       <mat-card class="stat-card service">
         <mat-card-content>
-          <div class="stat-icon-wrap teal">
-            <mat-icon>build</mat-icon>
-          </div>
+          <div class="stat-icon-wrap teal"><mat-icon>build</mat-icon></div>
           <div class="stat-info">
             <p class="stat-label">Total Service Cost</p>
             <p class="stat-big-value">{{ stats()!.totalServiceCost | number:'1.0-0' }} MKD</p>
@@ -105,56 +94,76 @@
 
     </div>
 
-    <!-- Charts Row -->
-    <h2 class="section-title" style="margin-top: 32px">Charts</h2>
+    <!-- Status Charts Row -->
+    <h2 class="section-title" style="margin-top: 32px">Fleet Status</h2>
     <div class="charts-grid">
 
       <mat-card class="chart-card">
-        <mat-card-header>
-          <mat-card-title>Fleet Assignment</mat-card-title>
-        </mat-card-header>
+        <mat-card-header><mat-card-title>Fleet Assignment</mat-card-title></mat-card-header>
         <mat-card-content class="chart-content">
-          <canvas baseChart
-            [data]="fleetChartData()"
-            [type]="'doughnut'"
-            [options]="doughnutOptions">
-          </canvas>
+          <canvas baseChart [data]="fleetChartData()" [type]="'doughnut'" [options]="doughnutOptions"></canvas>
         </mat-card-content>
       </mat-card>
 
       <mat-card class="chart-card">
-        <mat-card-header>
-          <mat-card-title>Defect Status</mat-card-title>
-        </mat-card-header>
+        <mat-card-header><mat-card-title>Defect Status</mat-card-title></mat-card-header>
         <mat-card-content class="chart-content">
-          <canvas baseChart
-            [data]="defectChartData()"
-            [type]="'doughnut'"
-            [options]="doughnutOptions">
-          </canvas>
+          <canvas baseChart [data]="defectChartData()" [type]="'doughnut'" [options]="doughnutOptions"></canvas>
         </mat-card-content>
       </mat-card>
 
     </div>
 
-    @if (stats()!.topVehiclesByDistance.length > 0) {
-      <mat-card class="chart-card" style="margin-top: 24px">
-        <mat-card-header>
-          <mat-card-title>Top Vehicles by Distance</mat-card-title>
-        </mat-card-header>
-        <mat-card-content class="chart-content" style="height: 240px">
-          <canvas baseChart
-            [data]="vehicleBarData()"
-            [type]="'bar'"
-            [options]="barOptions">
-          </canvas>
+    <!-- Monthly Costs Chart — FR-10.1 -->
+    <h2 class="section-title" style="margin-top: 32px">Monthly Costs (last 12 months)</h2>
+    <mat-card class="chart-card chart-card-wide">
+      <mat-card-header><mat-card-title>Fuel + Service Costs per Month (MKD)</mat-card-title></mat-card-header>
+      <mat-card-content class="chart-content" style="height: 280px">
+        <canvas baseChart [data]="monthlyCostData()" [type]="'line'" [options]="lineOptions"></canvas>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Cost by Service Type — FR-10.2 -->
+    @if (hasServiceTypeCostData()) {
+      <h2 class="section-title" style="margin-top: 32px">Cost by Service Type</h2>
+      <div class="charts-grid">
+        <mat-card class="chart-card">
+          <mat-card-header><mat-card-title>Service Cost Breakdown</mat-card-title></mat-card-header>
+          <mat-card-content class="chart-content">
+            <canvas baseChart [data]="serviceTypeCostData()" [type]="'doughnut'" [options]="doughnutOptions"></canvas>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Fuel Consumption per Vehicle — FR-10.3 -->
+        @if (hasConsumptionData()) {
+          <mat-card class="chart-card">
+            <mat-card-header><mat-card-title>Avg. Fuel Consumption per Vehicle (L/100km)</mat-card-title></mat-card-header>
+            <mat-card-content class="chart-content">
+              <canvas baseChart [data]="consumptionData()" [type]="'bar'" [options]="consumptionBarOptions"></canvas>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    } @else if (hasConsumptionData()) {
+      <h2 class="section-title" style="margin-top: 32px">Fuel Consumption</h2>
+      <mat-card class="chart-card chart-card-wide">
+        <mat-card-header><mat-card-title>Avg. Fuel Consumption per Vehicle (L/100km)</mat-card-title></mat-card-header>
+        <mat-card-content class="chart-content" style="height: 220px">
+          <canvas baseChart [data]="consumptionData()" [type]="'bar'" [options]="consumptionBarOptions"></canvas>
         </mat-card-content>
       </mat-card>
     }
 
-    <!-- Top Vehicles Table -->
+    <!-- Top Vehicles by Distance — Bar + Table -->
     @if (stats()!.topVehiclesByDistance.length > 0) {
       <h2 class="section-title" style="margin-top: 32px">Top Vehicles by Distance</h2>
+
+      <mat-card class="chart-card chart-card-wide" style="margin-bottom: 24px">
+        <mat-card-content class="chart-content" style="height: 240px">
+          <canvas baseChart [data]="vehicleBarData()" [type]="'bar'" [options]="barOptions"></canvas>
+        </mat-card-content>
+      </mat-card>
+
       <mat-card class="table-card">
         <mat-card-content>
           <div class="table-wrapper">
@@ -187,6 +196,13 @@
                 <td mat-cell *matCellDef="let row">{{ row.fuelCost | number:'1.0-0' }} MKD</td>
               </ng-container>
 
+              <ng-container matColumnDef="avgConsumption">
+                <th mat-header-cell *matHeaderCellDef>Avg. Consumption</th>
+                <td mat-cell *matCellDef="let row">
+                  {{ row.avgConsumption != null ? (row.avgConsumption | number:'1.1-2') + ' L/100km' : '—' }}
+                </td>
+              </ng-container>
+
               <tr mat-header-row *matHeaderRowDef="topVehicleColumns"></tr>
               <tr mat-row *matRowDef="let row; columns: topVehicleColumns;" class="table-row"></tr>
             </table>
@@ -194,5 +210,6 @@
         </mat-card-content>
       </mat-card>
     }
+
   }
 </div>

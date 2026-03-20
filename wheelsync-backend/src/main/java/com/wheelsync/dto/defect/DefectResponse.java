@@ -22,6 +22,7 @@ public class DefectResponse {
     private String resolutionNote;
     private LocalDate resolvedDate;
     private Long serviceRecordId;
+    private boolean hasPhoto;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

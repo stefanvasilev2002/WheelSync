@@ -8,11 +8,15 @@ import com.wheelsync.security.UserPrincipal;
 import com.wheelsync.service.DefectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -46,6 +50,31 @@ public class DefectController {
         DefectResponse response = defectService.create(request, principal);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok("Defect reported successfully", response));
+    }
+
+    @PostMapping("/{id}/photo")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FLEET_MANAGER', 'DRIVER')")
+    public ResponseEntity<ApiResponse<DefectResponse>> uploadPhoto(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        DefectResponse response = defectService.uploadPhoto(id, file, principal);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok("Photo uploaded successfully", response));
+    }
+
+    @GetMapping("/{id}/photo")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FLEET_MANAGER', 'DRIVER')")
+    public ResponseEntity<Resource> getPhoto(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        Resource resource = defectService.getPhoto(id, principal);
+        String filename = resource.getFilename() != null ? resource.getFilename() : "photo.jpg";
+        MediaType mediaType = filename.endsWith(".png") ? MediaType.IMAGE_PNG : MediaType.IMAGE_JPEG;
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                .body(resource);
     }
 
     @PatchMapping("/{id}/status")

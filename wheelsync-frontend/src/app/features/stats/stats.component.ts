@@ -13,6 +13,19 @@ import { ChartData, ChartOptions } from 'chart.js';
 import { StatsService } from '../../core/services/stats.service';
 import { StatsResponse } from '../../core/models/stats.model';
 
+const SERVICE_TYPE_LABELS: Record<string, string> = {
+  OIL_CHANGE: 'Oil Change',
+  FILTER_CHANGE: 'Filter Change',
+  TIRE_CHANGE: 'Tire Change',
+  ENGINE_REPAIR: 'Engine Repair',
+  TECHNICAL_INSPECTION: 'Technical Inspection',
+  OTHER: 'Other'
+};
+
+const SERVICE_TYPE_COLORS = [
+  '#3949ab', '#1e88e5', '#039be5', '#00acc1', '#00897b', '#43a047'
+];
+
 @Component({
   selector: 'ws-stats',
   standalone: true,
@@ -38,9 +51,9 @@ export class StatsComponent implements OnInit {
   stats = signal<StatsResponse | null>(null);
   loading = signal(false);
 
-  readonly topVehicleColumns = ['rank', 'vehicle', 'distance', 'fuelCost'];
+  readonly topVehicleColumns = ['rank', 'vehicle', 'distance', 'fuelCost', 'avgConsumption'];
 
-  // Doughnut: Fleet assignment status
+  // ── Doughnut: Fleet assignment status ──────────────────────────────────
   readonly fleetChartData = computed<ChartData<'doughnut'>>(() => {
     const s = this.stats();
     return {
@@ -53,7 +66,7 @@ export class StatsComponent implements OnInit {
     };
   });
 
-  // Doughnut: Defect status
+  // ── Doughnut: Defect status ─────────────────────────────────────────────
   readonly defectChartData = computed<ChartData<'doughnut'>>(() => {
     const s = this.stats();
     return {
@@ -66,7 +79,7 @@ export class StatsComponent implements OnInit {
     };
   });
 
-  // Horizontal bar: Top vehicles by distance
+  // ── Bar: Top vehicles by distance ───────────────────────────────────────
   readonly vehicleBarData = computed<ChartData<'bar'>>(() => {
     const rows = this.stats()?.topVehiclesByDistance ?? [];
     return {
@@ -80,6 +93,63 @@ export class StatsComponent implements OnInit {
     };
   });
 
+  // ── Line: Monthly costs (fuel + service) — FR-10.1 ─────────────────────
+  readonly monthlyCostData = computed<ChartData<'line'>>(() => {
+    const rows = this.stats()?.monthlyCosts ?? [];
+    return {
+      labels: rows.map(r => r.month),
+      datasets: [
+        {
+          label: 'Fuel Cost (MKD)',
+          data: rows.map(r => r.fuelCost),
+          borderColor: '#1e88e5',
+          backgroundColor: 'rgba(30,136,229,0.1)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4
+        },
+        {
+          label: 'Service Cost (MKD)',
+          data: rows.map(r => r.serviceCost),
+          borderColor: '#43a047',
+          backgroundColor: 'rgba(67,160,71,0.1)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4
+        }
+      ]
+    };
+  });
+
+  // ── Doughnut: Cost by service type — FR-10.2 ───────────────────────────
+  readonly serviceTypeCostData = computed<ChartData<'doughnut'>>(() => {
+    const map = this.stats()?.costByServiceType ?? {};
+    const entries = Object.entries(map).filter(([, v]) => v > 0);
+    return {
+      labels: entries.map(([k]) => SERVICE_TYPE_LABELS[k] ?? k),
+      datasets: [{
+        data: entries.map(([, v]) => v),
+        backgroundColor: SERVICE_TYPE_COLORS.slice(0, entries.length),
+        borderWidth: 0
+      }]
+    };
+  });
+
+  // ── Bar: Average fuel consumption per vehicle — FR-10.3 ────────────────
+  readonly consumptionData = computed<ChartData<'bar'>>(() => {
+    const rows = (this.stats()?.topVehiclesByDistance ?? []).filter(r => r.avgConsumption != null);
+    return {
+      labels: rows.map(r => r.vehicleName),
+      datasets: [{
+        label: 'Avg Consumption (L/100km)',
+        data: rows.map(r => r.avgConsumption ?? 0),
+        backgroundColor: '#00897b',
+        borderRadius: 4
+      }]
+    };
+  });
+
+  // ── Chart options ───────────────────────────────────────────────────────
   readonly doughnutOptions: ChartOptions<'doughnut'> = {
     responsive: true,
     maintainAspectRatio: false,
@@ -96,6 +166,42 @@ export class StatsComponent implements OnInit {
       y: { grid: { display: false } }
     }
   };
+
+  readonly lineOptions: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom' } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.06)' } }
+    }
+  };
+
+  readonly consumptionBarOptions: ChartOptions<'bar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => ` ${(ctx.parsed.x ?? 0).toFixed(2)} L/100km`
+        }
+      }
+    },
+    scales: {
+      x: { beginAtZero: true, grid: { display: false } },
+      y: { grid: { display: false } }
+    }
+  };
+
+  readonly hasConsumptionData = computed(() =>
+    (this.stats()?.topVehiclesByDistance ?? []).some(r => r.avgConsumption != null)
+  );
+
+  readonly hasServiceTypeCostData = computed(() =>
+    Object.values(this.stats()?.costByServiceType ?? {}).some(v => v > 0)
+  );
 
   ngOnInit(): void {
     this.load();

@@ -3,6 +3,14 @@ export interface VehicleStatRow {
   vehicleName: string;
   distanceKm: number;
   fuelCost: number;
+  avgConsumption: number | null;
+}
+
+export interface MonthlyCostRow {
+  month: string; // YYYY-MM
+  fuelCost: number;
+  serviceCost: number;
+  totalCost: number;
 }
 
 export interface StatsResponse {
@@ -19,4 +27,6 @@ export interface StatsResponse {
   resolvedDefects: number;
   dueSoonReminders: number;
   topVehiclesByDistance: VehicleStatRow[];
+  monthlyCosts: MonthlyCostRow[];
+  costByServiceType: Record<string, number>;
 }

@@ -21,4 +21,6 @@ public class DefectStatusUpdateRequest {
     private String resolutionNote;
 
     private LocalDate resolvedDate;
+
+    private Long serviceRecordId;
 }
