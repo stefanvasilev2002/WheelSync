@@ -1,0 +1,261 @@
+<div class="report-container">
+
+  @if (loading()) {
+    <div class="loading-center">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
+  @if (error()) {
+    <mat-card class="error-card">
+      <mat-card-content>{{ error() }}</mat-card-content>
+    </mat-card>
+  }
+
+  @if (!loading() && !error() && report(); as r) {
+    <!-- Header -->
+    <div class="report-header">
+      <div class="header-left">
+        <button mat-icon-button [routerLink]="['/vehicles', r.vehicleId]">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div>
+          <h1 class="report-title">Vehicle Report</h1>
+          <p class="report-subtitle">{{ r.year }} {{ r.make }} {{ r.model }} &bull; {{ r.licensePlate }}</p>
+        </div>
+      </div>
+      <button mat-raised-button color="primary" (click)="exportPdf()">
+        <mat-icon>picture_as_pdf</mat-icon>
+        Export PDF
+      </button>
+    </div>
+
+    <!-- Vehicle Info + Summary -->
+    <div class="summary-grid">
+      <mat-card class="info-card">
+        <mat-card-header>
+          <mat-card-title>Vehicle Information</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-row"><span class="label">VIN</span><span>{{ r.vin }}</span></div>
+          <div class="info-row"><span class="label">Fuel Type</span><span>{{ r.fuelType }}</span></div>
+          @if (r.engineType) {
+            <div class="info-row"><span class="label">Engine</span><span>{{ r.engineType }}</span></div>
+          }
+          @if (r.color) {
+            <div class="info-row"><span class="label">Color</span><span>{{ r.color }}</span></div>
+          }
+          <div class="info-row"><span class="label">Mileage</span><span>{{ r.currentMileage | number }} km</span></div>
+          @if (r.assignedDriverName) {
+            <div class="info-row"><span class="label">Driver</span><span>{{ r.assignedDriverName }}</span></div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="cost-card">
+        <mat-card-header>
+          <mat-card-title>Cost Summary</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="cost-row">
+            <span>Service Cost</span>
+            <span class="cost-value">{{ r.totalServiceCost | number:'1.2-2' }} MKD</span>
+          </div>
+          <div class="cost-row">
+            <span>Fuel Cost</span>
+            <span class="cost-value">{{ r.totalFuelCost | number:'1.2-2' }} MKD</span>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="cost-row total-row">
+            <span>Total Cost</span>
+            <span class="cost-value total-value">{{ r.totalCost | number:'1.2-2' }} MKD</span>
+          </div>
+          <div class="cost-row">
+            <span>Total Distance</span>
+            <span class="cost-value">{{ r.totalDistanceKm | number }} km</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Service Records -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>build</mat-icon>
+          Service Records ({{ r.services.length }})
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (r.services.length === 0) {
+          <p class="empty-msg">No service records.</p>
+        } @else {
+          <div class="table-scroll">
+            <table mat-table [dataSource]="r.services">
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef>Date</th>
+                <td mat-cell *matCellDef="let row">{{ row.date }}</td>
+              </ng-container>
+              <ng-container matColumnDef="serviceType">
+                <th mat-header-cell *matHeaderCellDef>Type</th>
+                <td mat-cell *matCellDef="let row">{{ serviceTypeLabels[row.serviceType] ?? row.serviceType }}</td>
+              </ng-container>
+              <ng-container matColumnDef="mileage">
+                <th mat-header-cell *matHeaderCellDef>Mileage</th>
+                <td mat-cell *matCellDef="let row">{{ row.mileage | number }} km</td>
+              </ng-container>
+              <ng-container matColumnDef="cost">
+                <th mat-header-cell *matHeaderCellDef>Cost (MKD)</th>
+                <td mat-cell *matCellDef="let row">{{ row.cost | number:'1.2-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="location">
+                <th mat-header-cell *matHeaderCellDef>Location</th>
+                <td mat-cell *matCellDef="let row">{{ row.location ?? '—' }}</td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="serviceColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: serviceColumns;"></tr>
+            </table>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Fuel Logs -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>local_gas_station</mat-icon>
+          Fuel Logs ({{ r.fuelLogs.length }})
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (r.fuelLogs.length === 0) {
+          <p class="empty-msg">No fuel logs.</p>
+        } @else {
+          <div class="table-scroll">
+            <table mat-table [dataSource]="r.fuelLogs">
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef>Date</th>
+                <td mat-cell *matCellDef="let row">{{ row.date }}</td>
+              </ng-container>
+              <ng-container matColumnDef="fuelType">
+                <th mat-header-cell *matHeaderCellDef>Type</th>
+                <td mat-cell *matCellDef="let row">{{ row.fuelType }}</td>
+              </ng-container>
+              <ng-container matColumnDef="quantity">
+                <th mat-header-cell *matHeaderCellDef>Liters</th>
+                <td mat-cell *matCellDef="let row">{{ row.quantityLiters | number:'1.2-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="pricePerLiter">
+                <th mat-header-cell *matHeaderCellDef>Price/L</th>
+                <td mat-cell *matCellDef="let row">{{ row.pricePerLiter | number:'1.2-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="totalPrice">
+                <th mat-header-cell *matHeaderCellDef>Total (MKD)</th>
+                <td mat-cell *matCellDef="let row">{{ row.totalPrice | number:'1.2-2' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="mileage">
+                <th mat-header-cell *matHeaderCellDef>Mileage</th>
+                <td mat-cell *matCellDef="let row">{{ row.mileageAtRefuel | number }} km</td>
+              </ng-container>
+              <ng-container matColumnDef="consumption">
+                <th mat-header-cell *matHeaderCellDef>L/100km</th>
+                <td mat-cell *matCellDef="let row">{{ row.consumption != null ? (row.consumption | number:'1.2-2') : '—' }}</td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="fuelColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: fuelColumns;"></tr>
+            </table>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Mileage Logs -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>speed</mat-icon>
+          Mileage Logs ({{ r.mileageLogs.length }})
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (r.mileageLogs.length === 0) {
+          <p class="empty-msg">No mileage logs.</p>
+        } @else {
+          <div class="table-scroll">
+            <table mat-table [dataSource]="r.mileageLogs">
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef>Date</th>
+                <td mat-cell *matCellDef="let row">{{ row.date }}</td>
+              </ng-container>
+              <ng-container matColumnDef="driver">
+                <th mat-header-cell *matHeaderCellDef>Driver</th>
+                <td mat-cell *matCellDef="let row">{{ row.driverName }}</td>
+              </ng-container>
+              <ng-container matColumnDef="startMileage">
+                <th mat-header-cell *matHeaderCellDef>Start</th>
+                <td mat-cell *matCellDef="let row">{{ row.startMileage | number }} km</td>
+              </ng-container>
+              <ng-container matColumnDef="endMileage">
+                <th mat-header-cell *matHeaderCellDef>End</th>
+                <td mat-cell *matCellDef="let row">{{ row.endMileage | number }} km</td>
+              </ng-container>
+              <ng-container matColumnDef="distance">
+                <th mat-header-cell *matHeaderCellDef>Distance</th>
+                <td mat-cell *matCellDef="let row">{{ row.distance | number }} km</td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="mileageColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: mileageColumns;"></tr>
+            </table>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Defects -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>warning</mat-icon>
+          Defects ({{ r.defects.length }})
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (r.defects.length === 0) {
+          <p class="empty-msg">No defects recorded.</p>
+        } @else {
+          <div class="table-scroll">
+            <table mat-table [dataSource]="r.defects">
+              <ng-container matColumnDef="reportedAt">
+                <th mat-header-cell *matHeaderCellDef>Reported</th>
+                <td mat-cell *matCellDef="let row">{{ row.reportedAt | date:'yyyy-MM-dd' }}</td>
+              </ng-container>
+              <ng-container matColumnDef="title">
+                <th mat-header-cell *matHeaderCellDef>Title</th>
+                <td mat-cell *matCellDef="let row">{{ row.title }}</td>
+              </ng-container>
+              <ng-container matColumnDef="priority">
+                <th mat-header-cell *matHeaderCellDef>Priority</th>
+                <td mat-cell *matCellDef="let row">
+                  <span [class]="'priority-chip priority-' + row.priority.toLowerCase()">
+                    {{ priorityLabels[row.priority] ?? row.priority }}
+                  </span>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let row">{{ statusLabels[row.status] ?? row.status }}</td>
+              </ng-container>
+              <ng-container matColumnDef="resolutionNote">
+                <th mat-header-cell *matHeaderCellDef>Resolution</th>
+                <td mat-cell *matCellDef="let row">{{ row.resolutionNote ?? '—' }}</td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="defectColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: defectColumns;"></tr>
+            </table>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

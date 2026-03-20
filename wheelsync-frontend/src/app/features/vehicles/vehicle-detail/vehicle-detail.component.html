@@ -27,6 +27,10 @@
             <mat-icon>edit</mat-icon>
             Edit
           </a>
+          <a mat-stroked-button color="accent" [routerLink]="['/vehicles', vehicle()!.id, 'report']">
+            <mat-icon>assessment</mat-icon>
+            Report
+          </a>
         }
         <a mat-button routerLink="/vehicles">
           <mat-icon>arrow_back</mat-icon>

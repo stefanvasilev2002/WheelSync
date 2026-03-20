@@ -65,6 +65,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/vehicles/vehicle-form/vehicle-form.component').then(m => m.VehicleFormComponent)
       },
+      {
+        path: 'vehicles/:id/report',
+        loadComponent: () =>
+          import('./features/vehicles/vehicle-report/vehicle-report.component').then(m => m.VehicleReportComponent)
+      },
 
       // Mileage
       {
