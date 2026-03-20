@@ -104,6 +104,13 @@ public class MileageLogService {
             }
         }
 
+        if (request.getStartMileage() < vehicle.getCurrentMileage()) {
+            throw new IllegalArgumentException(
+                "Start mileage (" + request.getStartMileage() +
+                " km) cannot be less than the vehicle's current mileage (" +
+                vehicle.getCurrentMileage() + " km)");
+        }
+
         if (request.getEndMileage() < request.getStartMileage()) {
             throw new IllegalArgumentException("End mileage cannot be less than start mileage");
         }

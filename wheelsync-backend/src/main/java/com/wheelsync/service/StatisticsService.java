@@ -1,5 +1,6 @@
 package com.wheelsync.service;
 
+import com.wheelsync.dto.stats.MonthlyCostRow;
 import com.wheelsync.dto.stats.StatsResponse;
 import com.wheelsync.dto.stats.VehicleStatRow;
 import com.wheelsync.entity.FuelLog;
@@ -15,11 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.YearMonth;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -108,16 +108,65 @@ public class StatisticsService {
                         Collectors.reducing(BigDecimal.ZERO, FuelLog::getTotalPrice, BigDecimal::add)
                 ));
 
+        // Average fuel consumption per vehicle: L/100km from non-null consumption logs
+        Map<Long, BigDecimal> vehicleAvgConsumption = fuelLogs.stream()
+                .filter(l -> l.getConsumption() != null)
+                .collect(Collectors.groupingBy(
+                        l -> l.getVehicle().getId(),
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                list -> {
+                                    BigDecimal sum = list.stream()
+                                            .map(FuelLog::getConsumption)
+                                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                                    return sum.divide(BigDecimal.valueOf(list.size()), 2, RoundingMode.HALF_UP);
+                                }
+                        )
+                ));
+
         List<VehicleStatRow> topVehiclesByDistance = vehicles.stream()
                 .map(v -> VehicleStatRow.builder()
                         .vehicleId(v.getId())
                         .vehicleName(v.getDisplayName() + " - " + v.getLicensePlate())
                         .distanceKm(vehicleDistance.getOrDefault(v.getId(), 0L))
                         .fuelCost(vehicleFuelCost.getOrDefault(v.getId(), BigDecimal.ZERO))
+                        .avgConsumption(vehicleAvgConsumption.get(v.getId()))
                         .build())
                 .sorted(Comparator.comparingLong(VehicleStatRow::getDistanceKm).reversed())
                 .limit(5)
                 .collect(Collectors.toList());
+
+        // Monthly costs: last 12 months
+        YearMonth now = YearMonth.now();
+        List<MonthlyCostRow> monthlyCosts = new ArrayList<>();
+        for (int i = 11; i >= 0; i--) {
+            YearMonth month = now.minusMonths(i);
+            String monthKey = month.toString(); // YYYY-MM
+
+            BigDecimal fuelCostMonth = fuelLogs.stream()
+                    .filter(l -> YearMonth.from(l.getDate()).equals(month))
+                    .map(FuelLog::getTotalPrice)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            BigDecimal serviceCostMonth = serviceRecords.stream()
+                    .filter(r -> YearMonth.from(r.getDate()).equals(month))
+                    .map(ServiceRecord::getCost)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            monthlyCosts.add(MonthlyCostRow.builder()
+                    .month(monthKey)
+                    .fuelCost(fuelCostMonth)
+                    .serviceCost(serviceCostMonth)
+                    .totalCost(fuelCostMonth.add(serviceCostMonth))
+                    .build());
+        }
+
+        // Cost by service type
+        Map<String, BigDecimal> costByServiceType = serviceRecords.stream()
+                .collect(Collectors.groupingBy(
+                        r -> r.getServiceType().name(),
+                        Collectors.reducing(BigDecimal.ZERO, ServiceRecord::getCost, BigDecimal::add)
+                ));
 
         return StatsResponse.builder()
                 .totalVehicles(totalVehicles)
@@ -133,6 +182,8 @@ public class StatisticsService {
                 .resolvedDefects(resolvedDefects)
                 .dueSoonReminders(dueSoonReminders)
                 .topVehiclesByDistance(topVehiclesByDistance)
+                .monthlyCosts(monthlyCosts)
+                .costByServiceType(costByServiceType)
                 .build();
     }
 

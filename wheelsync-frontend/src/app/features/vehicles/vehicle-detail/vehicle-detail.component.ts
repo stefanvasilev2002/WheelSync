@@ -15,10 +15,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { VehicleService } from '../../../core/services/vehicle.service';
 import { MileageService } from '../../../core/services/mileage.service';
 import { FuelService } from '../../../core/services/fuel.service';
+import { ServiceRecordService } from '../../../core/services/service-record.service';
+import { DefectService } from '../../../core/services/defect.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { VehicleResponse, VehicleAssignmentResponse, FUEL_TYPE_LABELS } from '../../../core/models/vehicle.model';
 import { MileageLogResponse } from '../../../core/models/mileage.model';
 import { FuelLogResponse } from '../../../core/models/fuel.model';
+import { ServiceRecordResponse, SERVICE_TYPE_LABELS } from '../../../core/models/service-record.model';
+import { DefectResponse, PRIORITY_LABELS, DEFECT_STATUS_LABELS } from '../../../core/models/defect.model';
 import { AssignDialogComponent, AssignDialogData } from '../assign-dialog/assign-dialog.component';
 
 @Component({
@@ -46,6 +50,8 @@ export class VehicleDetailComponent implements OnInit {
   private readonly vehicleService = inject(VehicleService);
   private readonly mileageService = inject(MileageService);
   private readonly fuelService = inject(FuelService);
+  private readonly serviceRecordService = inject(ServiceRecordService);
+  private readonly defectService = inject(DefectService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -56,6 +62,8 @@ export class VehicleDetailComponent implements OnInit {
   assignments = signal<VehicleAssignmentResponse[]>([]);
   mileageLogs = signal<MileageLogResponse[]>([]);
   fuelLogs = signal<FuelLogResponse[]>([]);
+  serviceRecords = signal<ServiceRecordResponse[]>([]);
+  defects = signal<DefectResponse[]>([]);
   loading = signal(true);
 
   readonly isAdminOrManager = computed(() =>
@@ -63,10 +71,15 @@ export class VehicleDetailComponent implements OnInit {
   );
 
   readonly fuelTypeLabels = FUEL_TYPE_LABELS;
+  readonly serviceTypeLabels = SERVICE_TYPE_LABELS;
+  readonly priorityLabels = PRIORITY_LABELS;
+  readonly defectStatusLabels = DEFECT_STATUS_LABELS;
 
   readonly assignmentColumns = ['driverName', 'assignedDate', 'unassignedDate', 'status'];
   readonly mileageColumns = ['date', 'startMileage', 'endMileage', 'distance', 'note'];
   readonly fuelColumns = ['date', 'fuelType', 'quantityLiters', 'pricePerLiter', 'totalPrice', 'mileageAtRefuel'];
+  readonly serviceColumns = ['date', 'serviceType', 'mileage', 'cost', 'location'];
+  readonly defectColumns = ['createdAt', 'title', 'priority', 'status'];
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -84,6 +97,8 @@ export class VehicleDetailComponent implements OnInit {
         this.loadAssignments(id);
         this.loadMileage(id);
         this.loadFuel(id);
+        this.loadServiceRecords(id);
+        this.loadDefects(id);
       },
       error: () => {
         this.loading.set(false);
@@ -110,6 +125,20 @@ export class VehicleDetailComponent implements OnInit {
   loadFuel(vehicleId: number): void {
     this.fuelService.getByVehicle(vehicleId).subscribe({
       next: (data) => this.fuelLogs.set(data),
+      error: () => {}
+    });
+  }
+
+  loadServiceRecords(vehicleId: number): void {
+    this.serviceRecordService.getAll().subscribe({
+      next: (data) => this.serviceRecords.set(data.filter(r => r.vehicleId === vehicleId)),
+      error: () => {}
+    });
+  }
+
+  loadDefects(vehicleId: number): void {
+    this.defectService.getAll().subscribe({
+      next: (data) => this.defects.set(data.filter(d => d.vehicleId === vehicleId)),
       error: () => {}
     });
   }

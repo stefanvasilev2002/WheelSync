@@ -25,6 +25,7 @@ export interface DefectResponse {
   resolutionNote: string | null;
   resolvedDate: string | null;
   serviceRecordId: number | null;
+  hasPhoto: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -40,4 +41,5 @@ export interface DefectStatusUpdateRequest {
   status: DefectStatus;
   resolutionNote?: string;
   resolvedDate?: string;
+  serviceRecordId?: number;
 }

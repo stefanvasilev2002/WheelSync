@@ -12,4 +12,5 @@ public class VehicleStatRow {
     private String vehicleName;
     private long distanceKm;
     private BigDecimal fuelCost;
+    private BigDecimal avgConsumption; // L/100km, nullable
 }

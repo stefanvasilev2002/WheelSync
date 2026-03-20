@@ -55,6 +55,27 @@
                     placeholder="Detailed description (optional)"></textarea>
         </mat-form-field>
 
+        <!-- Photo Upload -->
+        <div class="photo-section full-width">
+          <p class="photo-label">Photo (optional)</p>
+
+          @if (photoPreviewUrl()) {
+            <div class="photo-preview">
+              <img [src]="photoPreviewUrl()!" alt="Defect photo preview">
+              <button mat-icon-button class="remove-photo-btn" type="button" (click)="removePhoto()" matTooltip="Remove photo">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          } @else {
+            <label class="photo-upload-area">
+              <input type="file" accept="image/jpeg,image/jpg,image/png" (change)="onPhotoSelected($event)" hidden>
+              <mat-icon>add_photo_alternate</mat-icon>
+              <span>Click to attach a photo</span>
+              <small>JPG or PNG, max 10MB</small>
+            </label>
+          }
+        </div>
+
         <div class="form-actions full-width">
           <a mat-button routerLink="/defects">Cancel</a>
           <button mat-raised-button color="primary" type="submit" [disabled]="saving()">

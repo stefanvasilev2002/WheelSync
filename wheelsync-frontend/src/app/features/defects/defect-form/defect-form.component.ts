@@ -44,6 +44,8 @@ export class DefectFormComponent implements OnInit {
 
   vehicles = signal<VehicleResponse[]>([]);
   saving = signal(false);
+  selectedPhoto = signal<File | null>(null);
+  photoPreviewUrl = signal<string | null>(null);
 
   readonly priorities: { value: DefectPriority; label: string }[] = [
     { value: 'LOW', label: 'Low' },
@@ -72,6 +74,31 @@ export class DefectFormComponent implements OnInit {
     });
   }
 
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+      this.snackBar.open('Only JPG/PNG images are allowed', 'Close', { duration: 3000 });
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      this.snackBar.open('Photo must be less than 10MB', 'Close', { duration: 3000 });
+      return;
+    }
+
+    this.selectedPhoto.set(file);
+    const reader = new FileReader();
+    reader.onload = (e) => this.photoPreviewUrl.set(e.target?.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  removePhoto(): void {
+    this.selectedPhoto.set(null);
+    this.photoPreviewUrl.set(null);
+  }
+
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -85,10 +112,20 @@ export class DefectFormComponent implements OnInit {
       description: value.description || undefined,
       priority: value.priority!
     }).subscribe({
-      next: () => {
-        this.saving.set(false);
-        this.snackBar.open('Defect reported successfully', 'Close', { duration: 3000 });
-        this.router.navigate(['/defects']);
+      next: (defect) => {
+        const photo = this.selectedPhoto();
+        if (photo) {
+          this.defectService.uploadPhoto(defect.id, photo).subscribe({
+            next: () => this.finishSave(),
+            error: () => {
+              // Defect was created, photo upload failed — still navigate
+              this.snackBar.open('Defect reported, but photo upload failed', 'Close', { duration: 4000 });
+              this.router.navigate(['/defects']);
+            }
+          });
+        } else {
+          this.finishSave();
+        }
       },
       error: (err) => {
         this.saving.set(false);
@@ -96,6 +133,12 @@ export class DefectFormComponent implements OnInit {
         this.snackBar.open(msg, 'Close', { duration: 4000 });
       }
     });
+  }
+
+  private finishSave(): void {
+    this.saving.set(false);
+    this.snackBar.open('Defect reported successfully', 'Close', { duration: 3000 });
+    this.router.navigate(['/defects']);
   }
 
   getFieldError(field: string): string {

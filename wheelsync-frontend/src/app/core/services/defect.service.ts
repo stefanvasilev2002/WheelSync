@@ -38,4 +38,16 @@ export class DefectService {
       map(res => res.data)
     );
   }
+
+  uploadPhoto(id: number, file: File): Observable<DefectResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ApiResponse<DefectResponse>>(`${this.baseUrl}/${id}/photo`, formData).pipe(
+      map(res => res.data)
+    );
+  }
+
+  getPhotoUrl(id: number): string {
+    return `${this.baseUrl}/${id}/photo`;
+  }
 }

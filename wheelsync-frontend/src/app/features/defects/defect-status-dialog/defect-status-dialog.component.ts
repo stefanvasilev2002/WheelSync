@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -10,6 +10,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { DefectResponse, DefectStatus, DefectStatusUpdateRequest } from '../../../core/models/defect.model';
+import { ServiceRecordService } from '../../../core/services/service-record.service';
+import { ServiceRecordResponse } from '../../../core/models/service-record.model';
 
 @Component({
   selector: 'ws-defect-status-dialog',
@@ -28,10 +30,13 @@ import { DefectResponse, DefectStatus, DefectStatusUpdateRequest } from '../../.
   ],
   templateUrl: './defect-status-dialog.component.html'
 })
-export class DefectStatusDialogComponent {
+export class DefectStatusDialogComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<DefectStatusDialogComponent>);
+  private readonly serviceRecordService = inject(ServiceRecordService);
   readonly defect: DefectResponse = inject(MAT_DIALOG_DATA);
+
+  serviceRecords = signal<ServiceRecordResponse[]>([]);
 
   readonly statusOptions: { value: DefectStatus; label: string }[] = [
     { value: 'REPORTED', label: 'Reported' },
@@ -42,8 +47,18 @@ export class DefectStatusDialogComponent {
   form = this.fb.group({
     status: [this.defect.status as DefectStatus],
     resolutionNote: [this.defect.resolutionNote || ''],
-    resolvedDate: [this.defect.resolvedDate ? new Date(this.defect.resolvedDate) : null as Date | null]
+    resolvedDate: [this.defect.resolvedDate ? new Date(this.defect.resolvedDate) : null as Date | null],
+    serviceRecordId: [this.defect.serviceRecordId as number | null]
   });
+
+  ngOnInit(): void {
+    this.serviceRecordService.getAll().subscribe({
+      next: (records) => this.serviceRecords.set(
+        records.filter(r => r.vehicleId === this.defect.vehicleId)
+      ),
+      error: () => {}
+    });
+  }
 
   onSubmit(): void {
     const value = this.form.value;
@@ -55,7 +70,8 @@ export class DefectStatusDialogComponent {
     const result: DefectStatusUpdateRequest = {
       status: value.status as DefectStatus,
       resolutionNote: value.resolutionNote || undefined,
-      resolvedDate: resolvedDateStr
+      resolvedDate: resolvedDateStr,
+      serviceRecordId: value.serviceRecordId ?? undefined
     };
     this.dialogRef.close(result);
   }
