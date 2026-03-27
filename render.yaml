@@ -55,8 +55,9 @@ services:
         value: /app/uploads
 
   # ── Frontend ───────────────────────────────────────────────────────────────
-  - type: static
+  - type: web
     name: wheelsync-app
+    env: static
     buildCommand: cd wheelsync-frontend && npm ci && npm run build
     staticPublishPath: ./wheelsync-frontend/dist/wheelsync-frontend/browser
     pullRequestPreviewsEnabled: false
