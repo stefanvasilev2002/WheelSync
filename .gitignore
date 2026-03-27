@@ -21,3 +21,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Local secrets — never commit real credentials
+wheelsync-backend/src/main/resources/application-dev.yml

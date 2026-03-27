@@ -11,7 +11,51 @@
       <mat-icon>refresh</mat-icon>
       Refresh
     </button>
+    <button mat-raised-button color="accent" (click)="exportFleetPdf()" [disabled]="!stats()">
+      <mat-icon>picture_as_pdf</mat-icon>
+      Export Fleet PDF
+    </button>
   </div>
+
+  <!-- FR-10.5 Filters -->
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <form [formGroup]="filterForm" class="filter-row">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>From date</mat-label>
+          <input matInput [matDatepicker]="pickerFrom" formControlName="dateFrom">
+          <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFrom></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>To date</mat-label>
+          <input matInput [matDatepicker]="pickerTo" formControlName="dateTo">
+          <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+          <mat-datepicker #pickerTo></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Vehicle</mat-label>
+          <mat-select formControlName="vehicleId">
+            <mat-option [value]="null">All vehicles</mat-option>
+            @for (v of vehicles(); track v.id) {
+              <mat-option [value]="v.id">{{ v.make }} {{ v.model }} — {{ v.licensePlate }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <div class="filter-actions">
+          <button mat-raised-button color="primary" type="button" (click)="applyFilters()">
+            <mat-icon>search</mat-icon> Apply
+          </button>
+          <button mat-stroked-button type="button" (click)="clearFilters()">
+            <mat-icon>clear</mat-icon> Clear
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
 
   @if (loading()) {
     <div class="loading-container">

@@ -91,7 +91,7 @@ export class VehicleReportComponent implements OnInit {
     if (!r) return;
 
     import('jspdf').then(({ jsPDF }) => {
-      import('jspdf-autotable').then(() => {
+      import('jspdf-autotable').then(({ default: autoTable }) => {
         const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
         const pageWidth = doc.internal.pageSize.getWidth();
         let y = 15;
@@ -118,7 +118,7 @@ export class VehicleReportComponent implements OnInit {
         doc.text('Cost Summary', 14, y); y += 5;
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
-        (doc as any).autoTable({
+        autoTable(doc, {
           startY: y,
           head: [['Category', 'Amount (MKD)']],
           body: [
@@ -138,7 +138,7 @@ export class VehicleReportComponent implements OnInit {
           doc.setFontSize(11);
           doc.setFont('helvetica', 'bold');
           doc.text('Service Records', 14, y); y += 4;
-          (doc as any).autoTable({
+          autoTable(doc, {
             startY: y,
             head: [['Date', 'Type', 'Mileage', 'Cost (MKD)', 'Location']],
             body: r.services.map(s => [
@@ -160,7 +160,7 @@ export class VehicleReportComponent implements OnInit {
           doc.setFontSize(11);
           doc.setFont('helvetica', 'bold');
           doc.text('Fuel Logs', 14, y); y += 4;
-          (doc as any).autoTable({
+          autoTable(doc, {
             startY: y,
             head: [['Date', 'Type', 'Liters', 'Price/L', 'Total (MKD)', 'Mileage', 'Cons.']],
             body: r.fuelLogs.map(f => [
@@ -184,7 +184,7 @@ export class VehicleReportComponent implements OnInit {
           doc.setFontSize(11);
           doc.setFont('helvetica', 'bold');
           doc.text('Mileage Logs', 14, y); y += 4;
-          (doc as any).autoTable({
+          autoTable(doc, {
             startY: y,
             head: [['Date', 'Driver', 'Start', 'End', 'Distance']],
             body: r.mileageLogs.map(m => [
@@ -206,7 +206,7 @@ export class VehicleReportComponent implements OnInit {
           doc.setFontSize(11);
           doc.setFont('helvetica', 'bold');
           doc.text('Defects', 14, y); y += 4;
-          (doc as any).autoTable({
+          autoTable(doc, {
             startY: y,
             head: [['Reported', 'Title', 'Priority', 'Status', 'Resolution Note']],
             body: r.defects.map(d => [

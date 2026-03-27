@@ -126,6 +126,15 @@
                 </td>
               </ng-container>
 
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let row">
+                  <a mat-icon-button [routerLink]="['/mileage', row.id, 'edit']" matTooltip="Edit">
+                    <mat-icon>edit</mat-icon>
+                  </a>
+                </td>
+              </ng-container>
+
               <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns();" class="table-row"></tr>
             </table>

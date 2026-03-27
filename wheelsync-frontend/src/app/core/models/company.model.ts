@@ -7,6 +7,8 @@ export interface CompanyResponse {
   createdAt: string;
   userCount: number;
   vehicleCount: number;
+  managerId?: number;
+  managerName?: string;
 }
 
 export interface CompanyRequest {
@@ -14,4 +16,5 @@ export interface CompanyRequest {
   address?: string;
   phone?: string;
   contactPerson?: string;
+  managerId?: number;
 }

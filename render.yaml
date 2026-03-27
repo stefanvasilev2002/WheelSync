@@ -1,0 +1,67 @@
+databases:
+  - name: wheelsync-db
+    plan: free
+    databaseName: wheelsync
+    user: wheelsync
+
+services:
+  # ── Backend ────────────────────────────────────────────────────────────────
+  - type: web
+    name: wheelsync-api
+    runtime: docker
+    dockerfilePath: ./wheelsync-backend/Dockerfile
+    dockerContext: ./wheelsync-backend
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+      # Database — pulled automatically from the managed DB above
+      - key: DB_HOST
+        fromDatabase:
+          name: wheelsync-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: wheelsync-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: wheelsync-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: wheelsync-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: wheelsync-db
+          property: password
+
+      # Security — Render auto-generates a secure random value
+      - key: JWT_SECRET
+        generateValue: true
+
+      # Mail — fill these in the Render dashboard (sync: false = secret)
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+
+      # App
+      - key: FRONTEND_URL
+        value: https://wheelsync-app.onrender.com
+      - key: FILE_UPLOAD_DIR
+        value: /app/uploads
+
+  # ── Frontend ───────────────────────────────────────────────────────────────
+  - type: static
+    name: wheelsync-app
+    buildCommand: cd wheelsync-frontend && npm ci && npm run build
+    staticPublishPath: ./wheelsync-frontend/dist/wheelsync-frontend/browser
+    pullRequestPreviewsEnabled: false
+    routes:
+      # Angular SPA — all paths fall back to index.html
+      - type: rewrite
+        source: /*
+        destination: /index.html

@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,10 +9,17 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { ChartData, ChartOptions } from 'chart.js';
-import { StatsService } from '../../core/services/stats.service';
+import { StatsService, StatsFilter } from '../../core/services/stats.service';
 import { StatsResponse } from '../../core/models/stats.model';
+import { VehicleService } from '../../core/services/vehicle.service';
+import { VehicleResponse } from '../../core/models/vehicle.model';
 
 const SERVICE_TYPE_LABELS: Record<string, string> = {
   OIL_CHANGE: 'Oil Change',
@@ -32,6 +40,7 @@ const SERVICE_TYPE_COLORS = [
   imports: [
     CommonModule,
     RouterLink,
+    ReactiveFormsModule,
     MatCardModule,
     MatIconModule,
     MatButtonModule,
@@ -39,6 +48,11 @@ const SERVICE_TYPE_COLORS = [
     MatSnackBarModule,
     MatTableModule,
     MatDividerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSelectModule,
     BaseChartDirective
   ],
   providers: [provideCharts(withDefaultRegisterables())],
@@ -46,10 +60,19 @@ const SERVICE_TYPE_COLORS = [
 })
 export class StatsComponent implements OnInit {
   private readonly statsService = inject(StatsService);
+  private readonly vehicleService = inject(VehicleService);
+  private readonly fb = inject(FormBuilder);
   private readonly snackBar = inject(MatSnackBar);
 
   stats = signal<StatsResponse | null>(null);
   loading = signal(false);
+  vehicles = signal<VehicleResponse[]>([]);
+
+  filterForm = this.fb.group({
+    dateFrom:  [null as Date | null],
+    dateTo:    [null as Date | null],
+    vehicleId: [null as number | null]
+  });
 
   readonly topVehicleColumns = ['rank', 'vehicle', 'distance', 'fuelCost', 'avgConsumption'];
 
@@ -204,12 +227,24 @@ export class StatsComponent implements OnInit {
   );
 
   ngOnInit(): void {
+    this.vehicleService.getAll().subscribe({ next: v => this.vehicles.set(v), error: () => {} });
     this.load();
   }
 
   load(): void {
     this.loading.set(true);
-    this.statsService.getStats().subscribe({
+    const v = this.filterForm.value;
+
+    const toIso = (d: Date | null | undefined) =>
+      d ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` : undefined;
+
+    const filter: StatsFilter = {
+      dateFrom:  toIso(v.dateFrom),
+      dateTo:    toIso(v.dateTo),
+      vehicleId: v.vehicleId ?? undefined
+    };
+
+    this.statsService.getStats(filter).subscribe({
       next: (data) => {
         this.stats.set(data);
         this.loading.set(false);
@@ -218,6 +253,99 @@ export class StatsComponent implements OnInit {
         this.loading.set(false);
         this.snackBar.open('Error loading statistics', 'Close', { duration: 3000 });
       }
+    });
+  }
+
+  applyFilters(): void {
+    this.load();
+  }
+
+  clearFilters(): void {
+    this.filterForm.reset();
+    this.load();
+  }
+
+  /** FR-10.8 — Generate a fleet summary PDF from the currently loaded stats */
+  exportFleetPdf(): void {
+    const s = this.stats();
+    if (!s) return;
+
+    Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable')
+    ]).then(([{ default: jsPDF }, { default: autoTable }]) => {
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const today = new Date().toLocaleDateString('en-GB');
+
+      // Title
+      doc.setFontSize(20);
+      doc.setTextColor(57, 73, 171);
+      doc.text('WheelSync — Fleet Summary Report', 14, 20);
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(`Generated: ${today}`, 14, 27);
+
+      // Key metrics table
+      doc.setFontSize(13);
+      doc.setTextColor(0);
+      doc.text('Key Metrics', 14, 38);
+      autoTable(doc, {
+        startY: 42,
+        head: [['Metric', 'Value']],
+        body: [
+          ['Total Vehicles', s.totalVehicles.toString()],
+          ['Assigned Vehicles', s.assignedVehicles.toString()],
+          ['Unassigned Vehicles', s.unassignedVehicles.toString()],
+          ['Total Distance (km)', s.totalDistanceKm.toLocaleString()],
+          ['Total Mileage Records', s.totalMileageLogs.toString()],
+          ['Total Fuel Cost (MKD)', Number(s.totalFuelCost).toLocaleString('mk-MK', { minimumFractionDigits: 2 })],
+          ['Total Service Cost (MKD)', Number(s.totalServiceCost).toLocaleString('mk-MK', { minimumFractionDigits: 2 })],
+          ['Open Defects', s.openDefects.toString()],
+          ['Resolved Defects', s.resolvedDefects.toString()],
+          ['Reminders Due Soon', s.dueSoonReminders.toString()]
+        ],
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [57, 73, 171] },
+        alternateRowStyles: { fillColor: [240, 241, 250] }
+      });
+
+      // Top vehicles by distance
+      const topY = (doc as any).lastAutoTable.finalY + 10;
+      doc.setFontSize(13);
+      doc.text('Top Vehicles by Distance', 14, topY);
+      autoTable(doc, {
+        startY: topY + 4,
+        head: [['Vehicle', 'Distance (km)', 'Fuel Cost (MKD)', 'Avg Consumption (L/100km)']],
+        body: s.topVehiclesByDistance.map(r => [
+          r.vehicleName,
+          r.distanceKm.toLocaleString(),
+          Number(r.fuelCost).toLocaleString('mk-MK', { minimumFractionDigits: 2 }),
+          r.avgConsumption != null ? Number(r.avgConsumption).toFixed(2) : '—'
+        ]),
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [57, 73, 171] },
+        alternateRowStyles: { fillColor: [240, 241, 250] }
+      });
+
+      // Monthly costs (last 12 months)
+      const montY = (doc as any).lastAutoTable.finalY + 10;
+      doc.setFontSize(13);
+      doc.text('Monthly Costs (last 12 months)', 14, montY);
+      autoTable(doc, {
+        startY: montY + 4,
+        head: [['Month', 'Fuel Cost (MKD)', 'Service Cost (MKD)', 'Total (MKD)']],
+        body: s.monthlyCosts.map(r => [
+          r.month,
+          Number(r.fuelCost).toLocaleString('mk-MK', { minimumFractionDigits: 2 }),
+          Number(r.serviceCost).toLocaleString('mk-MK', { minimumFractionDigits: 2 }),
+          Number(r.totalCost).toLocaleString('mk-MK', { minimumFractionDigits: 2 })
+        ]),
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [57, 73, 171] },
+        alternateRowStyles: { fillColor: [240, 241, 250] }
+      });
+
+      doc.save(`fleet_summary_${today.replace(/\//g, '-')}.pdf`);
     });
   }
 }

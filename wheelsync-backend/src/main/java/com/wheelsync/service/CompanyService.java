@@ -3,8 +3,11 @@ package com.wheelsync.service;
 import com.wheelsync.dto.company.CompanyRequest;
 import com.wheelsync.dto.company.CompanyResponse;
 import com.wheelsync.entity.Company;
+import com.wheelsync.entity.User;
+import com.wheelsync.entity.enums.Role;
 import com.wheelsync.exception.ResourceNotFoundException;
 import com.wheelsync.repository.CompanyRepository;
+import com.wheelsync.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 public class CompanyService {
 
     private final CompanyRepository companyRepository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public List<CompanyResponse> getAll() {
@@ -42,6 +46,14 @@ public class CompanyService {
                 .contactPerson(request.getContactPerson())
                 .build();
         company = companyRepository.save(company);
+
+        if (request.getManagerId() != null) {
+            User manager = userRepository.findById(request.getManagerId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User", request.getManagerId()));
+            manager.setCompany(company);
+            userRepository.save(manager);
+        }
+
         return toResponse(company);
     }
 
@@ -56,6 +68,14 @@ public class CompanyService {
         company.setContactPerson(request.getContactPerson());
 
         company = companyRepository.save(company);
+
+        if (request.getManagerId() != null) {
+            User manager = userRepository.findById(request.getManagerId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User", request.getManagerId()));
+            manager.setCompany(company);
+            userRepository.save(manager);
+        }
+
         return toResponse(company);
     }
 
@@ -75,6 +95,9 @@ public class CompanyService {
                         .count()
                 : 0;
 
+        List<User> managers = userRepository.findByCompanyIdAndRole(company.getId(), Role.FLEET_MANAGER);
+        User manager = managers.isEmpty() ? null : managers.get(0);
+
         return CompanyResponse.builder()
                 .id(company.getId())
                 .name(company.getName())
@@ -84,6 +107,8 @@ public class CompanyService {
                 .createdAt(company.getCreatedAt())
                 .userCount(userCount)
                 .vehicleCount(vehicleCount)
+                .managerId(manager != null ? manager.getId() : null)
+                .managerName(manager != null ? manager.getFullName() : null)
                 .build();
     }
 }

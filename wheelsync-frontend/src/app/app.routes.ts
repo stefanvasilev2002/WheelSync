@@ -82,6 +82,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/mileage/mileage-form/mileage-form.component').then(m => m.MileageFormComponent)
       },
+      {
+        path: 'mileage/:id/edit',
+        loadComponent: () =>
+          import('./features/mileage/mileage-form/mileage-form.component').then(m => m.MileageFormComponent)
+      },
 
       // Fuel
       {

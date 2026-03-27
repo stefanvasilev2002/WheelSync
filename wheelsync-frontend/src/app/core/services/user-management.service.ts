@@ -30,6 +30,16 @@ export class UserManagementService {
     );
   }
 
+  getUnassignedFleetManagers(): Observable<UserResponse[]> {
+    return this.getAll().pipe(
+      map(users => users.filter(u =>
+        u.role === 'FLEET_MANAGER' &&
+        u.isActive &&
+        u.companyId === null
+      ))
+    );
+  }
+
   getById(id: number): Observable<UserResponse> {
     return this.http.get<ApiResponse<UserResponse>>(`${this.baseUrl}/${id}`).pipe(
       map(res => res.data)

@@ -16,11 +16,17 @@ public class FileStorageConfig {
 
     @Bean
     public Path fileStorageLocation() {
-        Path path = Paths.get(uploadDir).toAbsolutePath().normalize();
+        // Resolve relative paths against the user home so they are always writable on any OS
+        Path path = Paths.get(uploadDir);
+        if (!path.isAbsolute()) {
+            path = Paths.get(System.getProperty("user.home"), uploadDir).normalize();
+        } else {
+            path = path.normalize();
+        }
         try {
             Files.createDirectories(path);
         } catch (Exception e) {
-            throw new RuntimeException("Could not create upload directory", e);
+            throw new RuntimeException("Could not create upload directory at " + path + ": " + e.getMessage(), e);
         }
         return path;
     }

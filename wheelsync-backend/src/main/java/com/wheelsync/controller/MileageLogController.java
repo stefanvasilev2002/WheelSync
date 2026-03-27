@@ -46,4 +46,14 @@ public class MileageLogController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok("Mileage log saved successfully", response));
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FLEET_MANAGER', 'DRIVER')")
+    public ResponseEntity<ApiResponse<MileageLogResponse>> update(
+            @PathVariable Long id,
+            @Valid @RequestBody MileageLogRequest request,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        MileageLogResponse response = mileageLogService.update(id, request, principal);
+        return ResponseEntity.ok(ApiResponse.ok("Mileage log updated successfully", response));
+    }
 }

@@ -43,7 +43,7 @@ public class ServiceRecordController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'FLEET_MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FLEET_MANAGER', 'DRIVER')")
     public ResponseEntity<ApiResponse<ServiceRecordResponse>> create(
             @Valid @RequestBody ServiceRecordRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {

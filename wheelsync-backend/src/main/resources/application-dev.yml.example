@@ -1,0 +1,44 @@
+# Copy this file to application-dev.yml and fill in your real values.
+# application-dev.yml is gitignored so your credentials stay local.
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wheelsync
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  # Email — Gmail setup:
+  #   1. Enable 2-Step Verification on your Google account
+  #   2. Go to myaccount.google.com → Security → App passwords
+  #   3. Generate an app password (select "Mail" + "Windows Computer")
+  #   4. Paste the 16-character password below (no spaces)
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: your-email@gmail.com
+    password: your-16-char-app-password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: 8080
+
+app:
+  jwt:
+    secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    expiration-ms: 86400000   # 24 hours
+
+  file:
+    upload-dir: ./uploads
+
+  frontend-url: http://localhost:4200
+
+logging:
+  level:
+    com.wheelsync: DEBUG
+    org.springframework.security: INFO

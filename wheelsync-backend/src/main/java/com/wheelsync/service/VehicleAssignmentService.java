@@ -57,13 +57,15 @@ public class VehicleAssignmentService {
             throw new IllegalArgumentException("Driver is deactivated");
         }
 
-        // Unassign any existing active assignment for this vehicle
+        // Unassign any existing active assignment for this vehicle.
+        // Use saveAndFlush so the UPDATE reaches the DB before the INSERT below,
+        // otherwise the partial unique index (vehicle_id WHERE is_active=TRUE) is violated.
         Optional<VehicleAssignment> existingAssignment =
                 vehicleAssignmentRepository.findByVehicleIdAndIsActiveTrue(vehicleId);
         existingAssignment.ifPresent(a -> {
             a.setUnassignedDate(LocalDate.now());
             a.setIsActive(false);
-            vehicleAssignmentRepository.save(a);
+            vehicleAssignmentRepository.saveAndFlush(a);
         });
 
         VehicleAssignment assignment = VehicleAssignment.builder()

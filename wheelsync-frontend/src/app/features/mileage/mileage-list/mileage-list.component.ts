@@ -46,7 +46,7 @@ export class MileageListComponent implements OnInit {
   );
 
   readonly displayedColumns = computed(() => {
-    const cols = ['vehicle', 'date', 'startMileage', 'endMileage', 'distance', 'note'];
+    const cols = ['vehicle', 'date', 'startMileage', 'endMileage', 'distance', 'note', 'actions'];
     if (this.isManager()) cols.splice(0, 0, 'driver');
     return cols;
   });

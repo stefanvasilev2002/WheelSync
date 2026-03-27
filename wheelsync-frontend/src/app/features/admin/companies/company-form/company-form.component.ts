@@ -9,7 +9,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { CompanyService } from '../../../../core/services/company.service';
+import { UserManagementService } from '../../../../core/services/user-management.service';
+import { UserResponse } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'ws-company-form',
@@ -24,7 +27,8 @@ import { CompanyService } from '../../../../core/services/company.service';
     MatInputModule,
     MatFormFieldModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatSelectModule
   ],
   templateUrl: './company-form.component.html',
   styleUrl: './company-form.component.scss'
@@ -32,6 +36,7 @@ import { CompanyService } from '../../../../core/services/company.service';
 export class CompanyFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly companyService = inject(CompanyService);
+  private readonly userManagementService = inject(UserManagementService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
@@ -39,6 +44,7 @@ export class CompanyFormComponent implements OnInit {
   editId = signal<number | null>(null);
   loading = signal(false);
   saving = signal(false);
+  fleetManagers = signal<UserResponse[]>([]);
 
   get isEditMode(): boolean {
     return this.editId() !== null;
@@ -48,10 +54,16 @@ export class CompanyFormComponent implements OnInit {
     name:          ['', [Validators.required]],
     address:       [''],
     phone:         [''],
-    contactPerson: ['']
+    contactPerson: [''],
+    managerId:     [null as number | null]
   });
 
   ngOnInit(): void {
+    this.userManagementService.getUnassignedFleetManagers().subscribe({
+      next: (fms) => this.fleetManagers.set(fms),
+      error: () => {}
+    });
+
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       const id = Number(idParam);
@@ -91,7 +103,8 @@ export class CompanyFormComponent implements OnInit {
       name:          value.name!,
       address:       value.address || undefined,
       phone:         value.phone   || undefined,
-      contactPerson: value.contactPerson || undefined
+      contactPerson: value.contactPerson || undefined,
+      managerId:     value.managerId || undefined
     };
 
     this.saving.set(true);

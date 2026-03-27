@@ -32,4 +32,10 @@ export class MileageService {
       map(res => res.data)
     );
   }
+
+  update(id: number, request: MileageLogRequest): Observable<MileageLogResponse> {
+    return this.http.put<ApiResponse<MileageLogResponse>>(`${this.baseUrl}/${id}`, request).pipe(
+      map(res => res.data)
+    );
+  }
 }

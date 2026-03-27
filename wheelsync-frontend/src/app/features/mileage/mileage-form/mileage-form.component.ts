@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -44,11 +44,17 @@ export class MileageFormComponent implements OnInit {
   private readonly vehicleService = inject(VehicleService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
 
   vehicles = signal<VehicleResponse[]>([]);
   loadingVehicles = signal(false);
   saving = signal(false);
+  editId = signal<number | null>(null);
+
+  get isEditMode(): boolean {
+    return this.editId() !== null;
+  }
 
   readonly calculatedDistance = signal(0);
 
@@ -64,6 +70,39 @@ export class MileageFormComponent implements OnInit {
     this.loadVehicles();
     this.form.get('startMileage')?.valueChanges.subscribe(() => this.updateDistance());
     this.form.get('endMileage')?.valueChanges.subscribe(() => this.updateDistance());
+
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.editId.set(Number(idParam));
+      this.loadLog(Number(idParam));
+    }
+  }
+
+  loadLog(id: number): void {
+    this.loadingVehicles.set(true);
+    this.mileageService.getAll().subscribe({
+      next: (logs) => {
+        const log = logs.find(l => l.id === id);
+        if (log) {
+          const dateParts = log.date.split('-');
+          const date = new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2]));
+          this.form.patchValue({
+            vehicleId: log.vehicleId,
+            date,
+            startMileage: log.startMileage,
+            endMileage: log.endMileage,
+            note: log.note ?? ''
+          });
+          this.updateDistance();
+        }
+        this.loadingVehicles.set(false);
+      },
+      error: () => {
+        this.loadingVehicles.set(false);
+        this.snackBar.open('Error loading record', 'Close', { duration: 3000 });
+        this.router.navigate(['/mileage']);
+      }
+    });
   }
 
   loadVehicles(): void {
@@ -100,17 +139,24 @@ export class MileageFormComponent implements OnInit {
     const date = value.date as Date;
     const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-    this.saving.set(true);
-    this.mileageService.create({
+    const request = {
       vehicleId: value.vehicleId!,
       date: dateStr,
       startMileage: value.startMileage!,
       endMileage: value.endMileage!,
       note: value.note || undefined
-    }).subscribe({
+    };
+
+    this.saving.set(true);
+    const operation = this.isEditMode
+      ? this.mileageService.update(this.editId()!, request)
+      : this.mileageService.create(request);
+
+    operation.subscribe({
       next: () => {
         this.saving.set(false);
-        this.snackBar.open('Record saved successfully', 'Close', { duration: 3000 });
+        const msg = this.isEditMode ? 'Record updated successfully' : 'Record saved successfully';
+        this.snackBar.open(msg, 'Close', { duration: 3000 });
         this.router.navigate(['/mileage']);
       },
       error: (err) => {

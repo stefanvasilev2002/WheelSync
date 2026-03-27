@@ -20,4 +20,6 @@ public class CompanyRequest {
     private String phone;
 
     private String contactPerson;
+
+    private Long managerId;
 }

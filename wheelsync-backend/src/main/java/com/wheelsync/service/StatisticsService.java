@@ -40,12 +40,22 @@ public class StatisticsService {
     }
 
     @Transactional(readOnly = true)
-    public StatsResponse getStats(UserPrincipal principal) {
+    public StatsResponse getStats(UserPrincipal principal,
+                                   LocalDate dateFrom, LocalDate dateTo,
+                                   Long vehicleIdFilter, Long driverIdFilter) {
         boolean admin = isAdmin(principal);
 
         List<Vehicle> vehicles = admin
                 ? vehicleRepository.findAll().stream().filter(v -> Boolean.TRUE.equals(v.getIsActive())).collect(Collectors.toList())
                 : vehicleRepository.findByCompanyId(requireCompanyId(principal));
+
+        // Apply vehicleId filter if provided
+        if (vehicleIdFilter != null) {
+            vehicles = vehicles.stream()
+                    .filter(v -> v.getId().equals(vehicleIdFilter))
+                    .collect(Collectors.toList());
+        }
+
         int totalVehicles = vehicles.size();
 
         long assignedVehicles = vehicles.stream()
@@ -59,6 +69,13 @@ public class StatisticsService {
         List<MileageLog> mileageLogs = admin
                 ? mileageLogRepository.findAll()
                 : mileageLogRepository.findByVehicleCompanyIdOrderByDateDesc(requireCompanyId(principal));
+        // Apply filters
+        mileageLogs = mileageLogs.stream()
+                .filter(l -> vehicleIds.contains(l.getVehicle().getId()))
+                .filter(l -> dateFrom == null || !l.getDate().isBefore(dateFrom))
+                .filter(l -> dateTo == null || !l.getDate().isAfter(dateTo))
+                .filter(l -> driverIdFilter == null || l.getDriver().getId().equals(driverIdFilter))
+                .collect(Collectors.toList());
         long totalDistanceKm = mileageLogs.stream()
                 .mapToLong(l -> l.getDistance() != null ? l.getDistance() : 0L)
                 .sum();
@@ -67,6 +84,11 @@ public class StatisticsService {
         List<FuelLog> fuelLogs = admin
                 ? fuelLogRepository.findAll()
                 : fuelLogRepository.findByVehicleCompanyIdOrderByDateDesc(requireCompanyId(principal));
+        fuelLogs = fuelLogs.stream()
+                .filter(l -> vehicleIds.contains(l.getVehicle().getId()))
+                .filter(l -> dateFrom == null || !l.getDate().isBefore(dateFrom))
+                .filter(l -> dateTo == null || !l.getDate().isAfter(dateTo))
+                .collect(Collectors.toList());
         BigDecimal totalFuelCost = fuelLogs.stream()
                 .map(FuelLog::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -74,6 +96,8 @@ public class StatisticsService {
         // Service records — derived from vehicle list so admin is already handled
         List<ServiceRecord> serviceRecords = vehicles.stream()
                 .flatMap(v -> serviceRecordRepository.findByVehicleIdOrderByDateDesc(v.getId()).stream())
+                .filter(r -> dateFrom == null || !r.getDate().isBefore(dateFrom))
+                .filter(r -> dateTo == null || !r.getDate().isAfter(dateTo))
                 .collect(Collectors.toList());
         BigDecimal totalServiceCost = serviceRecords.stream()
                 .map(ServiceRecord::getCost)

@@ -138,6 +138,40 @@ public class MileageLogService {
         return toResponse(log);
     }
 
+    @Transactional
+    public MileageLogResponse update(Long id, MileageLogRequest request, UserPrincipal principal) {
+        MileageLog log = mileageLogRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("MileageLog", id));
+
+        boolean isAdmin = isAdmin(principal);
+
+        // Drivers can only edit their own logs
+        if (isDriver(principal) && !log.getDriver().getId().equals(principal.getId())) {
+            throw new AccessDeniedException("You can only edit your own mileage logs");
+        }
+
+        // FM/Admin: verify company ownership
+        if (!isAdmin) {
+            Long companyId = requireCompanyId(principal);
+            if (log.getVehicle().getCompany() == null ||
+                    !companyId.equals(log.getVehicle().getCompany().getId())) {
+                throw new AccessDeniedException("Access denied to this mileage log");
+            }
+        }
+
+        if (request.getEndMileage() < request.getStartMileage()) {
+            throw new IllegalArgumentException("End mileage cannot be less than start mileage");
+        }
+
+        log.setDate(request.getDate());
+        log.setStartMileage(request.getStartMileage());
+        log.setEndMileage(request.getEndMileage());
+        log.setNote(request.getNote());
+
+        log = mileageLogRepository.save(log);
+        return toResponse(log);
+    }
+
     public MileageLogResponse toResponse(MileageLog log) {
         // distance is computed by DB (end - start), but may be null before refresh
         Integer distance = log.getDistance() != null

@@ -58,6 +58,19 @@
               <input matInput formControlName="contactPerson" placeholder="First and last name...">
             </mat-form-field>
 
+            <!-- Fleet Manager assignment -->
+            <mat-form-field appearance="outline" class="span-2">
+              <mat-label>Assign Fleet Manager</mat-label>
+              <mat-icon matPrefix>manage_accounts</mat-icon>
+              <mat-select formControlName="managerId">
+                <mat-option [value]="null">— None —</mat-option>
+                @for (fm of fleetManagers(); track fm.id) {
+                  <mat-option [value]="fm.id">{{ fm.firstName }} {{ fm.lastName }} ({{ fm.email }})</mat-option>
+                }
+              </mat-select>
+              <mat-hint>Only Fleet Manager accounts without a company are listed</mat-hint>
+            </mat-form-field>
+
           </div>
         </mat-card-content>
       </mat-card>

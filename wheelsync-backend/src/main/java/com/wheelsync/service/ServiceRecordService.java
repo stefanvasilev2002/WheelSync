@@ -10,9 +10,13 @@ import com.wheelsync.entity.Vehicle;
 import com.wheelsync.entity.enums.ServiceRecordStatus;
 import com.wheelsync.exception.AccessDeniedException;
 import com.wheelsync.exception.ResourceNotFoundException;
+import com.wheelsync.entity.MaintenanceReminder;
+import com.wheelsync.entity.enums.IntervalType;
+import com.wheelsync.repository.MaintenanceReminderRepository;
 import com.wheelsync.repository.ServiceDocumentRepository;
 import com.wheelsync.repository.ServiceRecordRepository;
 import com.wheelsync.repository.UserRepository;
+import com.wheelsync.repository.VehicleAssignmentRepository;
 import com.wheelsync.repository.VehicleRepository;
 import com.wheelsync.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +49,8 @@ public class ServiceRecordService {
     private final ServiceDocumentRepository serviceDocumentRepository;
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
+    private final VehicleAssignmentRepository vehicleAssignmentRepository;
+    private final MaintenanceReminderRepository maintenanceReminderRepository;
     private final Path fileStorageLocation;
 
     @Transactional(readOnly = true)
@@ -77,14 +83,36 @@ public class ServiceRecordService {
 
     @Transactional
     public ServiceRecordResponse create(ServiceRecordRequest req, UserPrincipal principal) {
-        Vehicle vehicle = isAdmin(principal)
-                ? vehicleRepository.findById(req.getVehicleId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()))
-                : vehicleRepository.findByIdAndCompanyId(req.getVehicleId(), requireCompanyId(principal))
-                        .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
+        boolean driver = isDriver(principal);
+
+        Vehicle vehicle;
+        if (isAdmin(principal)) {
+            vehicle = vehicleRepository.findById(req.getVehicleId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
+        } else if (driver) {
+            // Driver must have an active assignment on the requested vehicle
+            Long companyId = requireCompanyId(principal);
+            vehicle = vehicleRepository.findByIdAndCompanyId(req.getVehicleId(), companyId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
+            boolean hasAssignment = vehicleAssignmentRepository
+                    .findByVehicleIdAndIsActiveTrue(req.getVehicleId())
+                    .map(a -> a.getDriver().getId().equals(principal.getId()))
+                    .orElse(false);
+            if (!hasAssignment) {
+                throw new AccessDeniedException("You do not have an active assignment for this vehicle");
+            }
+        } else {
+            vehicle = vehicleRepository.findByIdAndCompanyId(req.getVehicleId(), requireCompanyId(principal))
+                    .orElseThrow(() -> new ResourceNotFoundException("Vehicle", req.getVehicleId()));
+        }
 
         User createdBy = userRepository.findById(principal.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", principal.getId()));
+
+        // Drivers always submit with PENDING status — FM/Admin can set any status
+        ServiceRecordStatus status = driver
+                ? ServiceRecordStatus.PENDING
+                : (req.getStatus() != null ? req.getStatus() : ServiceRecordStatus.CONFIRMED);
 
         ServiceRecord record = ServiceRecord.builder()
                 .vehicle(vehicle)
@@ -94,11 +122,15 @@ public class ServiceRecordService {
                 .location(req.getLocation())
                 .cost(req.getCost())
                 .description(req.getDescription())
-                .status(req.getStatus() != null ? req.getStatus() : ServiceRecordStatus.CONFIRMED)
+                .status(status)
                 .createdBy(createdBy)
                 .build();
 
         record = serviceRecordRepository.save(record);
+
+        // FR-9.5 — Auto-reset the matching maintenance reminder (if any) by advancing its due dates
+        resetMatchingReminder(req.getVehicleId(), req.getServiceType(), req.getDate(), req.getMileage());
+
         return toResponse(record);
     }
 
@@ -217,6 +249,39 @@ public class ServiceRecordService {
 
     // --- Helpers ---
 
+    /**
+     * FR-9.5 — When a service record is created, find any matching active maintenance reminder
+     * for the same vehicle + service type and advance its next-due values based on its interval.
+     */
+    private void resetMatchingReminder(Long vehicleId, com.wheelsync.entity.enums.ServiceType serviceType,
+                                        java.time.LocalDate serviceDate, Integer serviceMileage) {
+        maintenanceReminderRepository
+                .findByVehicleIdAndServiceTypeAndIsActiveTrue(vehicleId, serviceType)
+                .ifPresent(reminder -> {
+                    reminder.setLastServiceDate(serviceDate);
+                    reminder.setLastServiceMileage(serviceMileage);
+
+                    if (reminder.getIntervalType() == IntervalType.DATE && reminder.getDateIntervalMonths() != null) {
+                        reminder.setNextDueDate(serviceDate.plusMonths(reminder.getDateIntervalMonths()));
+                    }
+
+                    if (reminder.getIntervalType() == IntervalType.MILEAGE && reminder.getMileageInterval() != null) {
+                        reminder.setNextDueMileage(serviceMileage + reminder.getMileageInterval());
+                    }
+
+                    if (reminder.getIntervalType() == IntervalType.BOTH) {
+                        if (reminder.getDateIntervalMonths() != null) {
+                            reminder.setNextDueDate(serviceDate.plusMonths(reminder.getDateIntervalMonths()));
+                        }
+                        if (reminder.getMileageInterval() != null) {
+                            reminder.setNextDueMileage(serviceMileage + reminder.getMileageInterval());
+                        }
+                    }
+
+                    maintenanceReminderRepository.save(reminder);
+                });
+    }
+
     private ServiceRecord findAndVerifyAccess(Long id, UserPrincipal principal) {
         ServiceRecord record = serviceRecordRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Service record", id));
@@ -246,6 +311,11 @@ public class ServiceRecordService {
     private boolean isAdmin(UserPrincipal principal) {
         return principal.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    private boolean isDriver(UserPrincipal principal) {
+        return principal.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_DRIVER"));
     }
 
     private Long requireCompanyId(UserPrincipal principal) {

@@ -17,4 +17,6 @@ public class CompanyResponse {
     private LocalDateTime createdAt;
     private int userCount;
     private int vehicleCount;
+    private Long managerId;
+    private String managerName;
 }
