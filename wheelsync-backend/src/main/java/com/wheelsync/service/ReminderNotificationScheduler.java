@@ -27,7 +27,7 @@ public class ReminderNotificationScheduler {
      * FR-9.4 — Run every day at 08:00 and send email notifications to Fleet Managers
      * for any maintenance reminder that is due within its warning threshold.
      */
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 8 * * *")
     @Transactional(readOnly = true)
     public void sendDueReminderEmails() {
         // Fetch all active reminders whose due date falls within the next 30 days
