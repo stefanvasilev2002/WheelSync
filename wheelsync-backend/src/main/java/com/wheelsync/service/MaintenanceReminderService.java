@@ -152,7 +152,9 @@ public class MaintenanceReminderService {
     }
 
     private LocalDate computeNextDueDate(MaintenanceReminderRequest req) {
-        if (req.getIntervalType() == IntervalType.DATE && req.getDateIntervalMonths() != null) {
+        boolean usesDate = req.getIntervalType() == IntervalType.DATE
+                        || req.getIntervalType() == IntervalType.BOTH;
+        if (usesDate && req.getDateIntervalMonths() != null) {
             LocalDate base = req.getLastServiceDate() != null ? req.getLastServiceDate() : LocalDate.now();
             return base.plusMonths(req.getDateIntervalMonths());
         }
@@ -160,7 +162,9 @@ public class MaintenanceReminderService {
     }
 
     private Integer computeNextDueMileage(MaintenanceReminderRequest req) {
-        if (req.getIntervalType() == IntervalType.MILEAGE && req.getMileageInterval() != null) {
+        boolean usesMileage = req.getIntervalType() == IntervalType.MILEAGE
+                           || req.getIntervalType() == IntervalType.BOTH;
+        if (usesMileage && req.getMileageInterval() != null) {
             int base = req.getLastServiceMileage() != null ? req.getLastServiceMileage() : 0;
             return base + req.getMileageInterval();
         }
