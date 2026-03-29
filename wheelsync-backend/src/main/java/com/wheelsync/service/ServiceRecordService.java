@@ -208,7 +208,7 @@ public class ServiceRecordService {
                 .serviceRecord(record)
                 .fileName(originalFilename)
                 .filePath(targetPath.toString())
-                .fileType(extension)
+                .fileType(extension.toUpperCase())
                 .fileSize(file.getSize())
                 .build();
 
