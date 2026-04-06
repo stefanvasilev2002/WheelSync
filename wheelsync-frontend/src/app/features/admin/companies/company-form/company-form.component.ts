@@ -60,7 +60,7 @@ export class CompanyFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.userManagementService.getUnassignedFleetManagers().subscribe({
-      next: (fms) => this.fleetManagers.set(fms),
+      next: (fms: UserResponse[]) => this.fleetManagers.set(fms),
       error: () => {}
     });
 

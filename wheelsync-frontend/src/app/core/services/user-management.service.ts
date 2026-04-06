@@ -25,6 +25,12 @@ export class UserManagementService {
     );
   }
 
+  getUnassignedFleetManagers(): Observable<UserResponse[]> {
+    return this.getAll().pipe(
+      map(users => users.filter(u => u.role === 'FLEET_MANAGER' && u.isActive && !u.companyId))
+    );
+  }
+
   getDriversByCompany(): Observable<UserResponse[]> {
     const companyId = this.authService.companyId();
     return this.getAll().pipe(
