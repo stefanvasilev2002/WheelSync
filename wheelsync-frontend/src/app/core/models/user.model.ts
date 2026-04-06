@@ -21,3 +21,13 @@ export interface UserUpdateRequest {
   companyId?: number | null;
   isActive: boolean;
 }
+
+export interface CreateUserRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phone?: string;
+  role: Role;
+  companyId?: number;
+}

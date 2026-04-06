@@ -6,7 +6,7 @@
         <mat-icon>directions_car</mat-icon>
       </div>
       <h1>WheelSync</h1>
-      <p>Create a new account</p>
+      <p>Креирај нова сметка</p>
     </div>
 
     <div class="card-body">
@@ -14,31 +14,31 @@
 
         <div class="name-row">
           <mat-form-field appearance="outline">
-            <mat-label>First Name</mat-label>
+            <mat-label>Име</mat-label>
             <input matInput formControlName="firstName" autocomplete="given-name">
             @if (f['firstName'].hasError('required') && f['firstName'].touched) {
-              <mat-error>Required</mat-error>
+              <mat-error>Задолжително</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Last Name</mat-label>
+            <mat-label>Презиме</mat-label>
             <input matInput formControlName="lastName" autocomplete="family-name">
             @if (f['lastName'].hasError('required') && f['lastName'].touched) {
-              <mat-error>Required</mat-error>
+              <mat-error>Задолжително</mat-error>
             }
           </mat-form-field>
         </div>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email address</mat-label>
+          <mat-label>Е-пошта</mat-label>
           <input matInput type="email" formControlName="email" autocomplete="email">
           <mat-icon matSuffix>email</mat-icon>
           @if (f['email'].hasError('required') && f['email'].touched) {
-            <mat-error>Email address is required</mat-error>
+            <mat-error>Е-поштата е задолжителна</mat-error>
           }
           @if (f['email'].hasError('email') && f['email'].touched) {
-            <mat-error>Invalid format</mat-error>
+            <mat-error>Невалиден формат</mat-error>
           }
           @if (f['email'].hasError('serverError')) {
             <mat-error>{{ f['email'].getError('serverError') }}</mat-error>
@@ -46,36 +46,13 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Phone number (optional)</mat-label>
+          <mat-label>Телефон (незадолжително)</mat-label>
           <input matInput type="tel" formControlName="phone" autocomplete="tel">
           <mat-icon matSuffix>phone</mat-icon>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Role</mat-label>
-          <mat-select formControlName="role">
-            @for (r of roles; track r.value) {
-              <mat-option [value]="r.value">{{ r.label }}</mat-option>
-            }
-          </mat-select>
-          <mat-icon matSuffix>badge</mat-icon>
-        </mat-form-field>
-
-        @if (selectedRole !== 'ADMIN' && companies.length > 0) {
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Company (optional)</mat-label>
-            <mat-select formControlName="companyId">
-              <mat-option [value]="null">— No company —</mat-option>
-              @for (c of companies; track c.id) {
-                <mat-option [value]="c.id">{{ c.name }}</mat-option>
-              }
-            </mat-select>
-            <mat-icon matSuffix>business</mat-icon>
-          </mat-form-field>
-        }
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Password</mat-label>
+          <mat-label>Лозинка</mat-label>
           <input matInput [type]="hidePassword ? 'password' : 'text'"
                  formControlName="password" autocomplete="new-password">
           <button mat-icon-button matSuffix type="button"
@@ -83,21 +60,21 @@
             <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
           @if (f['password'].hasError('required') && f['password'].touched) {
-            <mat-error>Password is required</mat-error>
+            <mat-error>Лозинката е задолжителна</mat-error>
           }
           @if (f['password'].hasError('minlength') && f['password'].touched) {
-            <mat-error>Minimum 8 characters</mat-error>
+            <mat-error>Минимум 8 знаци</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Confirm Password</mat-label>
+          <mat-label>Потврди лозинка</mat-label>
           <input matInput type="password" formControlName="confirmPassword"
                  autocomplete="new-password">
           <mat-icon matSuffix>lock</mat-icon>
         </mat-form-field>
         @if (form.hasError('passwordMismatch') && f['confirmPassword'].touched) {
-          <p class="field-error">Passwords do not match</p>
+          <p class="field-error">Лозинките не се совпаѓаат</p>
         }
 
         @if (errorMessage && !f['email'].hasError('serverError')) {
@@ -111,13 +88,13 @@
           @if (loading) {
             <mat-spinner diameter="20"></mat-spinner>
           } @else {
-            Register
+            Регистрирај се
           }
         </button>
 
         <div class="auth-links">
-          <span>Already have an account?</span>
-          <a routerLink="/auth/login">Sign in</a>
+          <span>Веќе имате сметка?</span>
+          <a routerLink="/auth/login">Пријави се</a>
         </div>
 
       </form>

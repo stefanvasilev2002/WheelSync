@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api.model';
-import { UserResponse, UserUpdateRequest } from '../models/user.model';
+import { UserResponse, UserUpdateRequest, CreateUserRequest } from '../models/user.model';
 import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
@@ -12,6 +12,12 @@ export class UserManagementService {
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
   private readonly baseUrl = `${environment.apiUrl}/users`;
+
+  create(request: CreateUserRequest): Observable<UserResponse> {
+    return this.http.post<ApiResponse<UserResponse>>(this.baseUrl, request).pipe(
+      map(res => res.data)
+    );
+  }
 
   getAll(): Observable<UserResponse[]> {
     return this.http.get<ApiResponse<UserResponse[]>>(this.baseUrl).pipe(
@@ -26,16 +32,6 @@ export class UserManagementService {
         u.role === 'DRIVER' &&
         u.isActive &&
         (companyId === null || u.companyId === companyId)
-      ))
-    );
-  }
-
-  getUnassignedFleetManagers(): Observable<UserResponse[]> {
-    return this.getAll().pipe(
-      map(users => users.filter(u =>
-        u.role === 'FLEET_MANAGER' &&
-        u.isActive &&
-        u.companyId === null
       ))
     );
   }

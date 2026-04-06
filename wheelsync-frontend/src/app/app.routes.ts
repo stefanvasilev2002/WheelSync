@@ -82,11 +82,6 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/mileage/mileage-form/mileage-form.component').then(m => m.MileageFormComponent)
       },
-      {
-        path: 'mileage/:id/edit',
-        loadComponent: () =>
-          import('./features/mileage/mileage-form/mileage-form.component').then(m => m.MileageFormComponent)
-      },
 
       // Fuel
       {
@@ -190,6 +185,12 @@ export const routes: Routes = [
         path: 'admin/users',
         loadComponent: () =>
           import('./features/admin/users/user-list/user-list.component').then(m => m.UserListComponent)
+      },
+      {
+        path: 'admin/users/new',
+        data: { createMode: true },
+        loadComponent: () =>
+          import('./features/admin/users/user-edit/user-edit.component').then(m => m.UserEditComponent)
       },
       {
         path: 'admin/users/:id/edit',

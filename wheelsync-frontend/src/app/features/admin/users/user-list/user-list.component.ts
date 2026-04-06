@@ -17,9 +17,9 @@ import { UserResponse } from '../../../../core/models/user.model';
 import { Role } from '../../../../core/models/auth.model';
 
 export const ROLE_LABELS: Record<Role, string> = {
-  ADMIN:         'Administrator',
-  FLEET_MANAGER: 'Manager',
-  DRIVER:        'Driver'
+  ADMIN:         'Администратор',
+  FLEET_MANAGER: 'Менаџер',
+  DRIVER:        'Возач'
 };
 
 @Component({
@@ -78,7 +78,7 @@ export class UserListComponent implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Error loading users', 'Close', { duration: 3000 });
+        this.snackBar.open('Грешка при вчитување на корисници', 'Затвори', { duration: 3000 });
       }
     });
   }
@@ -87,25 +87,29 @@ export class UserListComponent implements OnInit {
     this.searchQuery.set(value);
   }
 
+  createUser(): void {
+    this.router.navigate(['/admin/users/new']);
+  }
+
   editUser(id: number): void {
     this.router.navigate(['/admin/users', id, 'edit']);
   }
 
   deactivateUser(user: UserResponse): void {
-    const action = user.isActive ? 'deactivate' : 'activate';
+    const action = user.isActive ? 'деактивирате' : 'активирате';
     const confirmed = window.confirm(
-      `Are you sure you want to ${action} the user "${user.firstName} ${user.lastName}"?`
+      `Дали сте сигурни дека сакате да го ${action} корисникот "${user.firstName} ${user.lastName}"?`
     );
     if (!confirmed) return;
 
     this.userService.deactivate(user.id).subscribe({
       next: () => {
-        this.snackBar.open('User status updated', 'Close', { duration: 3000 });
+        this.snackBar.open('Статусот на корисникот е ажуриран', 'Затвори', { duration: 3000 });
         this.loadUsers();
       },
       error: (err) => {
-        const msg = err?.error?.message || 'Error updating user';
-        this.snackBar.open(msg, 'Close', { duration: 4000 });
+        const msg = err?.error?.message || 'Грешка при ажурирање на корисник';
+        this.snackBar.open(msg, 'Затвори', { duration: 4000 });
       }
     });
   }

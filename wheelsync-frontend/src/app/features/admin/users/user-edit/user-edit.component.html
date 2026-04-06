@@ -1,15 +1,15 @@
 <div class="page-container">
   <div class="page-header">
     <div class="header-left">
-      <mat-icon class="header-icon">person</mat-icon>
+      <mat-icon class="header-icon">{{ isCreateMode() ? 'person_add' : 'person' }}</mat-icon>
       <div>
-        <h1 class="page-title">Edit User</h1>
-        <p class="page-subtitle">Update user details</p>
+        <h1 class="page-title">{{ isCreateMode() ? 'Креирај корисник' : 'Уреди корисник' }}</h1>
+        <p class="page-subtitle">{{ isCreateMode() ? 'Додај нов корисник во системот' : 'Ажурирај детали за корисник' }}</p>
       </div>
     </div>
     <a mat-button routerLink="/admin/users">
       <mat-icon>arrow_back</mat-icon>
-      Back
+      Назад
     </a>
   </div>
 
@@ -22,16 +22,16 @@
       <mat-card class="form-card">
         <mat-card-header>
           <mat-icon mat-card-avatar>manage_accounts</mat-icon>
-          <mat-card-title>Personal Details</mat-card-title>
+          <mat-card-title>Лични детали</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <div class="form-grid">
 
             <!-- First name -->
             <mat-form-field appearance="outline">
-              <mat-label>First Name *</mat-label>
+              <mat-label>Ime *</mat-label>
               <mat-icon matPrefix>person</mat-icon>
-              <input matInput formControlName="firstName" placeholder="Enter first name...">
+              <input matInput formControlName="firstName" placeholder="Внесете ime...">
               @if (getFieldError('firstName')) {
                 <mat-error>{{ getFieldError('firstName') }}</mat-error>
               }
@@ -39,54 +39,84 @@
 
             <!-- Last name -->
             <mat-form-field appearance="outline">
-              <mat-label>Last Name *</mat-label>
+              <mat-label>Презиме *</mat-label>
               <mat-icon matPrefix>person</mat-icon>
-              <input matInput formControlName="lastName" placeholder="Enter last name...">
+              <input matInput formControlName="lastName" placeholder="Внесете презиме...">
               @if (getFieldError('lastName')) {
                 <mat-error>{{ getFieldError('lastName') }}</mat-error>
               }
             </mat-form-field>
 
+            <!-- Email (create mode only) -->
+            @if (isCreateMode()) {
+              <mat-form-field appearance="outline">
+                <mat-label>Е-пошта *</mat-label>
+                <mat-icon matPrefix>email</mat-icon>
+                <input matInput type="email" formControlName="email" placeholder="example@email.com">
+                @if (getFieldError('email')) {
+                  <mat-error>{{ getFieldError('email') }}</mat-error>
+                }
+              </mat-form-field>
+            }
+
             <!-- Phone -->
             <mat-form-field appearance="outline">
-              <mat-label>Phone</mat-label>
+              <mat-label>Телефон</mat-label>
               <mat-icon matPrefix>phone</mat-icon>
               <input matInput formControlName="phone" placeholder="+389 ...">
             </mat-form-field>
 
-            <!-- Role -->
-            <mat-form-field appearance="outline">
-              <mat-label>Role *</mat-label>
-              <mat-icon matPrefix>badge</mat-icon>
-              <mat-select formControlName="role">
-                @for (r of roles; track r.value) {
-                  <mat-option [value]="r.value">{{ r.label }}</mat-option>
+            <!-- Role (Admin sees dropdown; FM creates DRIVER only) -->
+            @if (isAdmin()) {
+              <mat-form-field appearance="outline">
+                <mat-label>Улога *</mat-label>
+                <mat-icon matPrefix>badge</mat-icon>
+                <mat-select formControlName="role">
+                  @for (r of roles; track r.value) {
+                    <mat-option [value]="r.value">{{ r.label }}</mat-option>
+                  }
+                </mat-select>
+                @if (getFieldError('role')) {
+                  <mat-error>{{ getFieldError('role') }}</mat-error>
                 }
-              </mat-select>
-              @if (getFieldError('role')) {
-                <mat-error>{{ getFieldError('role') }}</mat-error>
-              }
-            </mat-form-field>
+              </mat-form-field>
+            }
 
-            <!-- Company -->
-            <mat-form-field appearance="outline">
-              <mat-label>Company</mat-label>
-              <mat-icon matPrefix>business</mat-icon>
-              <mat-select formControlName="companyId">
-                <mat-option [value]="null">— No company —</mat-option>
-                @for (c of companies(); track c.id) {
-                  <mat-option [value]="c.id">{{ c.name }}</mat-option>
+            <!-- Company (Admin only) -->
+            @if (isAdmin()) {
+              <mat-form-field appearance="outline">
+                <mat-label>Компанија</mat-label>
+                <mat-icon matPrefix>business</mat-icon>
+                <mat-select formControlName="companyId">
+                  <mat-option [value]="null">— Без компанија —</mat-option>
+                  @for (c of companies(); track c.id) {
+                    <mat-option [value]="c.id">{{ c.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            }
+
+            <!-- Password (create mode only) -->
+            @if (isCreateMode()) {
+              <mat-form-field appearance="outline">
+                <mat-label>Лозинка *</mat-label>
+                <mat-icon matPrefix>lock</mat-icon>
+                <input matInput type="password" formControlName="password" placeholder="Минимум 8 знаци">
+                @if (getFieldError('password')) {
+                  <mat-error>{{ getFieldError('password') }}</mat-error>
                 }
-              </mat-select>
-            </mat-form-field>
+              </mat-form-field>
+            }
 
-            <!-- Active toggle -->
-            <div class="toggle-field">
-              <label class="toggle-label">User Status</label>
-              <mat-slide-toggle formControlName="isActive" color="primary">
-                {{ form.get('isActive')?.value ? 'Active' : 'Inactive' }}
-              </mat-slide-toggle>
-            </div>
+            <!-- Active toggle (edit mode only) -->
+            @if (!isCreateMode()) {
+              <div class="toggle-field">
+                <label class="toggle-label">Статус на корисник</label>
+                <mat-slide-toggle formControlName="isActive" color="primary">
+                  {{ form.get('isActive')?.value ? 'Активен' : 'Неактивен' }}
+                </mat-slide-toggle>
+              </div>
+            }
 
           </div>
         </mat-card-content>
@@ -95,15 +125,15 @@
       <div class="form-actions">
         <button mat-stroked-button type="button" routerLink="/admin/users">
           <mat-icon>close</mat-icon>
-          Cancel
+          Откажи
         </button>
         <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
           @if (saving()) {
             <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
           } @else {
-            <mat-icon>save</mat-icon>
+            <mat-icon>{{ isCreateMode() ? 'person_add' : 'save' }}</mat-icon>
           }
-          Save Changes
+          {{ isCreateMode() ? 'Креирај корисник' : 'Зачувај промени' }}
         </button>
       </div>
     </form>

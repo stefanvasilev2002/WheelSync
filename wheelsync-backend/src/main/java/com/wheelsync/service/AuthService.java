@@ -39,13 +39,9 @@ public class AuthService {
             throw new EmailAlreadyExistsException(request.getEmail());
         }
 
-        Role role = request.getRole() != null ? request.getRole() : Role.DRIVER;
-
+        // Public registration is always an unassigned DRIVER
+        Role role = Role.DRIVER;
         Company company = null;
-        if (request.getCompanyId() != null) {
-            company = companyRepository.findById(request.getCompanyId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Company", request.getCompanyId()));
-        }
 
         User user = User.builder()
                 .firstName(request.getFirstName())
