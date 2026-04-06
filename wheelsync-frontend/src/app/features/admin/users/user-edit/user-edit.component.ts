@@ -56,8 +56,8 @@ export class UserEditComponent implements OnInit {
 
   // Admin can create FM or DRIVER; FM can only create DRIVER
   readonly roles: { value: Role; label: string }[] = [
-    { value: 'FLEET_MANAGER', label: 'Менаџер на флота' },
-    { value: 'DRIVER',        label: 'Возач' }
+    { value: 'FLEET_MANAGER', label: 'Fleet Manager' },
+    { value: 'DRIVER',        label: 'Driver' }
   ];
 
   form = this.fb.group({
@@ -99,7 +99,7 @@ export class UserEditComponent implements OnInit {
     if (this.isAdmin()) {
       this.companyService.getAll().subscribe({
         next: (companies) => this.companies.set(companies),
-        error: () => this.snackBar.open('Грешка при вчитување компании', 'Затвори', { duration: 3000 })
+        error: () => this.snackBar.open('Error loading companies', 'Close', { duration: 3000 })
       });
     }
   }
@@ -120,7 +120,7 @@ export class UserEditComponent implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Грешка при вчитување корисник', 'Затвори', { duration: 3000 });
+        this.snackBar.open('Error loading user', 'Close', { duration: 3000 });
         this.router.navigate(['/admin/users']);
       }
     });
@@ -147,13 +147,13 @@ export class UserEditComponent implements OnInit {
       }).subscribe({
         next: () => {
           this.saving.set(false);
-          this.snackBar.open('Корисникот е успешно креиран', 'Затвори', { duration: 3000 });
+          this.snackBar.open('User created successfully', 'Close', { duration: 3000 });
           this.router.navigate(['/admin/users']);
         },
         error: (err) => {
           this.saving.set(false);
-          const msg = err?.error?.message || 'Грешка при креирање корисник';
-          this.snackBar.open(msg, 'Затвори', { duration: 4000 });
+          const msg = err?.error?.message || 'Error creating user';
+          this.snackBar.open(msg, 'Close', { duration: 4000 });
         }
       });
     } else {
@@ -167,13 +167,13 @@ export class UserEditComponent implements OnInit {
       }).subscribe({
         next: () => {
           this.saving.set(false);
-          this.snackBar.open('Корисникот е успешно ажуриран', 'Затвори', { duration: 3000 });
+          this.snackBar.open('User updated successfully', 'Close', { duration: 3000 });
           this.router.navigate(['/admin/users']);
         },
         error: (err) => {
           this.saving.set(false);
-          const msg = err?.error?.message || 'Грешка при зачувување';
-          this.snackBar.open(msg, 'Затвори', { duration: 4000 });
+          const msg = err?.error?.message || 'Error saving changes';
+          this.snackBar.open(msg, 'Close', { duration: 4000 });
         }
       });
     }
@@ -182,9 +182,9 @@ export class UserEditComponent implements OnInit {
   getFieldError(fieldName: string): string {
     const control = this.form.get(fieldName);
     if (!control?.errors || !control.touched) return '';
-    if (control.errors['required']) return 'Задолжително поле';
-    if (control.errors['email']) return 'Невалиден формат на е-пошта';
-    if (control.errors['minlength']) return 'Минимум 8 знаци';
-    return 'Невалидна вредност';
+    if (control.errors['required']) return 'This field is required';
+    if (control.errors['email']) return 'Invalid email format';
+    if (control.errors['minlength']) return 'Minimum 8 characters';
+    return 'Invalid value';
   }
 }

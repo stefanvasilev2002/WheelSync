@@ -70,7 +70,7 @@ export class RegisterComponent {
       next: () => this.router.navigate(['/dashboard']),
       error: (err: HttpErrorResponse) => {
         this.loading = false;
-        this.errorMessage = err.error?.message ?? 'Настана грешка при регистрација';
+        this.errorMessage = err.error?.message ?? 'An error occurred during registration';
         this.fieldErrors = err.error?.fieldErrors ?? {};
         if (err.status === 409) {
           this.form.get('email')?.setErrors({ serverError: this.errorMessage });
