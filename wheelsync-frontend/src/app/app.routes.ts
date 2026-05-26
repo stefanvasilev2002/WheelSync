@@ -2,6 +2,12 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { noAuthGuard } from './core/guards/no-auth.guard';
 
+// Eagerly imported — must be available offline for drivers in the field
+import { MileageListComponent } from './features/mileage/mileage-list/mileage-list.component';
+import { MileageFormComponent } from './features/mileage/mileage-form/mileage-form.component';
+import { FuelListComponent } from './features/fuel/fuel-list/fuel-list.component';
+import { FuelFormComponent } from './features/fuel/fuel-form/fuel-form.component';
+
 export const routes: Routes = [
   {
     path: 'auth',
@@ -71,29 +77,13 @@ export const routes: Routes = [
           import('./features/vehicles/vehicle-report/vehicle-report.component').then(m => m.VehicleReportComponent)
       },
 
-      // Mileage
-      {
-        path: 'mileage',
-        loadComponent: () =>
-          import('./features/mileage/mileage-list/mileage-list.component').then(m => m.MileageListComponent)
-      },
-      {
-        path: 'mileage/new',
-        loadComponent: () =>
-          import('./features/mileage/mileage-form/mileage-form.component').then(m => m.MileageFormComponent)
-      },
+      // Mileage — eagerly loaded so the form works offline (offline-first feature)
+      { path: 'mileage',     component: MileageListComponent },
+      { path: 'mileage/new', component: MileageFormComponent },
 
-      // Fuel
-      {
-        path: 'fuel',
-        loadComponent: () =>
-          import('./features/fuel/fuel-list/fuel-list.component').then(m => m.FuelListComponent)
-      },
-      {
-        path: 'fuel/new',
-        loadComponent: () =>
-          import('./features/fuel/fuel-form/fuel-form.component').then(m => m.FuelFormComponent)
-      },
+      // Fuel — eagerly loaded so the form works offline (offline-first feature)
+      { path: 'fuel',     component: FuelListComponent },
+      { path: 'fuel/new', component: FuelFormComponent },
 
       // Service Records
       {
