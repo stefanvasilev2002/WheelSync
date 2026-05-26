@@ -51,21 +51,23 @@ export class SyncService implements OnDestroy {
     if (this.syncing()) return;
     this.syncing.set(true);
 
+    let synced = 0;
     try {
-      await this.syncMileage();
-      await this.syncFuel();
+      synced += await this.syncMileage();
+      synced += await this.syncFuel();
       this.refreshPendingCount();
 
-      if (this.pendingCount() === 0) {
-        // All synced — no snackbar noise unless there was something to sync
+      if (synced > 0) {
+        this.showSyncedMessage(synced);
       }
     } finally {
       this.syncing.set(false);
     }
   }
 
-  private async syncMileage(): Promise<void> {
+  private async syncMileage(): Promise<number> {
     const entries = await this.offlineDb.getPendingMileage();
+    let count = 0;
     for (const entry of entries) {
       try {
         await new Promise<void>((resolve, reject) => {
@@ -78,15 +80,18 @@ export class SyncService implements OnDestroy {
             error: reject
           });
         });
+        count++;
       } catch {
         // Stop on first failure — will retry next time we're online
         break;
       }
     }
+    return count;
   }
 
-  private async syncFuel(): Promise<void> {
+  private async syncFuel(): Promise<number> {
     const entries = await this.offlineDb.getPendingFuel();
+    let count = 0;
     for (const entry of entries) {
       try {
         await new Promise<void>((resolve, reject) => {
@@ -99,10 +104,12 @@ export class SyncService implements OnDestroy {
             error: reject
           });
         });
+        count++;
       } catch {
         break;
       }
     }
+    return count;
   }
 
   showOfflineSavedMessage(): void {

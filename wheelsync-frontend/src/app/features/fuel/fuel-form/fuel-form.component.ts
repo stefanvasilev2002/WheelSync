@@ -154,6 +154,9 @@ export class FuelFormComponent implements OnInit {
     // Offline: save to IndexedDB
     if (!navigator.onLine) {
       this.offlineDb.addPendingFuel(request).then(() => {
+        navigator.serviceWorker?.ready.then(reg =>
+          (reg as any).sync?.register('wheelsync-sync').catch(() => {})
+        );
         this.saving.set(false);
         this.syncService.showOfflineSavedMessage();
         this.router.navigate(['/fuel']);
@@ -172,6 +175,9 @@ export class FuelFormComponent implements OnInit {
         // Fall back to offline storage on network error
         if (!navigator.onLine) {
           this.offlineDb.addPendingFuel(request).then(() => {
+            navigator.serviceWorker?.ready.then(reg =>
+              (reg as any).sync?.register('wheelsync-sync').catch(() => {})
+            );
             this.syncService.showOfflineSavedMessage();
             this.router.navigate(['/fuel']);
           });

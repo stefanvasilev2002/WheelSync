@@ -181,6 +181,9 @@ export class MileageFormComponent implements OnInit {
     // Offline: save to IndexedDB (only for new records; edits require connectivity)
     if (!navigator.onLine && !this.isEditMode) {
       this.offlineDb.addPendingMileage(request).then(() => {
+        navigator.serviceWorker?.ready.then(reg =>
+          (reg as any).sync?.register('wheelsync-sync').catch(() => {})
+        );
         this.saving.set(false);
         this.syncService.showOfflineSavedMessage();
         this.router.navigate(['/mileage']);
@@ -204,6 +207,9 @@ export class MileageFormComponent implements OnInit {
         // If network error, fall back to offline storage
         if (!navigator.onLine && !this.isEditMode) {
           this.offlineDb.addPendingMileage(request).then(() => {
+            navigator.serviceWorker?.ready.then(reg =>
+              (reg as any).sync?.register('wheelsync-sync').catch(() => {})
+            );
             this.syncService.showOfflineSavedMessage();
             this.router.navigate(['/mileage']);
           });
