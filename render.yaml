@@ -61,6 +61,15 @@ services:
     buildCommand: cd wheelsync-frontend && npm ci && npm run build
     staticPublishPath: ./wheelsync-frontend/dist/wheelsync-frontend/browser
     pullRequestPreviewsEnabled: false
+    headers:
+      # Correct MIME type so Chrome recognises this as a PWA manifest
+      - path: /manifest.webmanifest
+        name: Content-Type
+        value: application/manifest+json
+      # Service worker must never be cached — browser must always fetch the latest
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
     routes:
       # Angular SPA — all paths fall back to index.html
       - type: rewrite
