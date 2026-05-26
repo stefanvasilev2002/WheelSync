@@ -113,17 +113,40 @@ export class MileageFormComponent implements OnInit {
 
   loadVehicles(): void {
     this.loadingVehicles.set(true);
+
+    // Offline-first: if no connection, serve from IndexedDB immediately
+    if (!navigator.onLine) {
+      this.offlineDb.getCachedVehicles().then(cached => {
+        this.vehicles.set(cached.filter(v => v.isActive));
+        this.loadingVehicles.set(false);
+        if (cached.length === 0) {
+          this.snackBar.open('Offline — no cached vehicles available. Go online first.', 'OK', { duration: 5000 });
+        }
+      });
+      return;
+    }
+
     const obs = this.authService.isDriver()
       ? this.vehicleService.getMyVehicles()
       : this.vehicleService.getAll();
+
     obs.subscribe({
       next: (vehicles) => {
         this.vehicles.set(vehicles.filter(v => v.isActive));
+        this.offlineDb.saveVehicles(vehicles);   // update cache for next offline visit
         this.loadingVehicles.set(false);
       },
       error: () => {
-        this.loadingVehicles.set(false);
-        this.snackBar.open('Error loading vehicles', 'Close', { duration: 3000 });
+        // Network failed even though navigator.onLine was true — try cache as fallback
+        this.offlineDb.getCachedVehicles().then(cached => {
+          if (cached.length > 0) {
+            this.vehicles.set(cached.filter(v => v.isActive));
+            this.snackBar.open('Offline — showing cached vehicles', 'OK', { duration: 3000 });
+          } else {
+            this.snackBar.open('Error loading vehicles', 'Close', { duration: 3000 });
+          }
+          this.loadingVehicles.set(false);
+        });
       }
     });
   }
