@@ -1,7 +1,7 @@
 // WheelSync Service Worker
 // Handles: App Shell caching, offline fallback, Push Notifications
 
-const CACHE_NAME = 'wheelsync-v1';
+const CACHE_NAME = 'wheelsync-v2';
 const APP_SHELL = [
   '/',
   '/manifest.webmanifest',
