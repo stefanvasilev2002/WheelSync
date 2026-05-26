@@ -55,6 +55,17 @@
         </button>
       }
 
+      @if (pushPermission() !== 'granted') {
+        <button mat-icon-button
+                (click)="enablePush()"
+                [matTooltip]="pushPermission() === 'denied'
+                  ? 'Push notifications blocked — enable in browser site settings'
+                  : 'Enable push notifications'"
+                aria-label="Enable push notifications">
+          <mat-icon>notifications_off</mat-icon>
+        </button>
+      }
+
       <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="User menu">
         <mat-icon>account_circle</mat-icon>
       </button>

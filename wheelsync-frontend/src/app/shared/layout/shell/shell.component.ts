@@ -15,6 +15,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth.service';
 import { StatsService } from '../../../core/services/stats.service';
+import { PushNotificationService } from '../../../core/services/push-notification.service';
 
 interface NavItem {
   label: string;
@@ -38,9 +39,22 @@ interface NavItem {
 export class ShellComponent implements OnInit {
 
   private readonly statsService = inject(StatsService);
+  private readonly pushService = inject(PushNotificationService);
 
   notificationCount = signal(0);
   notificationTooltip = signal('');
+
+  /** 'granted' | 'denied' | 'default' — re-checked on every interaction */
+  pushPermission = signal<NotificationPermission>(
+    ('Notification' in window) ? Notification.permission : 'denied'
+  );
+
+  async enablePush(): Promise<void> {
+    await this.pushService.requestAndSubscribe();
+    if ('Notification' in window) {
+      this.pushPermission.set(Notification.permission);
+    }
+  }
 
   private isMobile = toSignal(
     this.breakpointObserver.observe(Breakpoints.Handset).pipe(

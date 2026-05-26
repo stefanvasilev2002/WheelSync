@@ -81,6 +81,11 @@ self.addEventListener('push', (event) => {
     ]
   };
 
+  if (Notification.permission !== 'granted') {
+    console.warn('[WheelSync SW] Push received but notification permission not granted — skipping.');
+    return;
+  }
+
   event.waitUntil(self.registration.showNotification(data.title, options));
 });
 
