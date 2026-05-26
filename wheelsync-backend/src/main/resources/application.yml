@@ -28,8 +28,8 @@ server:
 
 # VAPID keys for Web Push notifications.
 # Generate new keys with: npx web-push generate-vapid-keys
-# Replace these placeholders before deploying to production.
+# Keys must be supplied via environment variables — no hardcoded defaults.
 vapid:
-  public-key: ${VAPID_PUBLIC_KEY:BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U}
-  private-key: ${VAPID_PRIVATE_KEY:uzEXNZnLAzT58xhsM_5HSHSiTHKDsrVj_p0sIcKF8_I}
+  public-key: ${VAPID_PUBLIC_KEY}
+  private-key: ${VAPID_PRIVATE_KEY}
   subject: ${VAPID_SUBJECT:mailto:admin@wheelsync.mk}
