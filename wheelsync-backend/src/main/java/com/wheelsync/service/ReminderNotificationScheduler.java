@@ -22,6 +22,7 @@ public class ReminderNotificationScheduler {
     private final MaintenanceReminderRepository reminderRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final PushNotificationService pushNotificationService;
 
     /**
      * FR-9.4 — Run every day at 08:00 and send email notifications to Fleet Managers
@@ -45,18 +46,29 @@ public class ReminderNotificationScheduler {
                     : null;
             if (companyId == null) continue;
 
-            // Notify all active Fleet Managers of this company
+            String vehicleName = reminder.getVehicle().getDisplayName();
+            String serviceType = reminder.getServiceType().name();
+
+            // Notify all active Fleet Managers of this company (email + push)
             List<User> managers = userRepository.findByCompanyIdAndRole(companyId, Role.FLEET_MANAGER);
             for (User manager : managers) {
                 if (Boolean.TRUE.equals(manager.getIsActive())) {
                     emailService.sendMaintenanceReminderEmail(
                             manager.getEmail(),
                             manager.getFullName(),
-                            reminder.getVehicle().getDisplayName(),
-                            reminder.getServiceType().name()
+                            vehicleName,
+                            serviceType
                     );
                 }
             }
+
+            // Push notification to all subscribed managers of the company
+            pushNotificationService.sendToCompanyManagers(
+                    companyId,
+                    "Потсетник за одржување — " + vehicleName,
+                    "Претстои " + serviceType + " за " + vehicleName,
+                    "/reminders"
+            );
         }
 
         log.info("Reminder notification job completed: {} due reminders checked", candidates.size());

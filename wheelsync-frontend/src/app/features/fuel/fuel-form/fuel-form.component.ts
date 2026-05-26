@@ -15,6 +15,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FuelService } from '../../../core/services/fuel.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { SyncService } from '../../../core/services/sync.service';
+import { OfflineDbService } from '../../../core/services/offline-db.service';
 import { VehicleResponse, FUEL_TYPE_LABELS } from '../../../core/models/vehicle.model';
 import { FuelType } from '../../../core/models/vehicle.model';
 
@@ -44,8 +46,12 @@ export class FuelFormComponent implements OnInit {
   private readonly fuelService = inject(FuelService);
   private readonly vehicleService = inject(VehicleService);
   private readonly authService = inject(AuthService);
+  private readonly syncService = inject(SyncService);
+  private readonly offlineDb = inject(OfflineDbService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+
+  readonly isOnline = this.syncService.isOnline;
 
   vehicles = signal<VehicleResponse[]>([]);
   loadingVehicles = signal(false);
@@ -110,8 +116,7 @@ export class FuelFormComponent implements OnInit {
     const date   = value.date as Date;
     const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-    this.saving.set(true);
-    this.fuelService.create({
+    const request = {
       vehicleId:       value.vehicleId!,
       date:            dateStr,
       fuelType:        value.fuelType!,
@@ -119,7 +124,21 @@ export class FuelFormComponent implements OnInit {
       pricePerLiter:   value.pricePerLiter!,
       mileageAtRefuel: value.mileageAtRefuel!,
       location:        value.location || undefined
-    }).subscribe({
+    };
+
+    this.saving.set(true);
+
+    // Offline: save to IndexedDB
+    if (!navigator.onLine) {
+      this.offlineDb.addPendingFuel(request).then(() => {
+        this.saving.set(false);
+        this.syncService.showOfflineSavedMessage();
+        this.router.navigate(['/fuel']);
+      });
+      return;
+    }
+
+    this.fuelService.create(request).subscribe({
       next: () => {
         this.saving.set(false);
         this.snackBar.open('Record saved successfully', 'Close', { duration: 3000 });
@@ -127,8 +146,16 @@ export class FuelFormComponent implements OnInit {
       },
       error: (err) => {
         this.saving.set(false);
-        const msg = err?.error?.message || 'Error saving record';
-        this.snackBar.open(msg, 'Close', { duration: 4000 });
+        // Fall back to offline storage on network error
+        if (!navigator.onLine) {
+          this.offlineDb.addPendingFuel(request).then(() => {
+            this.syncService.showOfflineSavedMessage();
+            this.router.navigate(['/fuel']);
+          });
+        } else {
+          const msg = err?.error?.message || 'Error saving record';
+          this.snackBar.open(msg, 'Close', { duration: 4000 });
+        }
       }
     });
   }

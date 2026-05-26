@@ -15,6 +15,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MileageService } from '../../../core/services/mileage.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { SyncService } from '../../../core/services/sync.service';
+import { OfflineDbService } from '../../../core/services/offline-db.service';
 import { VehicleResponse } from '../../../core/models/vehicle.model';
 
 @Component({
@@ -43,9 +45,13 @@ export class MileageFormComponent implements OnInit {
   private readonly mileageService = inject(MileageService);
   private readonly vehicleService = inject(VehicleService);
   private readonly authService = inject(AuthService);
+  private readonly syncService = inject(SyncService);
+  private readonly offlineDb = inject(OfflineDbService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
+
+  readonly isOnline = this.syncService.isOnline;
 
   vehicles = signal<VehicleResponse[]>([]);
   loadingVehicles = signal(false);
@@ -148,6 +154,17 @@ export class MileageFormComponent implements OnInit {
     };
 
     this.saving.set(true);
+
+    // Offline: save to IndexedDB (only for new records; edits require connectivity)
+    if (!navigator.onLine && !this.isEditMode) {
+      this.offlineDb.addPendingMileage(request).then(() => {
+        this.saving.set(false);
+        this.syncService.showOfflineSavedMessage();
+        this.router.navigate(['/mileage']);
+      });
+      return;
+    }
+
     const operation = this.isEditMode
       ? this.mileageService.update(this.editId()!, request)
       : this.mileageService.create(request);
@@ -161,8 +178,16 @@ export class MileageFormComponent implements OnInit {
       },
       error: (err) => {
         this.saving.set(false);
-        const msg = err?.error?.message || 'Error saving record';
-        this.snackBar.open(msg, 'Close', { duration: 4000 });
+        // If network error, fall back to offline storage
+        if (!navigator.onLine && !this.isEditMode) {
+          this.offlineDb.addPendingMileage(request).then(() => {
+            this.syncService.showOfflineSavedMessage();
+            this.router.navigate(['/mileage']);
+          });
+        } else {
+          const msg = err?.error?.message || 'Error saving record';
+          this.snackBar.open(msg, 'Close', { duration: 4000 });
+        }
       }
     });
   }

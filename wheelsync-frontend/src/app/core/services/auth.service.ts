@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { TokenService } from './token.service';
+import { PushNotificationService } from './push-notification.service';
 import {
   LoginRequest, RegisterRequest, ForgotPasswordRequest,
   ResetPasswordRequest, AuthResponse, Role
@@ -27,7 +28,8 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private tokenService: TokenService,
-    private router: Router
+    private router: Router,
+    private pushService: PushNotificationService
   ) {}
 
   login(request: LoginRequest): Observable<ApiResponse<AuthResponse>> {
@@ -51,6 +53,7 @@ export class AuthService {
   }
 
   logout(): void {
+    this.pushService.unsubscribe();
     this.tokenService.clear();
     this._currentUser.set(null);
     this.router.navigate(['/auth/login']);
@@ -69,5 +72,7 @@ export class AuthService {
     this.tokenService.saveToken(data.token);
     this.tokenService.saveUser(data);
     this._currentUser.set(data);
+    // Request push permission and register subscription after login
+    this.pushService.requestAndSubscribe();
   }
 }

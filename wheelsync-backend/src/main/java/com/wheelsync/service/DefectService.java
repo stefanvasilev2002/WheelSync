@@ -39,6 +39,7 @@ public class DefectService {
     private final ServiceRecordRepository serviceRecordRepository;
     private final Path fileStorageLocation;
     private final EmailService emailService;
+    private final PushNotificationService pushNotificationService;
 
     @Transactional(readOnly = true)
     public List<DefectResponse> getByCompany(UserPrincipal principal) {
@@ -128,14 +129,23 @@ public class DefectService {
 
         defect = defectRepository.save(defect);
 
-        // Send email notification if status changed
+        // Send email + push notification if status changed
         if (!previousStatus.equals(req.getStatus())) {
             String reporterEmail = defect.getReportedBy().getEmail();
             String reporterName = defect.getReportedBy().getFullName();
             String vehicleDisplay = defect.getVehicle().getDisplayName();
+            String newStatusLabel = req.getStatus().name().replace('_', ' ');
+
             emailService.sendDefectStatusUpdateEmail(
                     reporterEmail, reporterName, vehicleDisplay,
-                    defect.getTitle(), req.getStatus().name().replace('_', ' '));
+                    defect.getTitle(), newStatusLabel);
+
+            pushNotificationService.sendToUser(
+                    defect.getReportedBy().getId(),
+                    "Статус на дефект сменет — " + vehicleDisplay,
+                    "\"" + defect.getTitle() + "\" е сега: " + newStatusLabel,
+                    "/defects"
+            );
         }
 
         return toResponse(defect);
